@@ -39,6 +39,9 @@ define( 'QW_FORM_PREFIX', "qw-query-options" );
 // settings object
 include_once QW_PLUGIN_DIR . '/includes/class-qw-settings.php';
 
+// form helper
+include_once QW_PLUGIN_DIR . '/includes/class-qw-form-fields.php';
+
 // Query Widget
 include_once QW_PLUGIN_DIR . '/widget.query.php';
 
