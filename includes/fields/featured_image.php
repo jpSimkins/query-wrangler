@@ -8,8 +8,8 @@ add_filter( 'qw_fields', 'qw_field_featured_image' );
 function qw_field_featured_image( $fields ) {
 
 	$fields['featured_image'] = array(
-		'title'            => 'Featured Image',
-		'description'      => 'The "post_thumbnail" of a given row.',
+		'title'            => __( 'Featured Image' ),
+		'description'      => __( 'The "post_thumbnail" of a given row.' ),
 		'output_callback'  => 'qw_theme_featured_image',
 		'output_arguments' => TRUE,
 		'form_callback'    => 'qw_field_featured_image_form',

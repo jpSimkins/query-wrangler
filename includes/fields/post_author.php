@@ -11,8 +11,8 @@ add_filter( 'qw_fields', 'qw_field_author' );
 function qw_field_author( $fields ) {
 
 	$fields['post_author'] = array(
-		'title'            => 'Post Author',
-		'description'      => 'Information relating to the author of a post.',
+		'title'            => __( 'Post Author' ),
+		'description'      => __( 'Information relating to the author of a post.' ),
 		'form_callback'    => 'qw_field_author_form',
 		'output_callback'  => 'qw_get_the_author',
 		'output_arguments' => TRUE,

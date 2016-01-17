@@ -12,8 +12,8 @@ add_filter( 'qw_fields', 'qw_field_author_avatar' );
 function qw_field_author_avatar( $fields ) {
 
 	$fields['post_author_avatar'] = array(
-		'title'            => 'Post Author Avatar',
-		'description'      => 'Avatar for the author of a post.',
+		'title'            => __( 'Post Author Avatar' ),
+		'description'      => __( 'Avatar for the author of a post.' ),
 		'form_callback'    => 'qw_field_author_avatar_form',
 		'output_callback'  => 'qw_get_avatar',
 		'output_arguments' => TRUE,

@@ -29,58 +29,58 @@ add_filter( 'qw_fields', 'qw_default_fields' );
  */
 function qw_default_fields( $fields ) {
 	$fields['ID']            = array(
-		'title'       => 'Post ID',
-		'description' => 'The post ID.',
+		'title'       => __( 'Post ID' ),
+		'description' => __( 'The post ID.' ),
 	);
 	$fields['post_title']    = array(
-		'title'           => 'Post Title',
-		'description'     => 'The title of a post.',
+		'title'           => __( 'Post Title' ),
+		'description'     => __( 'The title of a post.' ),
 		'output_callback' => 'get_the_title',
 	);
 	$fields['post_content']  = array(
-		'title'           => 'Post Content',
-		'description'     => 'The full content body of a post.',
+		'title'           => __( 'Post Content' ),
+		'description'     => __( 'The full content body of a post.' ),
 		'output_callback' => 'get_the_content',
 		'content_options' => TRUE,
 	);
 	$fields['post_excerpt']  = array(
-		'title'           => 'Post Excerpt',
-		'description'     => 'The excerpt of a post.',
+		'title'           => __( 'Post Excerpt' ),
+		'description'     => __( 'The excerpt of a post.' ),
 		'output_callback' => 'get_the_excerpt',
 		'content_options' => TRUE,
 	);
 	$fields['post_date']     = array(
-		'title'           => 'Post Date',
-		'description'     => 'Published date of a post.',
+		'title'           => __( 'Post Date' ),
+		'description'     => __( 'Published date of a post.' ),
 		'output_callback' => 'get_the_date',
 	);
 	$fields['post_status']   = array(
-		'title'       => 'Post Status',
-		'description' => 'Status of a post.',
+		'title'       => __( 'Post Status' ),
+		'description' => __( 'Status of a post.' ),
 	);
 	$fields['post_parent']   = array(
-		'title'       => 'Post Parent',
-		'description' => 'Parent page ID for a page.',
+		'title'       => __( 'Post Parent' ),
+		'description' => __( 'Parent page ID for a page.' ),
 	);
 	$fields['post_modified'] = array(
-		'title'       => 'Post Modified',
-		'description' => 'Last date a post was modified.',
+		'title'       => __( 'Post Modified' ),
+		'description' => __( 'Last date a post was modified.' ),
 	);
 	$fields['guid']          = array(
-		'title'       => 'GUID',
-		'description' => 'Global Unique ID for a post (url).',
+		'title'       => __( 'GUID' ),
+		'description' => __( 'Global Unique ID for a post (url).' ),
 	);
 	$fields['post_type']     = array(
-		'title'       => 'Post Type',
-		'description' => 'The type of a post.',
+		'title'       => __( 'Post Type' ),
+		'description' => __( 'The type of a post.' ),
 	);
 	$fields['comment_count'] = array(
-		'title'       => 'Comment Count',
-		'description' => 'Number of comments for a post.',
+		'title'       => __( 'Comment Count' ),
+		'description' => __( 'Number of comments for a post.' ),
 	);
 	$fields['permalink']     = array(
-		'title'           => 'Permalink',
-		'description'     => 'Pretty URL for a post.',
+		'title'           => __( 'Permalink' ),
+		'description'     => __( 'Pretty URL for a post.' ),
 		'output_callback' => 'get_permalink',
 	);
 

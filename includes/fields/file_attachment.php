@@ -13,8 +13,8 @@ add_filter( 'qw_file_styles', 'qw_default_file_styles', 0 );
 function qw_field_file_attachment( $fields ) {
 
 	$fields['file_attachment'] = array(
-		'title'            => 'File Attachment',
-		'description'      => 'Files that are attached to a post.',
+		'title'            => __( 'File Attachment' ),
+		'description'      => __( 'Files that are attached to a post.' ),
 		'output_callback'  => 'qw_theme_file',
 		'output_arguments' => TRUE,
 		'form_callback'    => 'qw_field_file_attachment_form',
@@ -30,15 +30,15 @@ function qw_field_file_attachment( $fields ) {
  */
 function qw_default_file_styles( $file_styles ) {
 	$file_styles['link']     = array(
-		'description' => 'Filename Link to File',
+		'description' => __( 'Filename Link to File' ),
 		//'callback' => 'qw_theme_file',
 	);
 	$file_styles['link_url'] = array(
-		'description' => 'URL Link to File',
+		'description' => __( 'URL Link to File' ),
 		//'callback' => 'qw_theme_file',
 	);
 	$file_styles['url']      = array(
-		'description' => 'URL of File',
+		'description' => __( 'URL of File' ),
 		//'callback' => 'qw_theme_file',
 	);
 

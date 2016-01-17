@@ -11,8 +11,8 @@ add_filter( 'qw_fields', 'qw_field_image_attachment' );
 function qw_field_image_attachment( $fields ) {
 
 	$fields['image_attachment'] = array(
-		'title'            => 'Image Attachment',
-		'description'      => 'Image files that are attached to a post.',
+		'title'            => __( 'Image Attachment' ),
+		'description'      => __( 'Image files that are attached to a post.' ),
 		'output_callback'  => 'qw_theme_image',
 		'output_arguments' => TRUE,
 		'form_callback'    => 'qw_field_image_attachment_form',

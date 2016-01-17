@@ -6,9 +6,7 @@ $form = new QW_Form_Fields( array(
 
 ?>
 <div id="qw-field-<?php print $field['name']; ?>" class="qw-field qw-sortable-item qw-item-form">
-	<div class="qw-remove button">
-		Remove
-	</div>
+	<div class="qw-remove button"> Remove </div>
 	<div class="qw-weight-container">
 		<?php
 		print $form->render_field( array(

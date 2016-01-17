@@ -11,13 +11,13 @@ add_filter( 'qw_fields', 'qw_field_meta_value_new' );
  */
 function qw_field_meta_value_new( $fields ) {
 	$fields['custom_field'] = array(
-		'title'            => 'Custom Field',
-		'description'      => 'Select a custom field (meta value)',
+		'title'            => __( 'Custom Field' ),
+		'description'      => __( 'Select a custom field (meta value)' ),
 		'output_callback'  => 'qw_display_post_meta_value_new',
 		'output_arguments' => TRUE,
 		'form_callback'    => 'qw_meta_value_new_form_callback',
 		'content_options'  => TRUE,
-		// need to dynamicall fix this on the the form and during output
+		// need to dynamically fix this on the the form and during output
 		'meta_key'         => '',
 	);
 
@@ -134,8 +134,7 @@ function qw_display_post_meta_value_new( $post, $field ) {
 		$field['meta_key'] = substr( $field['type'], 5 );
 	}
 
-	$display_handlers    = apply_filters( 'qw_meta_value_display_handlers',
-		array() );
+	$display_handlers    = apply_filters( 'qw_meta_value_display_handlers', array() );
 	$display_handler_key = isset( $field['display_handler'] ) ? $field['display_handler'] : 'none';
 	$handler             = isset( $display_handlers[ $display_handler_key ] ) ? $display_handlers[ $display_handler_key ] : $display_handlers['none'];
 

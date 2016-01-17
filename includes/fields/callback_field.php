@@ -11,8 +11,8 @@ add_filter( 'qw_fields', 'qw_callback_field' );
 function qw_callback_field( $fields ) {
 
 	$fields['callback_field'] = array(
-		'title'            => 'Callback',
-		'description'      => 'Arbitrarily execute a function.',
+		'title'            => __( 'Callback' ),
+		'description'      => __( 'Arbitrarily execute a function.' ),
 		'form_callback'    => 'qw_callback_field_form',
 		'output_callback'  => 'qw_execute_the_callback',
 		'output_arguments' => TRUE,
