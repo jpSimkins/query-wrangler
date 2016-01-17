@@ -1,19 +1,42 @@
-<form method="POST"
-      action="admin.php?page=query-wrangler&action=import&noheader=true">
-	<div class="qw-setting">
-		<label class="qw-label">Query Name:</label>
-		<input type="text" id="import-name" name="import-name" value=""/>
+<?php
+$form = new QW_Form_Fields( array(
+	'action' => admin_url('admin.php') . '?page=query-wrangler&action=import&noheader=true',
+	'form_field_prefix' => 'qw-import',
+) );
 
-		<p class="description">Enter the name to use for this query if it is
-			different from the source query. Leave blank to use the name of the
-			query.</p>
-	</div>
+print $form->open();
 
-	<strong>Paste query code here:</strong><br/>
-	<textarea name="import-query" id="import-query"></textarea>
+print $form->render_field( array(
+		'type' => 'text',
+		'name' => 'name',
+		'id' => 'name',
+		'title' => __( 'Query Name' ),
+		'description' => __( 'Enter the name to use for this query if it is different from the source query. Leave blank to use the name of the query.' ),
+		'value' => '',
+) );
+print $form->render_field( array(
+		'type' => 'textarea',
+		'name' => 'query',
+		'id' => 'query',
+		'title' => __( 'Query Code' ),
+		'description' => __( 'Paste query code here.' ),
+		'value' => '',
+		'class' => array( 'qw-textarea' ),
+) );
 
-	<div>
-		<input type="hidden" name="action" value="import"/>
-		<input type="submit" class="button-primary" value="Import"/>
-	</div>
-</form>
+print $form->render_field( array(
+		'type' => 'hidden',
+		'name' => 'action',
+		'value' => 'import',
+) );
+
+print $form->render_field( array(
+		'type' => 'submit',
+		'name' => 'import-submit',
+		'value' => __( 'Import' ),
+		'class' => array( 'button-primary' )
+) );
+
+print $form->close();
+
+

@@ -199,19 +199,22 @@ function qw_query_export( $query_id ) {
 	return "\$query = " . $export . ";";
 }
 
-/*
+/**
  * Import a query into the database
  *
+ * @param $post
+ * @return int
  */
 function qw_query_import( $post ) {
 	global $wpdb;
 	$table = $wpdb->prefix . "query_wrangler";
 
-	eval( stripslashes( $post['import-query'] ) );
+	$import = $post['qw-import'];
+	eval( stripslashes( $import['query'] ) );
 
-	if ( $post['import-name'] ) {
-		$query['name'] = $post['import-name'];
-		$query['slug'] = qw_make_slug( $post['import-name'] );
+	if ( $import['name'] ) {
+		$query['name'] = $import['name'];
+		$query['slug'] = qw_make_slug( $import['name'] );
 	}
 	$query['data'] = qw_serialize( $query['data'] );
 	$wpdb->insert( $table, $query );

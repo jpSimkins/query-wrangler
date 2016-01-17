@@ -62,6 +62,27 @@ class QW_Form_Fields {
 	}
 
 	/**
+	 * Opening form html
+	 *
+	 * @return string
+	 */
+	function open(){
+		$atts = $this->form_args;
+		$atts['class'] = implode( ' ', $atts['class'] );
+
+		return '<form ' . $this->attributes( $atts ). '>';
+	}
+
+	/**
+	 * Closing form html
+	 *
+	 * @return string
+	 */
+	function close(){
+		return '</form>';
+	}
+
+	/**
 	 * Execute the filters and methods that render a field
 	 *
 	 * @param $field
@@ -133,8 +154,10 @@ class QW_Form_Fields {
 		$html = '';
 
 		foreach( $array as $key => $value ){
-			$value = esc_attr( $value );
-			$html.= " {$key}='{$value}'";
+			if ( !empty( $value ) ) {
+				$value = esc_attr( $value );
+				$html .= " {$key}='{$value}'";
+			}
 		}
 
 		return $html;
