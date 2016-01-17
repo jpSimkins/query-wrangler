@@ -31,7 +31,7 @@ function qw_basic_footer_form( $item, $display ) {
 		'type' => 'textarea',
 		'name' => 'footer',
 		'description' => $item['description'],
-		'value' => isset( $display['footer'] ) ? qw_textarea( $display['footer'] ) : '',
+		'value' => isset( $display['footer'] ) ? $display['footer'] : '',
 		'class' => array( 'qw-field-textarea', 'qw-js-title' ),
 	) );
 }

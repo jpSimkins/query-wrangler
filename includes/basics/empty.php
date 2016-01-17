@@ -30,7 +30,7 @@ function qw_basic_empty_form( $item, $display ) {
 		'type' => 'textarea',
 		'name' => 'empty',
 		'description' => $item['description'],
-		'value' => isset( $display['empty'] ) ? qw_textarea( $display['empty'] ) : '',
+		'value' => isset( $display['empty'] ) ? $display['empty'] : '',
 		'class' => array( 'qw-field-textarea', 'qw-js-title' ),
 	) );
 }

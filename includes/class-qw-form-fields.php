@@ -102,10 +102,10 @@ class QW_Form_Fields {
 
 		// build the field's entire form name
 		$field['form_name'] = '';
-		if ( $this->form_args['form_field_prefix'] ){
+		if ( !empty( $this->form_args['form_field_prefix'] ) ){
 			$field['form_name'].= $this->form_args['form_field_prefix'];
 		}
-		if ( $field['name_prefix'] ) {
+		if ( !empty( $field['name_prefix'] ) ) {
 			$field['form_name'].= $field['name_prefix'];
 		}
 		$field['form_name'].= '[' . $field['name'] . ']';
@@ -118,7 +118,9 @@ class QW_Form_Fields {
 		$field['class'][] = 'qw-field-type-' . $field['type'];
 		$field['class'] = implode( ' ', $field['class'] );
 
-		$field['id'] = 'edit--' . sanitize_title( $field['form_name'] );
+		if ( empty( $field['id'] ) ) {
+			$field['id'] = 'edit--' . sanitize_title( $field['form_name'] );
+		}
 		return $field;
 	}
 
@@ -213,7 +215,7 @@ class QW_Form_Fields {
 				id="<?php echo esc_attr( $field['id'] ); ?>"
 				class="<?php echo esc_attr( $field['class'] ); ?>"
 				<?php echo $this->attributes( $field['attributes'] ); ?>
-		><?php echo esc_textarea( $field['value'] ); ?></textarea>
+		><?php echo qw_textarea( $field['value'] ); ?></textarea>
 		<?php
 	}
 

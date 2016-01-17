@@ -117,7 +117,7 @@ $form = new QW_Form_Fields( array(
 				print $form->render_field( array(
 					'type'  => 'textarea',
 					'name'  => 'custom_output',
-					'value' => isset( $field['values']['custom_output'] ) ? qw_textarea( $field['values']['custom_output'] ) : '',
+					'value' => isset( $field['values']['custom_output'] ) ? $field['values']['custom_output'] : '',
 					'class' => array( 'qw-field-textarea' )
 				) );
 
@@ -164,7 +164,7 @@ $form = new QW_Form_Fields( array(
 				'type'  => 'textarea',
 				'name'  => 'empty_field_content',
 				'description' => __( 'Field settings will apply to this content.' ),
-				'value' => isset( $field['values']['empty_field_content'] ) ? qw_textarea( $field['values']['empty_field_content'] ) : '',
+				'value' => isset( $field['values']['empty_field_content'] ) ? $field['values']['empty_field_content'] : '',
 				'class' => array( 'qw-field-textarea' )
 			) );
 

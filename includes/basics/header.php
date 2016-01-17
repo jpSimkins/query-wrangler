@@ -30,7 +30,7 @@ function qw_basic_header_form( $item, $display ) {
 		'type' => 'textarea',
 		'name' => 'header',
 		'description' => $item['description'],
-		'value' => isset( $display['header'] ) ? qw_textarea( $display['header'] ) : '',
+		'value' => isset( $display['header'] ) ? $display['header'] : '',
 		'class' => array( 'qw-field-textarea', 'qw-js-title' ),
 	) );
 }
