@@ -30,9 +30,8 @@ function qw_override_taxonomies_pre_save( $options, $query_id ) {
 	if ( isset( $options['override']['taxonomies'] ) &&
 	     is_array( $options['override']['taxonomies'] )
 	) {
-		$override                = $options['override']['taxonomies'];
-		$taxonomies              = get_taxonomies( array( 'public' => TRUE, ),
-			'objects' );
+		$override = $options['override']['taxonomies'];
+		$taxonomies = get_taxonomies( array( 'public' => TRUE, ), 'objects' );
 		$_qw_override_taxonomies = get_option( '_qw_override_taxonomies',
 			array() );
 
@@ -64,9 +63,6 @@ function qw_override_taxonomies_pre_save( $options, $query_id ) {
 		// need to save overrides somewhere quickly accessible
 		// eg, _qw_override_taxonomies__category = query_id
 		update_option( '_qw_override_taxonomies', $_qw_override_taxonomies );
-
-		// clean up soem redundant data from the form
-		$options['override']['taxonomies'] = $options['override']['taxonomies']['values'];
 	}
 
 	return $options;
@@ -94,25 +90,24 @@ function qw_override_taxonomies_delete_query( $query_id ){
  * @param $override
  */
 function qw_override_taxonomies_form( $override ) {
-	$taxonomies = get_taxonomies( array( 'public' => TRUE, ), 'objects' );
-	?>
-	<p>Select which tags to override.</p>
-	<div class="qw-checkboxes">
-		<?php
-		foreach ( $taxonomies as $taxonomy ) { ?>
-			<label class="qw-query-checkbox">
-				<input class="qw-js-title"
-				       type="checkbox"
-				       name="<?php print $override['form_prefix']; ?>[values][<?php print $taxonomy->name; ?>]"
-				       value="<?php print $taxonomy->name; ?>"
-					<?php checked( isset( $override['values'][ $taxonomy->name ] ) ); ?> />
-				<?php print $taxonomy->labels->name; ?>
-			</label>
-		<?php
-		}
-		?>
-	</div>
-<?php
+	$taxes = get_taxonomies( array( 'public' => TRUE, ), 'objects' );
+	$taxonomies = array();
+	foreach ( $taxes as $taxonomy ){
+		$taxonomies[ $taxonomy->name ] = $taxonomy->labels->name;
+	}
+
+	$form = new QW_Form_Fields( array(
+			'form_field_prefix' => $override['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+			'type' => 'checkboxes',
+			'name' => 'values',
+			'description' => __( 'Select which tags to override.' ),
+			'value' => isset( $override['values']['values'] ) ? $override['values']['values'] : array(),
+			'options' => $taxonomies,
+			'class' => array( 'qw-js-title' ),
+	) );
 }
 
 /**

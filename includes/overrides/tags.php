@@ -74,25 +74,24 @@ function qw_override_tags_pre_save( $options, $query_id ) {
  * @param $override
  */
 function qw_override_tags_form( $override ) {
-	$tags = get_terms( 'post_tag', array( 'hide_empty' => FALSE ) );
-	?>
-	<p>Select which tags to override.</p>
-	<div class="qw-checkboxes">
-		<?php
-		foreach ( $tags as $tag ) { ?>
-			<label class="qw-query-checkbox">
-				<input class="qw-js-title"
-				       type="checkbox"
-				       name="<?php print $override['form_prefix']; ?>[values][<?php print $tag->term_id; ?>]"
-				       value="<?php print $tag->name; ?>"
-					<?php checked( isset( $override['values']['values'][ $tag->term_id ] ) ); ?> />
-				<?php print $tag->name; ?>
-			</label>
-		<?php
-		}
-		?>
-	</div>
-<?php
+	$terms = get_terms( 'post_tag', array( 'hide_empty' => FALSE ) );
+	$tags = array();
+	foreach( $terms as $term ){
+		$tags[ $term->term_id ] = $term->name;
+	}
+
+	$form = new QW_Form_Fields( array(
+			'form_field_prefix' => $override['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+			'type' => 'checkboxes',
+			'name' => 'values',
+			'description' => __( 'Select which tags to override.' ),
+			'value' => isset( $override['values']['values'] ) ? $override['values']['values'] : array(),
+			'options' => $tags,
+			'class' => array( 'qw-js-title' ),
+	) );
 }
 
 /**

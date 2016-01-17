@@ -17,11 +17,10 @@ print $form->render_field( array(
 print $form->render_field( array(
 		'type' => 'textarea',
 		'name' => 'query',
-		'id' => 'query',
+		'id' => 'import-query',
 		'title' => __( 'Query Code' ),
 		'description' => __( 'Paste query code here.' ),
 		'value' => '',
-		'class' => array( 'qw-textarea' ),
 ) );
 
 print $form->render_field( array(

@@ -74,29 +74,24 @@ function qw_override_categories_pre_save( $options, $query_id ) {
  * @param $override
  */
 function qw_override_categories_form( $override ) {
-	$category_ids = get_terms( 'category',
-		array( 'fields' => 'ids', 'hide_empty' => 0 ) );
-	?>
-	<p>Select which categories to override.</p>
-	<div class="qw-checkboxes">
-		<?php
-		// List all categories as checkboxes
-		foreach ( $category_ids as $cat_id ) {
-			$cat_name = get_cat_name( $cat_id );
-			?>
-			<label class="qw-query-checkbox">
-				<input class="qw-js-title"
-				       type="checkbox"
-				       name="<?php print $override['form_prefix']; ?>[values][<?php print $cat_id; ?>]"
-				       value="<?php print $cat_name; ?>"
-					<?php checked( isset( $override['values']['values'][ $cat_id ] ) ); ?> />
-				<?php print $cat_name; ?>
-			</label>
-		<?php
-		}
-		?>
-	</div>
-<?php
+	$category_ids = get_terms( 'category', array( 'fields' => 'ids', 'hide_empty' => 0 ) );
+	$categories = array();
+	foreach( $category_ids as $cat_id ){
+		$categories[ $cat_id ] = get_cat_name( $cat_id );
+	}
+
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => $override['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+			'type' => 'checkboxes',
+			'name' => 'values',
+			'description' => __( 'Select which categories to override.' ),
+			'value' => isset( $override['values']['values'] ) ? $override['values']['values'] : array(),
+			'options' => $categories,
+			'class' => array( 'qw-js-title' ),
+	) );
 }
 
 /**

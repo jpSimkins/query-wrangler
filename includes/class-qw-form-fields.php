@@ -233,8 +233,9 @@ class QW_Form_Fields {
 	}
 
 	/**
-	 * @param array $array
+	 * Simple conversion of an array to tml attributes string
 	 *
+	 * @param array
 	 * @return string
 	 */
 	function attributes( $array = array() ){
@@ -304,25 +305,40 @@ class QW_Form_Fields {
 		<?php
 	}
 
+	/**
+	 * Group of checkboxes
+	 *  - expects an array of values as $field['value']
+	 *
+	 * @param $field
+	 */
 	function template_checkboxes( $field ){
+		$field['class'].= ' qw-checkboxes-item';
 		$i = 0;
-		foreach( $field['options'] as $value => $option ){
-			$checkbox = array_replace( $field, array(
-				'type' => 'checkbox',
-				'id' => $field['id'] . "--{$i}",
-				'name' => $field['name'] . '[]',
-			));
-
-			if ( in_array( $value, $field['value'] ) ){
-				$checkbox['attributes']['checked'] = 'checked';
-			}
-
-			$this->template_input( $checkbox );
-
+		foreach( $field['options'] as $value => $label ){
+			?>
+				<div class="qw-checkboxes-wrapper">
+					<label for="<?php echo esc_attr( $field['id'] ); ?>--<?php echo $i; ?>">
+						<input type="checkbox"
+							name="<?php echo esc_attr( $field['form_name'] ); ?>[<?php echo esc_attr( $value ); ?>]"
+							id="<?php echo esc_attr( $field['id'] ); ?>--<?php echo $i; ?>"
+							class="<?php echo esc_attr( $field['class'] ); ?>"
+							value="<?php echo esc_attr( $label ); ?>"
+							<?php checked( isset( $field['value'][ $value ] ) ); ?>
+		                >
+						<?php echo $label; ?>
+					</label>
+				</div>
+			<?php
 			$i++;
 		}
 	}
 
+	/**
+	 * Select box
+	 *  - expects an array of options as $field['options']
+	 *
+	 * @param $field
+	 */
 	function template_select( $field ){
 		?>
 		<select name="<?php echo esc_attr( $field['form_name'] ); ?>"
@@ -336,6 +352,12 @@ class QW_Form_Fields {
 		<?php
 	}
 
+	/**
+	 * Simple item list
+	 *  - expects an array of items as $field['items']
+	 *
+	 * @param $field
+	 */
 	function template_item_list( $field ){
 		?>
 		<ul class="<?php echo esc_attr( $field['class'] ); ?>">

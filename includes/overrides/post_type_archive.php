@@ -69,27 +69,18 @@ function qw_override_post_type_delete_query( $query_id ){
  * @param $override
  */
 function qw_override_post_type_archive_form( $override ) {
-	$post_types = qw_all_post_types();
-	?>
-	<p>Select which post types to override.</p>
-	<div class="qw-checkboxes">
-		<?php
-		// List all categories as checkboxes
-		foreach ( $post_types as $post_type ) {
-			?>
-			<label class="qw-query-checkbox">
-				<input class="qw-js-title"
-				       type="checkbox"
-				       name="<?php print $override['form_prefix']; ?>[values][<?php print $post_type; ?>]"
-				       value="<?php print $post_type; ?>"
-					<?php checked( isset( $override['values']['values'][ $post_type ] ) ); ?> />
-				<?php print $post_type; ?>
-			</label>
-		<?php
-		}
-		?>
-	</div>
-<?php
+	$form = new QW_Form_Fields( array(
+			'form_field_prefix' => $override['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+			'type' => 'checkboxes',
+			'name' => 'values',
+			'description' => __( 'Select which post types to override.' ),
+			'value' => isset( $override['values']['values'] ) ? $override['values']['values'] : array(),
+			'options' => qw_all_post_types(),
+			'class' => array( 'qw-js-title' ),
+	) );
 }
 
 /**
