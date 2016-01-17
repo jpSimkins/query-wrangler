@@ -80,9 +80,15 @@ class Query_Wrangler_List_Table extends WP_List_Table {
 				return ucfirst( $item[ $column_name ] );
 			case 'details':
 				$details = '';
+				$settings = QW_Settings::get_instance();
 
 				if ( $item['type'] != 'override' ) {
-					$details .= 'Shortcode options:<br />[query id=' . $item['ID'] . ']<br />[query slug="' . $item['slug'] . '"]';
+					if ( $settings->get('shortcode_compat') ){
+						$details .= 'Shortcode options:<br />[qw_query id=' . $item['ID'] . ']<br />[qw_query slug="' . $item['slug'] . '"]';
+					}
+					else {
+						$details .= 'Shortcode options:<br />[query id=' . $item['ID'] . ']<br />[query slug="' . $item['slug'] . '"]';
+					}
 				}
 
 				if ( $item['type'] == 'override' ) {
@@ -96,14 +102,14 @@ class Query_Wrangler_List_Table extends WP_List_Table {
 							if ( isset( $all_overrides[ $type ] ) ) {
 								$override = $all_overrides[ $type ];
 
-								$details .= $override['title'] . ': ';
-								$tmp = array();
+								$details .= '<br>'.$override['title'] . ': ';
 
-								foreach ( $values as $key => $value ) {
-									$tmp[] = $value;
+								if ( is_array( $values['values'] ) ) {
+									$details.= implode( ", ", $values['values'] );
 								}
-
-								$details .= implode( ', ', $tmp );
+								else {
+									$details.= ", ". $values['values'];
+								}
 							}
 						}
 					}
