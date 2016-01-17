@@ -14,6 +14,7 @@ $form = new QW_Form_Fields( array(
 			'name'  => 'weight',
 			'title' => __( 'Weight' ),
 			'value' => isset( $field['values']['weight'] ) ? $field['values']['weight'] : '',
+			'class' => array( 'qw-weight' )
 		) );
 		?>
 	</div>
