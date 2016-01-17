@@ -8,9 +8,9 @@ add_filter( 'qw_basics', 'qw_basic_settings_offset' );
 function qw_basic_settings_offset( $basics ) {
 
 	$basics['offset'] = array(
-		'title'         => 'Offset',
+		'title'         => __( 'Offset' ),
+		'description'   => __( 'Number of post to skip, or pass over. For example, if this field is 3, the first 3 items will be skipped and not displayed.' ),
 		'option_type'   => 'args',
-		'description'   => 'Number of post to skip, or pass over. For example, if this field is 3, the first 3 items will be skipped and not displayed.',
 		'form_callback' => 'qw_basic_offset_form',
 		'weight'        => 0,
 	);
@@ -18,12 +18,21 @@ function qw_basic_settings_offset( $basics ) {
 	return $basics;
 }
 
-function qw_basic_offset_form( $basic, $args ) {
-	?>
-	<p class="description"><?php print $basic['description']; ?></p>
-	<input class="qw-text-short qw-js-title"
-	       type="text"
-	       name="<?php print $basic['form_prefix']; ?>[offset]"
-	       value="<?php print $args['offset']; ?>"/>
-<?php
+/**
+ * @param $item
+ * @param $args
+ */
+function qw_basic_offset_form( $item, $args ) {
+
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => $item['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+		'type' => 'number',
+		'name' => 'offset',
+		'description' => $item['description'],
+		'value' => isset( $args['offset'] ) ? $args['offset'] : 0,
+		'class' => array( 'qw-js-title' ),
+	) );
 }

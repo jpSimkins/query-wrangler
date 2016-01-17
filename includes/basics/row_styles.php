@@ -16,9 +16,9 @@ add_filter( 'qw_row_complete_styles', 'qw_default_row_complete_styles', 0 );
  */
 function qw_basic_settings_row_style( $basics ) {
 	$basics['display_row_style'] = array(
-		'title'         => 'Row Style',
+		'title'         => __( 'Row Style' ),
+		'description'   => __( 'How should each post in this query be presented?' ),
 		'option_type'   => 'display',
-		'description'   => 'How should each post in this query be presented?',
 		'form_callback' => 'qw_basic_display_row_style_form',
 		'weight'        => 0,
 	);
@@ -26,22 +26,25 @@ function qw_basic_settings_row_style( $basics ) {
 	return $basics;
 }
 
-/*
+/**
  * Default Row Styles
+ *
+ * @param $row_styles
+ * @return mixed
  */
 function qw_default_row_styles( $row_styles ) {
 	$row_styles['posts']  = array(
-		'title'             => 'Posts',
+		'title'             => __( 'Posts' ),
 		'settings_callback' => 'qw_row_style_posts_settings',
 		'settings_key'      => 'post',
 	);
 	$row_styles['fields'] = array(
-		'title'             => 'Fields',
+		'title'             => __( 'Fields' ),
 		'settings_callback' => 'qw_row_style_fields_settings',
 		'settings_key'      => 'field',
 	);
 	$row_styles['template_part'] = array(
-		'title'             => 'Template Part',
+		'title'             => __( 'Template Part' ),
 		'settings_callback' => 'qw_row_style_template_part_settings',
 		'settings_key'      => 'template_part',
 	);
@@ -50,57 +53,61 @@ function qw_default_row_styles( $row_styles ) {
 }
 
 
-/*
+/**
  * Default Row 'Posts' Styles
+ *
+ * @param $row_complete_styles
+ * @return array
  */
 function qw_default_row_complete_styles( $row_complete_styles ) {
 	$row_complete_styles['complete'] = array(
-		'title' => 'Complete Post',
+		'title' => __( 'Complete Post' ),
 	);
 	$row_complete_styles['excerpt']  = array(
-		'title' => 'Excerpt',
+		'title' => __( 'Excerpt' ),
 	);
 
 	return $row_complete_styles;
 }
 
-function qw_basic_display_row_style_form( $basic, $display ) {
-	$row_styles = qw_all_row_styles();
+/**
+ * @param $item
+ * @param $display
+ */
+function qw_basic_display_row_style_form( $item, $display ) {
+	$row_styles = array();
+	foreach ( qw_all_row_styles() as $key => $details ) {
+		$row_styles[ $key ] = $details['title'];
+	}
+
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => $item['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+		'type' => 'select',
+		'name' => 'row_style',
+		'description' => $item['description'],
+		'value' => isset( $display['row_style'] ) ? $display['row_style'] : '',
+		'options' => $row_styles,
+		'class' => array( 'qw-js-title' ),
+	) );
 	?>
-	<p class="description"><?php print $basic['description']; ?></p>
-	<select class='qw-js-title'
-	        id="qw-display-type"
-	        name="<?php print $basic['form_prefix']; ?>[row_style]">
-		<?php
-		foreach ( $row_styles as $type => $row_style ) { ?>
-			<option value="<?php print $type; ?>"
-				<?php if ( $display['row_style'] == $type ) {
-					print 'selected="selected"';
-				} ?>>
-				<?php print $row_style['title']; ?>
-			</option>
-		<?php
-		}
-		?>
-	</select>
 
 	<!-- style settings -->
-	<p class="description">Some Row Styles have additional settings.</p>
+	<p class="description"><?php _e( 'Some Row Styles have additional settings.' ); ?></p>
 	<div id="row-style-settings">
 		<?php
-		foreach ( $row_styles as $type => $row_style ) {
+		foreach ( qw_all_row_styles() as $type => $row_style ) {
 			if ( isset( $row_style['settings_callback'] ) && function_exists( $row_style['settings_callback'] ) ) {
 				$row_style['values'] = ( isset( $row_style['settings_key'] ) && isset( $display[ $row_style['settings_key'] . '_settings' ] ) ) ? $display[ $row_style['settings_key'] . '_settings' ] : array();
 				?>
-				<div
-					id="tab-row-style-settings-<?php print $row_style['hook_key']; ?>"
-					class="qw-query-content">
-					<h3 class="qw-setting-header"><?php print $row_style['title']; ?>
-						Settings</h3>
+				<div id="tab-row-style-settings-<?php print $row_style['hook_key']; ?>"
+					 class="qw-query-content">
+					<h3><?php print $row_style['title']; ?> <?php _e( 'Settings' ); ?></h3>
 
 					<div class="qw-setting-group">
-						<?php print $row_style['settings_callback']( $row_style,
-							$display ); ?>
+						<?php print $row_style['settings_callback']( $row_style, $display ); ?>
 					</div>
 				</div>
 			<?php
@@ -111,67 +118,78 @@ function qw_basic_display_row_style_form( $basic, $display ) {
 <?php
 }
 
+/**
+ * @param $row_style
+ * @param $display
+ */
 function qw_row_style_posts_settings( $row_style, $display ) {
-	?>
-	<p class="description">Select the amount of the post to be shown.</p>
-	<select class="qw-js-title"
-	        name="qw-query-options[display][post_settings][size]">
-		<option value="complete"
-			<?php if ( isset( $row_style['values']['size'] ) && $row_style['values']['size'] == "complete" ) {
-				print 'selected="selected"';
-			} ?>>
-			Complete Post
-		</option>
-		<option value="excerpt"
-			<?php if ( isset( $row_style['values']['size'] ) && $row_style['values']['size'] == "excerpt" ) {
-				print 'selected="selected"';
-			} ?>>
-			Excerpt
-		</option>
-	</select>
-<?php
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => QW_FORM_PREFIX . '[display][post_settings]',
+	) );
+
+	print $form->render_field( array(
+		'type' => 'select',
+		'name' => 'size',
+		'description' => __( 'Select the amount of the post to be shown.' ),
+		'value' => isset( $row_style['values']['size'] ) ? $row_style['values']['size'] : '',
+		'options' => array(
+			'complete' => __( 'Complete Post' ),
+			'excerpt' => __( 'Excerpt' ),
+		),
+		'class' => array( 'qw-js-title' ),
+	) );
 }
 
 /**
  * @param $row_style
+ * @param $display
  */
 function qw_row_style_fields_settings( $row_style, $display ) {
 	$query_fields = isset( $display['field_settings']['fields'] ) ? $display['field_settings']['fields'] : array();
 	$all_fields   = qw_all_fields();
-	?>
-	<p class="description">Group by field</p>
-	<select class="qw-js-title"
-	        name="qw-query-options[display][field_settings][group_by_field]">
-		<option value="__none__"> - None -</option>
-		<?php
-		if ( ! empty( $query_fields ) ) {
-			foreach ( $query_fields as $field_name => $field ) {
-				?>
-				<option
-					value="<?php print esc_attr( $field_name ); ?>"><?php print $all_fields[ $field['hook_key'] ]['title']; ?> </option>
-			<?php
-			}
-		}
-		?>
-	</select>
-<?php
+
+	$group_by_options = array(
+		'__none__' => __( '- None -' ),
+	);
+	foreach( $query_fields as $field_name => $field ){
+		$group_by_options[ $field_name ] = $all_fields[ $field['hook_key'] ]['title'] . ' - ' . $field_name;
+	}
+
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => QW_FORM_PREFIX . '[display][field_settings]',
+	) );
+
+	print $form->render_field( array(
+		'type' => 'select',
+		'name' => 'group_by_field',
+		'title' => __( 'Group by field' ),
+		'value' => isset( $row_style['values']['group_by_field'] ) ? $row_style['values']['group_by_field'] : '',
+		'options' => $group_by_options,
+		'class' => array( 'qw-js-title' ),
+	) );
 }
 
 /**
  * @param $row_style
+ * @param $display
  */
 function qw_row_style_template_part_settings( $row_style, $display ) {
-	$path = isset( $row_style['values']['path'] ) ? $row_style['values']['path'] : '';
-	$name = isset( $row_style['values']['name'] ) ? $row_style['values']['name'] : '';
-	?>
-	Path:
-	<input type="text"
-	       name="qw-query-options[display][template_part_settings][path]"
-	       value="<?php echo esc_attr($path); ?>">
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => QW_FORM_PREFIX . '[display][template_part_settings]',
+	) );
 
-	Name:
-	<input type="text"
-	       name="qw-query-options[display][template_part_settings][name]"
-	       value="<?php echo esc_attr($name); ?>">
-	<?php
+	print $form->render_field( array(
+		'type' => 'text',
+		'name' => 'path',
+		'title' => __( 'Path' ),
+		'value' => isset( $row_style['values']['path'] ) ? $row_style['values']['path'] : '',
+		'class' => array( 'qw-js-title' ),
+	) );
+	print $form->render_field( array(
+		'type' => 'text',
+		'name' => 'name',
+		'title' => __( 'Name' ),
+		'value' => isset( $row_style['values']['name'] ) ? $row_style['values']['name'] : '',
+		'class' => array( 'qw-js-title' ),
+	) );
 }

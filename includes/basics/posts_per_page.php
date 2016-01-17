@@ -8,9 +8,9 @@ add_filter( 'qw_basics', 'qw_basic_settings_posts_per_page' );
 function qw_basic_settings_posts_per_page( $basics ) {
 
 	$basics['posts_per_page'] = array(
-		'title'         => 'Posts Per Page',
+		'title'         => __( 'Posts Per Page' ),
+		'description'   => __( 'Number of posts to show per page. Use -1 to display all results.' ),
 		'option_type'   => 'args',
-		'description'   => 'Number of posts to show per page. Use -1 to display all results.',
 		'form_callback' => 'qw_basic_posts_per_page_form',
 		'weight'        => 0,
 	);
@@ -18,13 +18,20 @@ function qw_basic_settings_posts_per_page( $basics ) {
 	return $basics;
 }
 
-function qw_basic_posts_per_page_form( $basic, $args ) {
-	$posts_per_page = isset( $args['posts_per_page'] ) ? $args['posts_per_page'] : 5;
-	?>
-	<p class="description"><?php print $basic['description']; ?></p>
-	<input class="qw-text-short qw-js-title"
-	       type="text"
-	       name="<?php print $basic['form_prefix']; ?>[posts_per_page]"
-	       value="<?php print $posts_per_page; ?>"/>
-<?php
+/**
+ * @param $item
+ * @param $args
+ */
+function qw_basic_posts_per_page_form( $item, $args ) {
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => $item['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+		'type' => 'text',
+		'name' => 'posts_per_page',
+		'description' => $item['description'],
+		'value' => isset( $args['posts_per_page'] ) ? $args['posts_per_page'] : 5,
+		'class' => array( 'qw-js-title' ),
+	) );
 }

@@ -10,9 +10,9 @@ add_filter( 'qw_pager_types', 'qw_default_pager_types', 0 );
  */
 function qw_basic_settings_pager( $basics ) {
 	$basics['pager'] = array(
-		'title'         => 'Pager',
+		'title'         => __( 'Pager' ),
+		'description'   => __( 'Select which type of pager to use.' ),
 		'option_type'   => 'display',
-		'description'   => 'Select which type of pager to use.',
 		'form_callback' => 'qw_basic_pager_form',
 		'weight'        => 0,
 	);
@@ -25,18 +25,18 @@ function qw_basic_settings_pager( $basics ) {
  */
 function qw_default_pager_types( $pagers ) {
 	$pagers['default'] = array(
-		'title'    => 'Default',
+		'title'    => __( 'Default' ),
 		'callback' => 'qw_theme_pager_default'
 	);
 	$pagers['numbers'] = array(
-		'title'    => 'Page Numbers',
+		'title'    => __( 'Page Numbers' ),
 		'callback' => 'qw_theme_pager_numbers'
 	);
 
 	// WP PageNavi Plugin
 	if ( function_exists( 'wp_pagenavi' ) ) {
 		$pagers['pagenavi'] = array(
-			'title'    => 'PageNavi',
+			'title'    => __( 'PageNavi' ),
 			'callback' => 'wp_pagenavi'
 		);
 	}
@@ -44,72 +44,83 @@ function qw_default_pager_types( $pagers ) {
 	return $pagers;
 }
 
-function qw_basic_pager_form( $basic, $display ) {
-	$pager_types    = qw_all_pager_types();
-	$use_pager      = isset( $display['page']['pager']['active'] ) ? 'checked="checked"' : '';
-	$pager_previous = isset( $display['page']['pager']['previous'] ) ? $display['page']['pager']['previous'] : "";
-	$pager_next     = isset( $display['page']['pager']['next'] ) ? $display['page']['pager']['next'] : "";
-	//$use_pager_key  = isset($display['page']['pager']['use_pager_key']) ? 'checked="checked"': '';
-	//$pager_key     = isset($display['page']['pager']['pager_key']) ? $display['page']['pager']['pager_key']: "";
-	?>
-	<label class='qw-field-checkbox'>
-		<input class='qw-js-title'
-		       type='checkbox'
-		       name="qw-query-options[display][page][pager][active]"
-			<?php print $use_pager;?> />
-		Use Pagination
-	</label>
+/**
+ * @param $item
+ * @param $display
+ */
+function qw_basic_pager_form( $item, $display ) {
+	$pager_types = array();
+	foreach( qw_all_pager_types() as $key => $details ){
+		$pager_types[ $key ] = $details['title'];
+	}
 
-	<select class='qw-js-title'
-	        name="<?php print $basic['form_prefix']; ?>[page][pager][type]">
-		<?php
-		foreach ( $pager_types as $pager_name => $pager_options ) {
-			$selected = ( $display['page']['pager']['type'] == $pager_name ) ? 'selected="selected"' : '';
-			?>
-			<option value="<?php echo $pager_name; ?>"
-				<?php echo $selected; ?>>
-				<?php echo $pager_options['title']; ?>
-			</option>
-		<?php
-		}
-		?>
-	</select>
-	<p>
-		Use the following options to change the Default Pager labels.
-	</p>
-	<strong>Previous Page Label:</strong>
-	<p>
-		<input class='qw-js-title'
-		       type="text"
-		       name="<?php print $basic['form_prefix']; ?>[page][pager][previous]"
-		       value="<?php print $pager_previous; ?>"/>
-	</p>
-	<strong>Next Page Label:</strong>
-	<p>
-		<input class='qw-js-title'
-		       type="text"
-		       name="<?php print $basic['form_prefix']; ?>[page][pager][next]"
-		       value="<?php print $pager_next; ?>"/>
-	</p>
-	<?php /*
-    <strong>Pager Key:</strong>
-    <p class="description">Use this if you need multiple paginating querys on a single wordpress page.</p>
-    <p>
-      <label>
-        <input type="checkbox"
-               name="<?php print $basic['form_prefix']; ?>[page][pager][use_pager_key]"
-               <?php print $use_pager_key; ?> />
-        Use pager key
-      </label>
-    </p>
-    <p class="description">Pager key should a unique string of lowercase characters with underscores. No spaces.</p>
-    <p>
-      <input type="text"
-             name="<?php print $basic['form_prefix']; ?>[page][pager][pager_key]"
-             value="<?php print $pager_key; ?>" />
-    </p>
-    */ ?>
-<?php
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => $item['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+		'type' => 'checkbox',
+		'name_prefix' => '[page][pager]',
+		'name' => 'active',
+		'title' => __( 'Use Pagination' ),
+		'value' => isset( $display['page']['pager']['active'] ) ? $display['page']['pager']['active'] : false,
+		'class' => array( 'qw-js-title' ),
+	) );
+
+	print $form->render_field( array(
+		'type' => 'select',
+		'name_prefix' => '[page][pager]',
+		'name' => 'type',
+		'title' => __( 'Pager Type' ),
+		'value' => isset( $display['page']['pager']['type'] ) ? $display['page']['pager']['type'] : '',
+		'options' => $pager_types,
+		'class' => array( 'qw-js-title' ),
+	) );
+
+	?>
+	<p class="description"><?php _e( 'Use the following options to change the Default Pager labels.' ); ?></p>
+	<?php
+
+	print $form->render_field( array(
+		'type' => 'text',
+		'name_prefix' => '[page][pager]',
+		'name' => 'previous',
+		'title' => __( 'Previous Page Label' ),
+		'value' => isset( $display['page']['pager']['previous'] ) ? $display['page']['pager']['previous'] : '',
+		'class' => array( 'qw-js-title' ),
+	) );
+
+	print $form->render_field( array(
+		'type' => 'text',
+		'name_prefix' => '[page][pager]',
+		'name' => 'next',
+		'title' => __( 'Next Page Label' ),
+		'value' => isset( $display['page']['pager']['next'] ) ? $display['page']['pager']['next'] : '',
+		'class' => array( 'qw-js-title' ),
+	) );
+
+	/*
+
+	print $form->render_field( array(
+		'type' => 'checkbox',
+		'name_prefix' => '[page][pager]',
+		'name' => '',
+		'title' => __( 'Use pager key' ),
+		'description' => __( 'Use this if you need multiple paginating queries on a single page.' ),
+		'value' => isset( $display['page']['pager']['use_pager_key'] ) ? $display['page']['pager']['use_pager_key']: 0,
+		'class' => array( 'qw-js-title' ),
+	) );
+
+	print $form->render_field( array(
+		'type' => 'text',
+		'name_prefix' => '[page][pager]',
+		'name' => 'pager_key',
+		'title' => __( 'Pager Key' ),
+		'description' => __( 'Pager key should a unique string of lowercase characters with underscores. No spaces.' ),
+		'value' => isset( $display['page']['pager']['pager_key'] ) ? $display['page']['pager']['pager_key'] : '',
+		'class' => array( 'qw-js-title' ),
+	) );
+	// */
 }
 
 /*

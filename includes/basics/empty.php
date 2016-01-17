@@ -7,9 +7,9 @@ add_filter( 'qw_basics', 'qw_basic_settings_empty' );
  */
 function qw_basic_settings_empty( $basics ) {
 	$basics['empty'] = array(
-		'title'         => 'Empty Text',
+		'title'         => __( 'Empty Text' ),
+		'description'   => __( 'The content placed here will appear if the query has no results.' ),
 		'option_type'   => 'display',
-		'description'   => 'The content placed here will appear if the query has no results.',
 		'form_callback' => 'qw_basic_empty_form',
 		'weight'        => 0,
 	);
@@ -17,12 +17,20 @@ function qw_basic_settings_empty( $basics ) {
 	return $basics;
 }
 
+/**
+ * @param $item
+ * @param $display
+ */
+function qw_basic_empty_form( $item, $display ) {
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => $item['form_prefix'],
+	) );
 
-function qw_basic_empty_form( $basic, $display ) {
-	$empty = isset( $display['empty'] ) ? $display['empty'] : "";
-	?>
-	<p class="description"><?php print $basic['description']; ?></p>
-	<textarea name="<?php print $basic['form_prefix']; ?>[empty]"
-	          class="qw-field-textarea qw-js-title"><?php print qw_textarea( $empty ); ?></textarea>
-<?php
+	print $form->render_field( array(
+		'type' => 'textarea',
+		'name' => 'empty',
+		'description' => $item['description'],
+		'value' => isset( $display['empty'] ) ? qw_textarea( $display['empty'] ) : '',
+		'class' => array( 'qw-field-textarea', 'qw-js-title' ),
+	) );
 }

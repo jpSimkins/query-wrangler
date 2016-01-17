@@ -11,9 +11,9 @@ add_filter( 'qw_post_statuses', 'qw_default_post_statuses', 0 );
 function qw_basic_settings_post_status( $basics ) {
 
 	$basics['post_status'] = array(
-		'title'         => 'Posts Status',
+		'title'         => __( 'Posts Status' ),
+		'description'   => __( 'Select the post status of the items displayed.' ),
 		'option_type'   => 'args',
-		'description'   => 'Select the post status of the items displayed.',
 		'form_callback' => 'qw_basic_post_status_form',
 		'weight'        => 0,
 	);
@@ -26,48 +26,50 @@ function qw_basic_settings_post_status( $basics ) {
  */
 function qw_default_post_statuses( $post_statuses ) {
 	$post_statuses['publish'] = array(
-		'title' => 'Published',
+		'title' => __( 'Published' ),
 	);
 	$post_statuses['pending'] = array(
-		'title' => 'Pending',
+		'title' => __( 'Pending' ),
 	);
 	$post_statuses['draft']   = array(
-		'title' => 'Draft',
+		'title' => __( 'Draft' ),
 	);
 	$post_statuses['future']  = array(
-		'title' => 'Future (Scheduled)',
+		'title' => __( 'Future (Scheduled)' ),
 	);
 	$post_statuses['trash']   = array(
-		'title' => 'Trashed',
+		'title' => __( 'Trashed' ),
 	);
 	$post_statuses['private'] = array(
-		'title' => 'Private',
+		'title' => __( 'Private' ),
 	);
-	$post_statuses['any']     = array(
-		'title' => 'Any',
+	$post_statuses['any'] = array(
+		'title' => __( 'Any' ),
 	);
 
 	return $post_statuses;
 }
 
-function qw_basic_post_status_form( $basic, $args ) {
-	$post_statuses = qw_all_post_statuses();
-	?>
-	<p class="description"><?php print $basic['description']; ?></p>
-	<select id="qw-post-status"
-	        class='qw-js-title'
-	        name="<?php print $basic['form_prefix']; ?>[post_status]">
-		<?php
-		foreach ( $post_statuses as $key => $post_status ) { ?>
-			<option value="<?php print $key; ?>"
-				<?php if ( $args['post_status'] == $key ) {
-					print 'selected="selected"';
-				} ?>>
-				<?php print $post_status['title']; ?>
-			</option>
-		<?php
-		}
-		?>
-	</select>
-<?php
+/**
+ * @param $item
+ * @param $args
+ */
+function qw_basic_post_status_form( $item, $args ) {
+	$post_statuses = array();
+	foreach( qw_all_post_statuses() as $key => $details ) {
+		$post_statuses[ $key ] = $details['title'];
+	}
+
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => $item['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+		'type' => 'select',
+		'name' => 'post_status',
+		'description' => $item['description'],
+		'value' => isset( $args['post_status'] ) ? $args['post_status'] : '',
+		'options' => $post_statuses,
+		'class' => array( 'qw-js-title' ),
+	) );
 }

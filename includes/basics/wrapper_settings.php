@@ -7,9 +7,9 @@ add_filter( 'qw_basics', 'qw_basic_settings_wrapper_settings' );
  */
 function qw_basic_settings_wrapper_settings( $basics ) {
 	$basics['wrapper_classes'] = array(
-		'title'         => 'Wrapper Classes',
+		'title'         => __( 'Wrapper Classes' ),
+		'description'   => __( 'The CSS class names will be added to the query. This enables you to use specific CSS code for each query. You may define multiples classes separated by spaces.' ),
 		'option_type'   => 'display',
-		'description'   => 'The CSS class names will be added to the query. This enables you to use specific CSS code for each query. You may define multiples classes separated by spaces.',
 		'form_callback' => 'qw_basic_wrapper_classes_form',
 		'weight'        => 0,
 	);
@@ -17,13 +17,21 @@ function qw_basic_settings_wrapper_settings( $basics ) {
 	return $basics;
 }
 
-function qw_basic_wrapper_classes_form( $basic, $display ) {
-	$wrapper_classes = isset( $display['wrapper-classes'] ) ? $display['wrapper-classes'] : "";
-	?>
-	<p class="description"><?php print $basic['description']; ?></p>
-	<input class="qw-text-long qw-js-title"
-	       type="text"
-	       name="<?php print $basic['form_prefix']; ?>[wrapper-classes]"
-	       value="<?php print $wrapper_classes; ?>"/>
-<?php
+/**
+ * @param $item
+ * @param $display
+ */
+function qw_basic_wrapper_classes_form( $item, $display ) {
+
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => $item['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+			'type' => 'text',
+			'name' => 'wrapper-classes',
+			'description' => $item['description'],
+			'value' => isset( $display['wrapper-classes'] ) ? $display['wrapper-classes'] : '',
+			'class' => array( 'qw-js-title' ),
+	) );
 }
