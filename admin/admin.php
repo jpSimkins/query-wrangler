@@ -80,12 +80,13 @@ function qw_admin_templates( $templates ) {
 function qw_insert_new_query( $post ) {
 	global $wpdb;
 	$table_name = $wpdb->prefix . "query_wrangler";
+	$create = $post['qw-create'];
 
 	$values = array(
-		'name' => $post['qw-name'],
-		'slug' => sanitize_title( $post['qw-name'] ),
-		'type' => $post['qw-type'],
-		'path' => ( $post['page-path'] ) ? urlencode( $post['page-path'] ) : NULL,
+		'name' => sanitize_text_field( $create['name'] ),
+		'slug' => sanitize_title( $create['name'] ),
+		'type' => sanitize_text_field( $create['type'] ),
+		'path' => NULL,
 		'data' => qw_serialize( qw_default_query_data() ),
 	);
 
@@ -135,7 +136,7 @@ function qw_update_query( $post ) {
 	}
 
 	// hook for presave
-	$query_id = (int) $_GET['edit'];
+	$query_id = absint( $_GET['edit'] );
 	$options  = apply_filters( 'qw_pre_save', $options, $query_id );
 	$new_data = qw_serialize( $options );
 
@@ -192,7 +193,7 @@ function qw_query_export( $query_id ) {
 
 	$row = $wpdb->get_row( $sql, ARRAY_A );
 	unset( $row['id'] );
-	// unserealize the stored data
+
 	$row['data'] = qw_unserialize( $row['data'] );
 	$export      = var_export( $row, 1 );
 

@@ -6,12 +6,15 @@ class QW_Form_Fields {
 		'class' => array(),
 		'method' => 'POST',
 		'action' => '',
+		'attributes' => array(),
+		'form_style' => 'flat',
 	);
 
 	public $form_args = array(
 		'form_field_prefix' => '',
 	);
 
+	public $form_styles = array();
 	public $field_types = array();
 
 	public $default_field_args = array(
@@ -43,8 +46,30 @@ class QW_Form_Fields {
 	function __construct( $form_args = array() ){
 		$this->form_args = array_replace( $this->default_form_args, $form_args );
 		$this->register_default_field_types();
+		$this->register_default_form_styles();
 	}
 
+	/**
+	 *
+	 */
+	function register_default_form_styles(){
+		$this->form_styles = array(
+			'flat' => array(
+				'form_open' => array( $this, 'form_open_flat' ),
+				'form_close' => array( $this, 'form_close_flat' ),
+				'field_wrapper' => array( $this, 'field_wrapper_flat' ),
+			),
+			'settings_table' => array(
+				'form_open' => array( $this, 'form_open_settings_table' ),
+				'form_close' => array( $this, 'form_close_settings_table' ),
+				'field_wrapper' => array( $this, 'field_wrapper_settings_table' ),
+			)
+		);
+	}
+
+	/**
+	 *
+	 */
 	function register_default_field_types(){
 		$this->field_types = array_replace( $this->field_types, array(
 			'text' => array( $this, 'template_input' ),
@@ -62,15 +87,60 @@ class QW_Form_Fields {
 	}
 
 	/**
+	 * @return array
+	 */
+	function get_form_style(){
+		// default to flat style
+		$style = $this->form_styles['flat'];
+
+		if ( isset( $this->form_styles[ $this->form_args['form_style'] ] ) ){
+			$style = $this->form_styles[ $this->form_args['form_style'] ];
+		}
+
+		return $style;
+	}
+
+	/**
+	 * Merge default and set attributes for the html form element
+	 *
+	 * @return array
+	 */
+	function get_form_attributes(){
+		$atts_keys=  array( 'id', 'action', 'method', 'class' );
+		$attributes = array();
+
+		foreach( $atts_keys as $key ){
+			if ( !empty( $this->form_args[ $key ] ) ) {
+				$attributes[ $key ] = $this->form_args[ $key ];
+			}
+		}
+
+		if ( !empty( $this->form_args['attributes'] ) ) {
+			$attributes = array_replace( $attributes, $this->form_args['attributes'] );
+		}
+
+		if ( !empty( $attributes['class'] ) ) {
+			$attributes['class'] = implode( ' ', $attributes['class'] );
+		}
+
+		return $attributes;
+	}
+
+	/**
 	 * Opening form html
 	 *
 	 * @return string
 	 */
 	function open(){
-		$atts = $this->form_args;
-		$atts['class'] = implode( ' ', $atts['class'] );
+		$output = '<form ' . $this->attributes( $this->get_form_attributes() ). '>';
 
-		return '<form ' . $this->attributes( $atts ). '>';
+		$style = $this->get_form_style();
+
+		if ( is_callable( $style['form_open'] ) ){
+			$output.= call_user_func( $style['form_open'] );
+		}
+
+		return $output;
 	}
 
 	/**
@@ -79,7 +149,17 @@ class QW_Form_Fields {
 	 * @return string
 	 */
 	function close(){
-		return '</form>';
+		$output = '';
+
+		$style = $this->get_form_style();
+
+		if ( is_callable( $style['form_close'] ) ){
+			$output.= call_user_func( $style['form_close'] );
+		}
+
+		$output.= '</form>';
+
+		return $output;
 	}
 
 	/**
@@ -93,6 +173,7 @@ class QW_Form_Fields {
 		$field = $this->make_field( $field );
 		$field_html = '';
 
+		// template the field
 		if ( isset( $this->field_types[ $field['type'] ] ) ){
 			ob_start();
 			call_user_func( $this->field_types[ $field['type'] ], $field );
@@ -103,9 +184,15 @@ class QW_Form_Fields {
 			return $field_html;
 		}
 
-		ob_start();
-		$this->render_flat_wrapper( $field, $field_html );
-		$wrapper_html = ob_get_clean();
+		// template the wrapper
+		$wrapper_html = $field_html;
+		$style = $this->get_form_style();
+
+		if ( is_callable( $style['field_wrapper'] ) ){
+			ob_start();
+			call_user_func( $style['field_wrapper'], $field, $field_html );
+			$wrapper_html = ob_get_clean();
+		}
 
 		return $wrapper_html;
 	}
@@ -161,31 +248,6 @@ class QW_Form_Fields {
 		}
 
 		return $html;
-	}
-
-	/**
-	 * @param $field
-	 * @param $field_html
-	 */
-	function render_flat_wrapper( $field, $field_html ){
-		?>
-		<div id="<?php echo esc_attr( $field['id'] ) ;?>--wrapper"
-			 class="qw-field-wrapper">
-			<label for="<?php echo esc_attr( $field['id'] ); ?>" class="qw-field-label">
-				<?php echo $field['title']; ?>
-			</label>
-
-			<?php if ( !empty( $field['description'] ) ) : ?>
-				<p class="description"><?php echo $field['description']; ?></p>
-			<?php endif; ?>
-
-			<?php echo $field_html; ?>
-
-			<?php if ( !empty($field['help']) ) : ?>
-				<p class="description"><?php echo $field['help']; ?></p>
-			<?php endif; ?>
-		</div>
-		<?php
 	}
 
 	/**
@@ -285,6 +347,83 @@ class QW_Form_Fields {
 			?>
 		</ul>
 		<?php
+	}
+
+
+	// **** styles ***** //
+
+
+	/**
+	 * Settings Table
+	 *
+	 * @param $field
+	 * @param $field_html
+	 */
+	function field_wrapper_settings_table( $field, $field_html ){
+		?>
+		<tr  id="<?php echo esc_attr( $field['id'] ) ;?>--wrapper"
+		     class="qw-field-wrapper">
+			<th>
+				<label for="<?php echo esc_attr( $field['id'] ); ?>" class="qw-field-label">
+					<?php echo $field['title']; ?>
+				</label>
+			</th>
+			<td>
+				<?php echo $field_html; ?>
+
+				<?php if ( !empty( $field['description'] ) ) : ?>
+					<p class="description"><?php echo $field['description']; ?></p>
+				<?php endif; ?>
+
+				<?php if ( !empty($field['help']) ) : ?>
+					<p class="description"><?php echo $field['help']; ?></p>
+				<?php endif; ?>
+			</td>
+		</tr>
+		<?php
+	}
+
+	function form_open_settings_table(){
+		return '<table class="form-table">';
+	}
+
+	function form_close_settings_table(){
+		return '</table>';
+	}
+
+	/**
+	 * Flat form style
+	 *
+	 * @param $field
+	 * @param $field_html
+	 */
+	function field_wrapper_flat( $field, $field_html ){
+		?>
+		<div id="<?php echo esc_attr( $field['id'] ) ;?>--wrapper"
+		     class="qw-field-wrapper">
+			<label for="<?php echo esc_attr( $field['id'] ); ?>" class="qw-field-label">
+				<?php echo $field['title']; ?>
+			</label>
+
+			<?php if ( !empty( $field['description'] ) ) : ?>
+				<p class="description"><?php echo $field['description']; ?></p>
+			<?php endif; ?>
+
+			<?php echo $field_html; ?>
+
+			<?php if ( !empty($field['help']) ) : ?>
+				<p class="description"><?php echo $field['help']; ?></p>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
+
+	function form_open_flat(){
+		return '<div class="qw-form">';
+	}
+
+	function form_close_flat(){
+		return '</div>';
 	}
 }
 

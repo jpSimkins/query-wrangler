@@ -217,38 +217,40 @@ function qw_edit_query_form() {
  * Settings!
  */
 function qw_save_settings( $post ) {
-	$widget_theme_compat = isset( $post['qw-widget-theme-compat'] ) ? $post['qw-widget-theme-compat'] : '';
-	$live_preview = ( isset( $post['qw-live-preview'] ) ) ? $post['qw-live-preview'] : '';
-	$show_silent_meta = ( isset( $post['qw-show-silent-meta'] ) ) ? $post['qw-show-silent-meta'] : '';
-	$meta_value_field_handler = ( isset( $post['qw-meta-value-field-handler'] ) ) ? $post['qw-meta-value-field-handler'] : '';
-	$shortcode_compat = isset( $post['qw-shortcode-compat'] ) ? $post['qw-shortcode-compat'] : '';
+	$new = $post['qw-settings'];
 
 	$settings = QW_Settings::get_instance();
-	$settings->set( 'edit_theme', $post['qw-theme'] );
-	$settings->set( 'widget_theme_compat',$widget_theme_compat );
-	$settings->set( 'live_preview', $live_preview );
-	$settings->set( 'show_silent_meta', $show_silent_meta );
-	$settings->set( 'meta_value_field_handler', $meta_value_field_handler );
-	$settings->set( 'shortcode_compat', $shortcode_compat );
+	$settings->set( 'edit_theme', sanitize_text_field( $new['edit_theme'] ) );
+	$settings->set( 'widget_theme_compat', (int) !empty( $new['widget_theme_compat'] ) );
+	$settings->set( 'live_preview',        (int) !empty( $new['live_preview'] ) );
+	$settings->set( 'show_silent_meta',    (int) !empty( $new['show_silent_meta'] ) );
+	$settings->set( 'shortcode_compat',    (int) !empty( $new['shortcode_compat'] ) );
+	$settings->set( 'meta_value_field_handler', absint( $new['meta_value_field_handler'] ) );
 	$settings->save();
 }
 
 function qw_settings_page() {
 	$settings = QW_Settings::get_instance();
-	$settings_args = array(
-		'edit_themes'              => qw_all_edit_themes(),
+
+	$editor_options = array();
+	foreach( qw_all_edit_themes() as $key => $theme ){
+		$editor_options[ $key ] = $theme['title'];
+	}
+
+	$settings_form_args = array(
+		'editor_options' => $editor_options,
 		'meta_value_field_options' => array(
-			0 => 'Default handler',
-			1 => 'New handler (beta)',
+			0 => __( 'Default handler' ),
+			1 => __( 'New handler (beta)' ),
 		),
 	);
-	$settings_args = array_merge( $settings_args, $settings->values );
-	$args          = array(
-		'title'   => 'Query Wrangler Settings',
-		'content' => theme( 'query_settings', $settings_args )
+	$settings_form_args = array_merge( $settings_form_args, $settings->values );
+	$wrapper_args = array(
+		'title'   => __( 'Query Wrangler Settings' ),
+		'content' => theme( 'query_settings', $settings_form_args ),
 	);
 
-	print theme( 'admin_wrapper', $args );
+	print theme( 'admin_wrapper', $wrapper_args );
 }
 
 /*
@@ -256,7 +258,7 @@ function qw_settings_page() {
  */
 function qw_create_query_page() {
 	$args = array(
-		'title'   => 'Create Query',
+		'title'   => __( 'Create Query' ),
 		'content' => theme( 'query_create' )
 	);
 
@@ -272,9 +274,9 @@ function qw_export_page() {
 	$row   = $wpdb->get_row( $wpdb->prepare( 'SELECT name FROM ' . $table . ' WHERE id = %d ', $_GET['export'] ) );
 
 	$args = array(
-		'title'   => 'Export Query: <em>' . $row->name . '</em>',
+		'title'   => __( 'Export Query' ) . ' <em>' . $row->name . '</em>',
 		'content' => theme( 'query_export',
-			array( 'query_id' => $_GET['export'] ) ),
+			array( 'query_id' => absint( $_GET['export'] ) ) ),
 	);
 	print theme( 'admin_wrapper', $args );
 }
@@ -285,7 +287,7 @@ function qw_export_page() {
 function qw_import_page() {
 	// show import page
 	$args = array(
-		'title'   => 'Import Query',
+		'title'   => __( 'Import Query' ),
 		'content' => theme( 'query_import' ),
 	);
 	print theme( 'admin_wrapper', $args );
