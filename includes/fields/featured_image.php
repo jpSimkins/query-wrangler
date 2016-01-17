@@ -22,25 +22,19 @@ function qw_field_featured_image( $fields ) {
  * Image attachment settings Form
  */
 function qw_field_featured_image_form( $field ) {
-	//$image_styles = _qw_get_image_styles();
-	$image_styles = get_intermediate_image_sizes();
-	?>
-	<p>
-		<label class="qw-label">Image Display Style:</label>
-		<select class='qw-js-title'
-		        name='<?php print $field['form_prefix']; ?>[image_display_style]'>
-			<?php
-			foreach ( $image_styles as $key => $style ) {
-				$style_selected = ( $field['values']['image_display_style'] == $style ) ? 'selected="selected"' : '';
-				?>
-				<option
-					value="<?php print $style; ?>" <?php print $style_selected; ?>><?php print $style; ?></option>
-			<?php
-			}
-			?>
-		</select>
-	</p>
-<?php
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => $field['form_prefix'],
+	) );
+
+
+	print $form->render_field( array(
+		'type' => 'select',
+		'name' => 'image_display_style',
+		'title' => __( 'Image Display Style' ),
+		'value' => isset( $field['values']['image_display_style'] ) ? $field['values']['image_display_style'] : '',
+		'options' => get_intermediate_image_sizes(),
+		'class' => array( 'qw-js-title' ),
+	) );
 }
 
 /*

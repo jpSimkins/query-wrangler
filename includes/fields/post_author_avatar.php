@@ -2,8 +2,12 @@
 // add default fields to the hook filter
 add_filter( 'qw_fields', 'qw_field_author_avatar' );
 
-/*
+/**
  * Add field to qw_fields
+ *
+ * @param $fields
+ *
+ * @return array
  */
 function qw_field_author_avatar( $fields ) {
 
@@ -18,10 +22,14 @@ function qw_field_author_avatar( $fields ) {
 	return $fields;
 }
 
-/*
+/**
  * Avatar output callback
+ *   - get_avatar( $id_or_email, $size, $default, $alt );
  *
- * get_avatar( $id_or_email, $size, $default, $alt );
+ * @param $post
+ * @param $field
+ *
+ * @return string
  */
 function qw_get_avatar( $post, $field ) {
 	if ( isset( $field['link_to_author'] ) ) {
@@ -34,26 +42,30 @@ function qw_get_avatar( $post, $field ) {
 	return $output;
 }
 
-/*
+/**
  * Avatar form callback
+ *
+ * @param $field
  */
 function qw_field_author_avatar_form( $field ) {
-	$link_selected = ( isset( $field['values']['link_to_author'] ) ) ? 'checked="checked"' : '';
-	$size          = isset( $field['values']['size'] ) ? $field['values']['size'] : '';
-	?>
-	<label class="qw-label">Avatar Size: </label>
-	<input class='qw-js-title'
-	       type="text"
-	       name="<?php print $field['form_prefix']; ?>[size]"
-	       value="<?php print $size; ?>"/>
-	(pixel width)
-	<p>
-		<label class='qw-field-checkbox'>
-			<input type='checkbox'
-			       name='<?php print $field['form_prefix']; ?>[link_to_author]'
-				<?php print $link_selected; ?> />
-			Link to author page (list of author posts)
-		</label>
-	</p>
-<?php
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => $field['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+		'type' => 'number',
+		'name' => 'size',
+		'title' => __( 'Avatar Size' ),
+		'description' => __( 'Desired avatar size in pixels.' ),
+		'value' => isset( $field['values']['size'] ) ? $field['values']['size'] : '',
+		'class' => array( 'qw-js-title' ),
+	) );
+
+	print $form->render_field( array(
+		'type' => 'checkbox',
+		'name' => 'link_to_author',
+		'title' => __( 'Link to author page' ),
+		'value' => isset( $field['values']['link_to_author'] ) ? $field['values']['link_to_author'] : false,
+		'class' => array( 'qw-js-title' ),
+	) );
 }

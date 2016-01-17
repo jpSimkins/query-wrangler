@@ -25,7 +25,6 @@ class QW_Form_Fields {
 
 		// top-lvl][mid-lvl][bottom-lvl
 		'name_prefix' => '',
-		'data' => array(),
 
 		// additional special attributes like size, rows, cols, etc
 		'attributes' => array(),
@@ -58,6 +57,7 @@ class QW_Form_Fields {
 			'textarea' => array( $this, 'template_textarea' ),
 			'checkboxes' => array( $this, 'template_checkboxes' ),
 			'select' => array( $this, 'template_select' ),
+			'item_list' => array( $this, 'template_item_list' ),
 		) );
 	}
 
@@ -78,6 +78,10 @@ class QW_Form_Fields {
 			$field_html = ob_get_clean();
 		}
 
+		if ( empty( $field['title'] ) && empty( $field['description'] ) && empty( $field['help'] ) ) {
+			return $field_html;
+		}
+
 		ob_start();
 		$this->render_flat_wrapper( $field, $field_html );
 		$wrapper_html = ob_get_clean();
@@ -95,7 +99,6 @@ class QW_Form_Fields {
 	function make_field( $args = array() ){
 		$field = array_replace( $this->default_field_args, $args );
 		$field['name'] = sanitize_title( $args['name'] );
-		$field['id'] = 'edit--' . $field['name'];
 
 		// build the field's entire form name
 		$field['form_name'] = '';
@@ -112,8 +115,10 @@ class QW_Form_Fields {
 			$field['class'] = array( $field['class'] );
 		}
 		$field['class'][] = 'qw-field';
+		$field['class'][] = 'qw-field-type-' . $field['type'];
 		$field['class'] = implode( ' ', $field['class'] );
 
+		$field['id'] = 'edit--' . sanitize_title( $field['form_name'] );
 		return $field;
 	}
 
@@ -140,7 +145,7 @@ class QW_Form_Fields {
 	function render_flat_wrapper( $field, $field_html ){
 		?>
 		<div id="<?php echo esc_attr( $field['id'] ) ;?>--wrapper"
-			class="qw-field-wrapper">
+			 class="qw-field-wrapper">
 			<label for="<?php echo esc_attr( $field['id'] ); ?>" class="qw-field-label">
 				<?php echo $field['title']; ?>
 			</label>
@@ -159,6 +164,28 @@ class QW_Form_Fields {
 	}
 
 	/**
+	 * Single checkbox field has a hidden predecessor to provide a default value
+	 *
+	 * @param $field
+	 */
+	function template_checkbox( $field ){
+		$hidden = array_replace( $field, array(
+				'type' => 'hidden',
+				'value' => 0,
+				'id' => $field['id'] . '--hidden',
+				'attributes' => array(),
+				'class' => 'qw-field-hidden',
+		));
+		$this->template_input( $hidden );
+
+		if ( isset( $field['value'] ) && $field['value'] ) {
+			$field['attributes']['checked'] = 'checked';
+		}
+		$field['value'] = 'on';
+		$this->template_input( $field );
+	}
+
+	/**
 	 * Generic input field
 	 *
 	 * @param $field
@@ -171,31 +198,8 @@ class QW_Form_Fields {
 				class="<?php echo esc_attr( $field['class'] ); ?>"
 				value="<?php echo esc_attr( $field['value'] ); ?>"
 				<?php echo $this->attributes( $field['attributes'] ); ?>
-				<?php echo $this->attributes( $field['data'] ); ?>
-		/>
+		>
 		<?php
-	}
-
-	/**
-	 * Single checkbox field has a hidden predecessor to provide a default value
-	 *
-	 * @param $field
-	 */
-	function template_checkbox( $field ){
-		$hidden = array_replace( $field, array(
-			'type' => 'hidden',
-			'value' => 0,
-			'id' => $field['id'] . '--hidden',
-			'data' => array(),
-			'attributes' => array(),
-		));
-		$this->template_input( $hidden );
-
-		if ( isset( $field['value'] ) && $field['value'] != 0 ) {
-			$field['attributes']['checked'] = 'checked';
-		}
-		$field['value'] = 'on';
-		$this->template_input( $field );
 	}
 
 	/**
@@ -209,7 +213,6 @@ class QW_Form_Fields {
 				id="<?php echo esc_attr( $field['id'] ); ?>"
 				class="<?php echo esc_attr( $field['class'] ); ?>"
 				<?php echo $this->attributes( $field['attributes'] ); ?>
-				<?php echo $this->attributes( $field['data'] ); ?>
 		><?php echo esc_textarea( $field['value'] ); ?></textarea>
 		<?php
 	}
@@ -238,12 +241,24 @@ class QW_Form_Fields {
 		<select name="<?php echo esc_attr( $field['form_name'] ); ?>"
 		       id="<?php echo esc_attr( $field['id'] ); ?>"
 		       class="<?php echo esc_attr( $field['class'] ); ?>"
-				<?php echo $this->attributes( $field['attributes'] ); ?>
-				<?php echo $this->attributes( $field['data'] ); ?> >
+				<?php echo $this->attributes( $field['attributes'] ); ?> >
 			<?php foreach( $field['options'] as $value => $option ) : ?>
 				<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, $field['value'] ); ?>><?php echo esc_html( $option ); ?></option>
 			<?php endforeach; ?>
 		</select>
+		<?php
+	}
+
+	function template_item_list( $field ){
+		?>
+		<ul class="<?php echo esc_attr( $field['class'] ); ?>">
+			<?php
+			foreach ( $field['items'] as $item ) { ?>
+				<li><?php print $item; ?></li>
+				<?php
+			}
+			?>
+		</ul>
 		<?php
 	}
 }

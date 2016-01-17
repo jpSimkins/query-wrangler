@@ -1,204 +1,181 @@
 <?php
-$link_selected               = ( isset( $field['values']['link'] ) ) ? 'checked="checked"' : '';
-$has_label                   = ( isset( $field['values']['has_label'] ) ) ? 'checked="checked"' : '';
-$label                       = ( isset( $field['values']['label'] ) ) ? $field['values']['label'] : "";
-$rewrite_output_selected     = ( isset( $field['values']['rewrite_output'] ) ) ? 'checked="checked"' : '';
-$exclude_display_selected    = ( isset( $field['values']['exclude_display'] ) ) ? 'checked="checked"' : '';
-$apply_the_content           = ( isset( $field['values']['apply_the_content'] ) ) ? 'checked="checked"' : '';
-$hide_if_empty               = ( isset( $field['values']['hide_if_empty'] ) ) ? 'checked="checked"' : '';
-$classes                     = ( isset( $field['values']['classes'] ) ) ? $field['values']['classes'] : '';
-$empty_field_content         = ( isset( $field['values']['empty_field_content'] ) ) ? $field['values']['empty_field_content'] : '';
-$empty_field_content_enabled = ( isset( $field['values']['empty_field_content_enabled'] ) ) ? $field['values']['empty_field_content_enabled'] : '';
+
+$form = new QW_Form_Fields( array(
+	'form_field_prefix' => $field['form_prefix'],
+) );
+
 ?>
-<div id="qw-field-<?php print $field['name']; ?>"
-     class="qw-field qw-sortable-item qw-item-form">
-  <span class="qw-setting-header">
-    <?php
-    print $field['title'];
-    if ( $has_label ) {
-	    print ': ' . $field['values']['label'];
-    }
-    ?>
-  </span>
+<div id="qw-field-<?php print $field['name']; ?>" class="qw-field qw-sortable-item qw-item-form">
+	<div class="qw-remove button">
+		Remove
+	</div>
+	<div class="qw-weight-container">
+		<?php
+		print $form->render_field( array(
+			'type'  => 'number',
+			'name'  => 'weight',
+			'title' => __( 'Weight' ),
+			'value' => isset( $field['values']['weight'] ) ? $field['values']['weight'] : '',
+		) );
+		?>
+	</div>
+	<p class="description"><?php print $field['description']; ?></p>
 
-	<div class="group">
-		<input class='qw-field-type '
-		       type='hidden'
-		       name='<?php print $field['form_prefix']; ?>[type]'
-		       value='<?php print $field['type']; ?>'/>
-		<input class='qw-field-hook_key'
-		       type='hidden'
-		       name='<?php print $field['form_prefix']; ?>[hook_key]'
-		       value='<?php print $field['hook_key']; ?>'/>
-		<input class='qw-field-name qw-js-title'
-		       type='hidden'
-		       name='<?php print $field['form_prefix']; ?>[name]'
-		       value='<?php print $field['name']; ?>'/>
+	<?php
 
+	print $form->render_field( array(
+		'type'  => 'hidden',
+		'name'  => 'type',
+		'value' => isset( $field['values']['type'] ) ? $field['values']['type'] : '',
+		'class' => array( 'qw-field-type' ),
+	) );
 
-		<div class="qw-remove button">
-			Remove
+	print $form->render_field( array(
+		'type'  => 'hidden',
+		'name'  => 'hook_key',
+		'value' => isset( $field['values']['hook_key'] ) ? $field['values']['hook_key'] : '',
+		'class' => array( 'qw-field-hook_key' ),
+	) );
+
+	print $form->render_field( array(
+		'type'  => 'hidden',
+		'name'  => 'name',
+		'value' => isset( $field['values']['name'] ) ? $field['values']['name'] : '',
+		'class' => array( 'qw-field-name', 'qw-js-title' ),
+	) );
+	?>
+
+	<?php if ( isset( $field['form'] ) ) { ?>
+		<div class="qw-field-form qw-setting">
+			<?php print $field['form']; ?>
 		</div>
-		<div class="qw-weight-container">
-			Weight:
-			<input class='qw-weight'
-			       name='qw-query-options[display][field_settings][fields][<?php print $field['name']; ?>][weight]'
-			       type='text' size='2'
-			       value='<?php print $weight; ?>'/>
-		</div>
+	<?php } ?>
 
-		<p class="description"><?php print $field['description']; ?></p>
+	<div class='qw-field-options'>
+		<?php
 
-		<?php if ( isset( $field['form'] ) ) { ?>
-			<div class="qw-field-form qw-setting">
-				<?php print $field['form']; ?>
-			</div>
-		<?php } ?>
+		print $form->render_field( array(
+			'type'  => 'checkbox',
+			'name'  => 'exclude_display',
+			'title' => __( 'Exclude this field from display' ),
+			'value' => isset( $field['values']['exclude_display'] ) ? $field['values']['exclude_display'] : 0,
+		) );
 
-		<div class='qw-field-options'>
-			<!-- exclude display -->
-			<label class='qw-field-checkbox qw-field-row'>
-				<input type='checkbox'
-				       name='<?php print $field['form_prefix']; ?>[exclude_display]'
-					<?php print $exclude_display_selected; ?> />
-				Exclude this field from display
-			</label>
+		print $form->render_field( array(
+			'type'  => 'checkbox',
+			'name'  => 'link',
+			'title' => __( 'Link this field to the post' ),
+			'value' => isset( $field['values']['link'] ) ? $field['values']['link'] : FALSE,
+		) );
 
-			<!-- link -->
-			<label class='qw-field-checkbox qw-field-row'>
-				<input type='checkbox'
-				       name='<?php print $field['form_prefix']; ?>[link]'
-					<?php print $link_selected; ?> />
-				Link this field to the post
-			</label>
+		print $form->render_field( array(
+			'type'  => 'checkbox',
+			'name'  => 'has_label',
+			'title' => __( 'Create a Label for this field' ),
+			'value' => isset( $field['values']['has_label'] ) ? $field['values']['has_label'] : FALSE,
+		) );
 
-			<!-- label -->
-			<div class="qw-options-group qw-field-row">
-				<div class="qw-options-group-title">
-					<label class='qw-field-checkbox'>
-						<input type='checkbox'
-						       name='<?php print $field['form_prefix']; ?>[has_label]'
-							<?php print $has_label; ?> />
-						Create a Label for this field.
-					</label>
-				</div>
-				<div class="qw-options-group-content qw-field-options-hidden">
-					<strong>Label Text: </strong>
-					<input class='qw-js-title'
-					       type="text"
-					       name="<?php print $field['form_prefix']; ?>[label]"
-					       value="<?php print $label; ?>"/>
-				</div>
-			</div>
+		print $form->render_field( array(
+			'type'  => 'text',
+			'name'  => 'label',
+			'title' => __( 'Label Text' ),
+			'value' => isset( $field['values']['label'] ) ? $field['values']['label'] : '',
+		) );
 
-			<?php
-			if ( isset( $field['content_options'] ) && $field['content_options'] ) {
-				?>
-				<label class='qw-field-checkbox qw-field-row'>
-					<input type='checkbox'
-					       name='<?php print $field['form_prefix']; ?>[apply_the_content]'
-						<?php print $apply_the_content; ?> />
-					Apply "the_content" filter to this field
-				</label>
-			<?php
-			}
-			?>
+		if ( isset( $field['content_options'] ) && $field['content_options'] ) {
 
-			<!-- hide_if_empty -->
-			<label class='qw-field-checkbox qw-field-row'>
-				<input type='checkbox'
-				       name='<?php print $field['form_prefix']; ?>[hide_if_empty]'
-					<?php print $hide_if_empty; ?> />
-				Hide field if empty
-			</label>
+			print $form->render_field( array(
+				'type'  => 'checkbox',
+				'name'  => 'apply_the_content',
+				'title' => __( 'Apply "the_content" filter to this field' ),
+				'value' => isset( $field['values']['apply_the_content'] ) ? $field['values']['apply_the_content'] : FALSE,
+			) );
+		}
 
-			<!-- rewrite output -->
-			<div class="qw-options-group qw-field-row">
-				<div class="qw-options-group-title">
-					<label class='qw-field-checkbox'>
-						<input type='checkbox'
-						       name='<?php print $field['form_prefix']; ?>[rewrite_output]'
-							<?php print $rewrite_output_selected; ?> />
-						Rewrite the output of this field
-					</label>
-				</div>
-				<div class="qw-options-group-content qw-field-options-hidden">
-          <textarea name='<?php print $field['form_prefix']; ?>[custom_output]'
-                    class="qw-field-textarea"><?php print ( isset( $field['values']['custom_output'] ) ) ? qw_textarea( $field['values']['custom_output'] ) : ''; ?></textarea>
+		print $form->render_field( array(
+			'type'  => 'checkbox',
+			'name'  => 'hide_if_empty',
+			'title' => __( 'Hide field if empty' ),
+			'value' => isset( $field['values']['hide_if_empty'] ) ? $field['values']['hide_if_empty'] : FALSE,
+		) );
 
-					<div class="qw-field-tokens">
-						<p>
-							Available replacement tokens. These tokens will be
-							replaced with the processed results of their fields.
-						</p>
-						<ul class="qw-field-tokens-list">
-							<?php
-							if ( isset( $tokens ) && is_array( $tokens ) ) {
-								foreach ( $tokens as $token ) { ?>
-									<li><?php print $token; ?></li>
-								<?php
-								}
-							}
-							?>
-						</ul>
-					</div>
-				</div>
-			</div>
-
-			<!-- additional field classes -->
-			<div class="qw-field-wrapper qw-field-row">
-				<label class='qw-field'>
-					<strong>Additional Classes</strong><br/>
-					<input type='text'
-					       name='<?php print $field['form_prefix']; ?>[classes]'
-					       value='<?php print $classes; ?>'/>
-				</label>
-
-				<p class="description">Additional CSS classes to add to the
-					field during output. Separate multiple classes with
-					spaces.</p>
-			</div>
-		</div>
-
-		<!-- enable empty field content -->
+		?>
+		<!-- rewrite output -->
 		<div class="qw-options-group qw-field-row">
 			<div class="qw-options-group-title">
-				<label class='qw-field-checkbox'>
-					<input type='checkbox'
-					       name='<?php print $field['form_prefix']; ?>[empty_field_content_enabled]'
-						<?php print $empty_field_content_enabled; ?> />
-					Rewrite empty result text
-				</label>
+				<?php
+				print $form->render_field( array(
+					'type'  => 'checkbox',
+					'name'  => 'rewrite_output',
+					'title' => __( 'Rewrite the output of this field' ),
+					'value' => isset( $field['values']['rewrite_output'] ) ? $field['values']['rewrite_output'] : FALSE,
+				) );
+				?>
 			</div>
 			<div class="qw-options-group-content qw-field-options-hidden">
-				<!-- empty field content -->
-				<label class='qw-field'>
-          <textarea
-	          name='<?php print $field['form_prefix']; ?>[empty_field_content]'
-	          class="qw-field-textarea"><?php print qw_textarea( $empty_field_content ); ?></textarea>
-				</label>
+				<?php
 
-				<p class="description">Field settings will apply to this
-					content.</p>
+				print $form->render_field( array(
+					'type'  => 'textarea',
+					'name'  => 'custom_output',
+					'value' => isset( $field['values']['custom_output'] ) ? qw_textarea( $field['values']['custom_output'] ) : '',
+					'class' => array( 'qw-field-textarea' )
+				) );
 
-				<div class="qw-field-tokens">
-					<p>
-						Available replacement tokens. These tokens will be
-						replaced with the processed results of their fields.
-					</p>
-					<ul class="qw-field-tokens-list">
-						<?php
-						if ( isset( $tokens ) && is_array( $tokens ) ) {
-							foreach ( $tokens as $token ) { ?>
-								<li><?php print $token; ?></li>
-							<?php
-							}
-						}
-						?>
-					</ul>
-				</div>
+				print $form->render_field( array(
+					'type' => 'item_list',
+					'name' => 'tokens',
+					'items' => $tokens,
+					'description' => __( 'Available replacement tokens. These tokens will be replaced with the processed results of their fields.' ),
+				) );
+				?>
 			</div>
 		</div>
 
+		<?php
+
+		print $form->render_field( array(
+			'type' => 'text',
+			'name' => 'classes',
+			'title' => __( 'Additional Classes' ),
+			'description' => __( 'Additional CSS classes to add to the
+				field during output. Separate multiple classes with
+				spaces.' ),
+			'value' => isset( $field['values']['classes'] ) ? $field['values']['classes'] : '',
+		) );
+		?>
+	</div>
+
+	<!-- enable empty field content -->
+	<div class="qw-options-group qw-field-row">
+		<div class="qw-options-group-title">
+			<?php
+			print $form->render_field( array(
+				'type'  => 'checkbox',
+				'name'  => 'empty_field_content_enabled',
+				'title' => __( 'Rewrite empty result text' ),
+				'value' => isset( $field['values']['empty_field_content_enabled'] ) ? $field['values']['empty_field_content_enabled'] : FALSE,
+			) );
+			?>
+		</div>
+		<div class="qw-options-group-content qw-field-options-hidden">
+			<?php
+
+			print $form->render_field( array(
+				'type'  => 'textarea',
+				'name'  => 'empty_field_content',
+				'description' => __( 'Field settings will apply to this content.' ),
+				'value' => isset( $field['values']['empty_field_content'] ) ? qw_textarea( $field['values']['empty_field_content'] ) : '',
+				'class' => array( 'qw-field-textarea' )
+			) );
+
+			print $form->render_field( array(
+				'type' => 'item_list',
+				'name' => 'tokens',
+				'items' => $tokens,
+				'description' => __( 'Available replacement tokens. These tokens will be replaced with the processed results of their fields.' ),
+			) );
+			?>
+		</div>
 	</div>
 </div>

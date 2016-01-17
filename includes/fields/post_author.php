@@ -2,8 +2,11 @@
 // add default fields to the hook filter
 add_filter( 'qw_fields', 'qw_field_author' );
 
-/*
+/**
  * Add field to qw_fields
+ *
+ * @param $fields
+ * @return array
  */
 function qw_field_author( $fields ) {
 
@@ -18,8 +21,13 @@ function qw_field_author( $fields ) {
 	return $fields;
 }
 
-/*
+/**
  * Author output callback
+ *
+ * @param $post
+ * @param $field
+ *
+ * @return string
  */
 function qw_get_the_author( $post, $field ) {
 	switch ( $field['output_type'] ) {
@@ -40,38 +48,35 @@ function qw_get_the_author( $post, $field ) {
 	return $author;
 }
 
-/*
+/**
  * Author form callback
+ *
+ * @param $field
  */
 function qw_field_author_form( $field ) {
-	$options       = array(
-		'name' => 'Author Name',
-		'ID'   => 'Author ID',
-	);
-	$link_selected = ( isset( $field['values']['link_to_author'] ) ) ? 'checked="checked"' : '';
-	?>
-	<label class="qw-label">Author Field Settings:</label>
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => $field['form_prefix'],
+	) );
 
-	<select class='qw-js-title'
-	        name="<?php print $field['form_prefix']; ?>[output_type]">
-		<?php
-		foreach ( $options as $value => $title ) { ?>
-			<option value="<?php print $value; ?>"
-				<?php print ( $field['values']['output_type'] == $value ) ? 'selected="selected"' : ''; ?>>
-				<?php print $title; ?>
-			</option>
-		<?php
-		}
-		?>
-	</select>
+	print $form->render_field( array(
+		'type' => 'select',
+		'name' => 'output_type',
+		'title' => __( 'Author Field Settings' ),
+		'description' => __( '' ),
+		'value' => isset( $field['values']['output_type'] ) ? $field['values']['output_type'] : '',
+		'options' => array(
+			'name' => __( 'Author Name' ),
+			'ID'   => __( 'Author ID' ),
+		),
+		'class' => array( 'qw-js-title' ),
+	) );
 
-	<p>
-		<label class='qw-field-checkbox'>
-			<input type='checkbox'
-			       name='<?php print $field['form_prefix']; ?>[link_to_author]'
-				<?php print $link_selected; ?> />
-			Link to author page (list of author posts)
-		</label>
-	</p>
-<?php
+	print $form->render_field( array(
+		'type' => 'checkbox',
+		'name' => 'link_to_author',
+		'title' => __( 'Link to author page' ),
+		'description' => __( '' ),
+		'value' => isset( $field['values']['link_to_author'] ) ? $field['values']['link_to_author'] : false,
+		'class' => array( 'qw-js-title' ),
+	) );
 }

@@ -5,8 +5,10 @@ add_filter( 'qw_fields', 'qw_field_file_attachment' );
 // add default file styles to the filter
 add_filter( 'qw_file_styles', 'qw_default_file_styles', 0 );
 
-/*
+/**
  * Add field to qw_fields
+ *
+ * @param $fields
  */
 function qw_field_file_attachment( $fields ) {
 
@@ -21,7 +23,7 @@ function qw_field_file_attachment( $fields ) {
 	return $fields;
 }
 
-/*
+/**
  * File Styles
  *
  * @return array of file styles
@@ -43,42 +45,47 @@ function qw_default_file_styles( $file_styles ) {
 	return $file_styles;
 }
 
-/*
+/**
  * File attachment settings Form
+ *
+ * @param $field
  */
 function qw_field_file_attachment_form( $field ) {
-	$file_styles = qw_all_file_styles();
-	?>
-	<!-- file display -->
-	<label class="qw-label">Number of items to show:</label>
-	<input class="qw-text-short"
-	       type="text"
-	       name='<?php print $field['form_prefix']; ?>[file_display_count]'
-	       value="<?php print ( isset( $field['values']['file_display_count'] ) ) ? $field['values']['file_display_count'] : 0;?>"/>
+	$file_styles = array();
 
-	<p>
-		<label class="qw-label">File Display Style:</label>
-		<select class='qw-js-title'
-		        name='<?php print $field['form_prefix']; ?>[file_display_style]'>
-			<?php
-			foreach ( $file_styles as $key => $file_style_details ) {
-				$style_selected = ( $field['values']['file_display_style'] == $key ) ? 'selected="selected"' : '';
-				?>
-				<option
-					value="<?php print $key; ?>" <?php print $style_selected; ?>><?php print $file_style_details['description']; ?></option>
-			<?php
-			}
-			?>
-		</select>
-	</p>
-<?php
+	foreach( qw_all_file_styles() as $key => $style ){
+		$file_styles[ $key ] = $style['description'];
+	}
+
+
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => $field['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+		'type' => 'number',
+		'name' => 'file_display_count',
+		'title' => __( 'Number of items to show' ),
+		'value' => isset( $field['values']['file_display_count'] ) ? $field['values']['file_display_count'] : 0,
+		'class' => array( 'qw-js-title' ),
+	) );
+
+	print $form->render_field( array(
+		'type' => 'select',
+		'name' => 'file_display_style',
+		'title' => __( 'File Display Style' ),
+		'value' => isset( $field['values']['file_display_style'] ) ? $field['values']['file_display_style'] : '',
+		'options' => $file_styles,
+		'class' => array( 'qw-js-title' ),
+	) );
 }
 
-/*
+/**
  * Get and theme attached post files
  *
- * @param int $post_id The post->ID
- * $param int $count Number of files to get
+ * @param $post
+ * @param $field
+ * @return string
  */
 function qw_theme_file( $post, $field ) {
 	$style = ( $field['file_display_style'] ) ? $field['file_display_style'] : 'link';
@@ -117,7 +124,7 @@ function qw_theme_file( $post, $field ) {
 	}
 }
 
-/*
+/**
  * Get files attached to a post
  *
  * @param int $post_id The WP post id

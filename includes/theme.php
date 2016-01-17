@@ -368,7 +368,7 @@ function qw_make_fields_rows( &$qw_query, $options ) {
 			$tokens[ '{{' . $field_name . '}}' ] = $row['fields'][ $field_name ]['output'];
 
 			// look for rewrite output
-			if ( isset( $field_settings['rewrite_output'] ) ) {
+			if ( !empty( $field_settings['rewrite_output'] ) ) {
 				// replace tokens with results
 				$field_settings['custom_output']        = str_replace( array_keys( $tokens ),
 					array_values( $tokens ),
@@ -377,26 +377,26 @@ function qw_make_fields_rows( &$qw_query, $options ) {
 			}
 
 			// apply link to field
-			if ( isset( $field_settings['link'] ) ) {
+			if ( !empty( $field_settings['link'] ) ) {
 				$row['fields'][ $field_name ]['output'] = '<a class="query-field-link" href="' . get_permalink() . '">' . $row['fields'][ $field_name ]['output'] . '</a>';
 			}
 
 			// get default field label for tables
-			$row['fields'][ $field_name ]['label'] = ( isset( $field_settings['has_label'] ) ) ? $field_settings['label'] : '';
+			$row['fields'][ $field_name ]['label'] = isset( $field_settings['label'] ) ? $field_settings['label'] : '';
 
 			// apply labels to full style fields
-			if ( isset( $field_settings['has_label'] ) &&
-			     $display['type'] != 'full' &&
+			if ( !empty( $field_settings['has_label'] ) &&
+			     //$display['type'] != 'full' &&
 			     $display['style'] != 'table'
 			) {
 				$row['fields'][ $field_name ]['output'] = '<label class="query-label">' . $field_settings['label'] . '</label> ' . $row['fields'][ $field_name ]['output'];
 			}
 
 			// the_content filter
-			if ( isset( $field_settings['apply_the_content'] ) ) {
-				$row['fields'][ $field_name ]['output'] = apply_filters( 'the_content',
-					$row['fields'][ $field_name ]['output'] );
-			} else {
+			if ( !empty( $field_settings['apply_the_content'] ) ) {
+				$row['fields'][ $field_name ]['output'] = apply_filters( 'the_content', $row['fields'][ $field_name ]['output'] );
+			}
+			else {
 				// apply shortcodes to field output
 				$row['fields'][ $field_name ]['output'] = do_shortcode( $row['fields'][ $field_name ]['output'] );
 			}
@@ -405,10 +405,10 @@ function qw_make_fields_rows( &$qw_query, $options ) {
 			$row['fields'][ $field_name ]['content'] = $row['fields'][ $field_name ]['output'];
 
 			// hide if empty
-			$row['hide'] = ( isset( $field_settings['hide_if_empty'] ) && $row['is_empty'] );
+			$row['hide'] = ( !empty( $field_settings['hide_if_empty'] ) && $row['is_empty'] );
 
 			// after all operations, remove if excluded
-			if ( isset( $field_settings['exclude_display'] ) || $row['hide'] ) {
+			if ( !empty( $field_settings['exclude_display'] ) || $row['hide'] ) {
 				unset( $row['fields'][ $field_name ]['output'] );
 			}
 		}
