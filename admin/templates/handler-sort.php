@@ -1,45 +1,52 @@
 <?php
-/*
- * $sort: array of default sort data, and specific sort data
- */
+
+$form = new QW_Form_Fields( array(
+		'form_field_prefix' => $sort['form_prefix'],
+) );
+
 ?>
 <!-- <?php print $sort['name']; ?> -->
-<div id="qw-sort-<?php print $sort['name']; ?>"
-     class="qw-sort qw-sortable-item qw-item-form">
-  <span class="qw-setting-header">
-    <?php print $sort['title']; ?>
-  </span>
-
-	<div class="group">
-		<input class='qw-sort-type'
-		       type='hidden'
-		       name='<?php print $sort['form_prefix']; ?>[type]'
-		       value='<?php print $sort['type']; ?>'/>
-		<input class='qw-sort-hook_key'
-		       type='hidden'
-		       name='<?php print $sort['form_prefix']; ?>[hook_key]'
-		       value='<?php print $sort['hook_key']; ?>'/>
-		<input class='qw-sort-name'
-		       type='hidden'
-		       name='<?php print $sort['form_prefix']; ?>[name]'
-		       value='<?php print $sort['name']; ?>'/>
-
-		<div class="qw-remove button">
-			Remove
-		</div>
-		<div class="qw-weight-container">
-			<input class='qw-weight'
-			       name='qw-query-options[args][sorts][<?php print $sort['name']; ?>][weight]'
-			       type='text' size='2'
-			       value='<?php print $weight; ?>'/>
-		</div>
-
-		<p class="description"><?php print $sort['description']; ?></p>
-
-		<?php if ( $sort['form'] ) { ?>
-			<div class="qw-sort-form">
-				<?php print $sort['form']; ?>
-			</div>
-		<?php } ?>
+<div id="qw-sort-<?php print $sort['name']; ?>" class="qw-sort qw-sortable-item qw-item-form">
+	<div class="qw-remove button"> Remove </div>
+	<div class="qw-weight-container">
+		<?php
+		print $form->render_field( array(
+				'type'  => 'number',
+				'name'  => 'weight',
+				'title' => __( 'Weight' ),
+				'value' => $sort['weight'],
+				'class' => array( 'qw-weight' )
+		) );
+		?>
 	</div>
+	<p class="description"><?php print $sort['description']; ?></p>
+
+	<?php
+
+	print $form->render_field( array(
+			'type'  => 'hidden',
+			'name'  => 'type',
+			'value' => $sort['type'],
+			'class' => array( 'qw-field-type' ),
+	) );
+
+	print $form->render_field( array(
+			'type'  => 'hidden',
+			'name'  => 'hook_key',
+			'value' => $sort['hook_key'],
+			'class' => array( 'qw-field-hook_key' ),
+	) );
+
+	print $form->render_field( array(
+			'type'  => 'hidden',
+			'name'  => 'name',
+			'value' => $sort['name'],
+			'class' => array( 'qw-field-name', 'qw-js-title' ),
+	) );
+
+	if ( $sort['form'] ) {
+		print $sort['form'];
+	}
+
+	?>
 </div>
