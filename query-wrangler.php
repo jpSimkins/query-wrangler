@@ -128,12 +128,6 @@ function qw_init_frontend() {
 }
 
 function qw_admin_init() {
-	$settings = QW_Settings::get_instance();
-
-	if ( $settings->get( 'qw_live_preview' ) === FALSE ) {
-		add_option( 'qw_live_preview', 'on' );
-	}
-
 	include_once QW_PLUGIN_DIR . '/admin/admin.php';
 	include_once QW_PLUGIN_DIR . '/admin/query-admin-pages.php';
 	include_once QW_PLUGIN_DIR . '/admin/ajax.php';
@@ -180,30 +174,29 @@ function qw_menu() {
 			break;
 		}
 	}
-	// http://codex.wordpress.org/Function_Reference/add_menu_page
+
 	$list_page = add_menu_page( 'Query Wrangler',
-		'Query Wrangler',
+		__( 'Query Wrangler' ),
 		'manage_options',
 		'query-wrangler',
 		'qw_page_handler',
 		'',
 		$menu_placement );
-	// http://codex.wordpress.org/Function_Reference/add_submenu_page
 	$create_page = add_submenu_page( 'query-wrangler',
-		'Create New Query',
-		'Add New',
+		__( 'Create New Query' ),
+		__( 'Add New' ),
 		'manage_options',
 		'qw-create',
 		'qw_create_query_page' );
 	$import_page = add_submenu_page( 'query-wrangler',
-		'Import',
-		'Import',
+		__( 'Import' ),
+		__( 'Import' ),
 		'manage_options',
 		'qw-import',
 		'qw_import_page' );
 	$settings_page = add_submenu_page( 'query-wrangler',
-		'Settings',
-		'Settings',
+		__( 'Settings' ),
+		__( 'Settings' ),
 		'manage_options',
 		'qw-settings',
 		'qw_settings_page' );

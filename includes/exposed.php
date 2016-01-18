@@ -7,7 +7,7 @@ function qw_generate_exposed_handlers( $options ) {
 	if ( $exposed = qw_process_exposed_handlers( $options ) ) {
 		$output = array( 'sorts' => '', 'filters' => '' );
 		// loop through sorts and filters
-		if ( isset( $exposed['sorts'] ) && is_array( $exposed['sorts'] ) ) {
+		if ( !empty( $exposed['sorts'] ) && is_array( $exposed['sorts'] ) ) {
 			// loop through each exposed item
 			foreach ( $exposed['sorts'] as $name => $item ) {
 				// show the exposed form
@@ -19,7 +19,7 @@ function qw_generate_exposed_handlers( $options ) {
 		}
 
 		// loop through sorts and filters
-		if ( isset( $exposed['filters'] ) && is_array( $exposed['filters'] ) ) {
+		if ( !empty( $exposed['filters'] ) && is_array( $exposed['filters'] ) ) {
 			// loop through each exposed item
 			foreach ( $exposed['filters'] as $name => $item ) {
 				// show the exposed form
@@ -39,28 +39,28 @@ function qw_generate_exposed_handlers( $options ) {
  */
 function qw_process_exposed_handlers( $options ) {
 	// look for exposed filters or sorts
-	if ( isset( $options['args']['sorts'] ) && is_array( $options['args']['sorts'] ) ) {
+	if ( !empty( $options['args']['sorts'] ) && is_array( $options['args']['sorts'] ) ) {
 		$all_sorts     = qw_all_sort_options();
 		$exposed_sorts = array();
 		foreach ( $options['args']['sorts'] as $name => $sort ) {
-			if ( isset( $sort['is_exposed'] ) ) {
+			if ( !empty( $sort['is_exposed'] ) ) {
 				$exposed_sorts[ $name ] = $all_sorts[ $sort['hook_key'] ];
 				// override exposed_key
-				if ( ! empty( $sort['exposed_key'] ) ) {
+				if ( !empty( $sort['exposed_key'] ) ) {
 					$exposed_sorts[ $name ]['exposed_key'] = $sort['exposed_key'];
 				}
 				$exposed_sorts[ $name ]['values'] = $sort;
 			}
 		}
 	}
-	if ( isset( $options['args']['filters'] ) && is_array( $options['args']['filters'] ) ) {
+	if ( !empty( $options['args']['filters'] ) && is_array( $options['args']['filters'] ) ) {
 		$exposed_filters = array();
 		$all_filters     = qw_all_filters();
 		foreach ( $options['args']['filters'] as $name => $filter ) {
-			if ( isset( $filter['is_exposed'] ) ) {
+			if ( !empty( $filter['is_exposed'] ) ) {
 				$exposed_filters[ $name ] = $all_filters[ $filter['hook_key'] ];
 				// override exposed_key
-				if ( ! empty( $filter['exposed_key'] ) ) {
+				if ( !empty( $filter['exposed_key'] ) ) {
 					$exposed_filters[ $name ]['exposed_key'] = $filter['exposed_key'];
 				}
 				$exposed_filters[ $name ]['values'] = $filter;
@@ -69,9 +69,8 @@ function qw_process_exposed_handlers( $options ) {
 	}
 
 	$exposed = array();
-	if ( isset( $exposed_filters ) && count( $exposed_filters ) > 0 ) {
-		$exposed_filters    = apply_filters( 'qw_process_exposed_filters',
-			$exposed_filters );
+	if ( !empty( $exposed_filters ) && count( $exposed_filters ) > 0 ) {
+		$exposed_filters    = apply_filters( 'qw_process_exposed_filters', $exposed_filters );
 		$exposed['filters'] = $exposed_filters;
 	}
 	/*

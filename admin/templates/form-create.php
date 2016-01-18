@@ -42,6 +42,8 @@
 		'value' => __( 'Create' ),
 		'class' => array( 'button-primary' ),
 	) );
+
+	print $form->close();
 	?>
 </div>
 
