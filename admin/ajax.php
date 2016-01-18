@@ -1,6 +1,30 @@
 <?php
-/*
- * Ajax form templates
+
+/**
+ * Ajax callback for meta_key autocomplete
+ */
+function qw_meta_key_autocomplete() {
+	if ( isset( $_POST['qw_meta_key_autocomplete'] ) ) {
+		$meta_key = sanitize_text_field( $_POST['qw_meta_key_autocomplete'] );
+
+		global $wpdb;
+		$like = $wpdb->esc_like( $meta_key );
+		$query = $wpdb->prepare(
+				"SELECT DISTINCT(`meta_key`) FROM {$wpdb->postmeta} WHERE `meta_key` LIKE '%s' LIMIT 15",
+				'%' . $like. '%'
+		);
+		$results = $wpdb->get_col( $query );
+
+		wp_send_json( array(
+				'success' => TRUE,
+				'values'  => $results,
+		) );
+	}
+	exit;
+}
+
+/**
+ * Ajax for form templates
  */
 function qw_form_ajax() {
 	switch ( $_POST['form'] ) {

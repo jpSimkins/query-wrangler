@@ -74,6 +74,7 @@ var QueryWrangler = {};
          * Submit an ajax call via POST
          * @param post_data_form
          * @param callback
+         * @param responseDataType
          */
         post: function ( post_data_form, callback, responseDataType ) {
           if ( typeof responseDataType == 'undefined' ){

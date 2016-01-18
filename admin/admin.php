@@ -304,26 +304,3 @@ function qw_check_version() {
 		update_option( 'qw_plugin_version', QW_VERSION );
 	}
 }
-
-add_action( 'wp_ajax_qw_meta_key_autocomplete', 'qw_meta_key_autocomplete' );
-
-/**
- * Ajax callback for meta_key autocomplete
- */
-function qw_meta_key_autocomplete() {
-	if ( isset( $_POST['qw_meta_key_autocomplete'] ) ) {
-		$meta_key = sanitize_text_field( $_POST['qw_meta_key_autocomplete'] );
-		global $wpdb;
-		$query = $wpdb->prepare(
-				"SELECT DISTINCT(`meta_key`) FROM {$wpdb->postmeta} WHERE `meta_key` LIKE '%s' LIMIT 15",
-				'%' . $meta_key . '%'
-		);
-		$results = $wpdb->get_col( $query );
-
-		wp_send_json( array(
-			'success' => TRUE,
-			'values'  => $results,
-		) );
-	}
-	exit;
-}

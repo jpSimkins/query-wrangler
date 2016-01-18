@@ -136,6 +136,9 @@ function qw_admin_init() {
 	//add_action( 'wp_ajax_nopriv_qw_form_ajax', 'qw_form_ajax' );
 	add_action( 'wp_ajax_qw_form_ajax', 'qw_form_ajax' );
 	add_action( 'wp_ajax_qw_data_ajax', 'qw_data_ajax' );
+
+	add_action( 'wp_ajax_qw_meta_key_autocomplete', 'qw_meta_key_autocomplete' );
+
 	add_action( 'admin_head', 'qw_admin_css' );
 
 	// js
