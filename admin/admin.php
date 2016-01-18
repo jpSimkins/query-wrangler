@@ -7,13 +7,6 @@ function qw_admin_templates( $templates ) {
 	$settings = QW_Settings::get_instance();
 	$theme = $settings->get( 'edit_theme', QW_DEFAULT_THEME );
 
-	// preview query
-	$templates['query_preview'] = array(
-		'files'        => 'admin/templates/preview-json.php',
-		'default_path' => QW_PLUGIN_DIR,
-		'arguments'    => array( 'options' => NULL ),
-	);
-
 	// editor theme template
 	$templates['query_editor'] = array(
 		'files'        => 'admin/editors/[theme]/[theme]-editor.php',
@@ -307,7 +300,7 @@ function qw_check_version() {
 		// first upgrade
 		include QW_PLUGIN_DIR . '/upgrade.php';
 		qw_upgrade_12_to_13();
-		// set our version numer
+		// set our version number
 		update_option( 'qw_plugin_version', QW_VERSION );
 	}
 }
@@ -321,12 +314,12 @@ function qw_meta_key_autocomplete() {
 	if ( isset( $_POST['qw_meta_key_autocomplete'] ) ) {
 		$meta_key = sanitize_text_field( $_POST['qw_meta_key_autocomplete'] );
 		global $wpdb;
-		$query   = $wpdb->prepare( "SELECT DISTINCT(`meta_key`) FROM {$wpdb->postmeta} WHERE `meta_key` LIKE '%s' LIMIT 15",
-			'%' . $meta_key . '%' );
+		$query = $wpdb->prepare(
+				"SELECT DISTINCT(`meta_key`) FROM {$wpdb->postmeta} WHERE `meta_key` LIKE '%s' LIMIT 15",
+				'%' . $meta_key . '%'
+		);
 		$results = $wpdb->get_col( $query );
 
-
-		//foreach ($query)
 		wp_send_json( array(
 			'success' => TRUE,
 			'values'  => $results,

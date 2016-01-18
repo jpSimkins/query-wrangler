@@ -39,61 +39,19 @@ $live_preview = QW_Settings::get_instance()->get('live_preview');
 			<div id="query-preview-controls" class="query-preview-inactive">
 				<label>
 					<input id="live-preview"
-					       type="checkbox"
-							<?php checked( $live_preview ); ?> />
+						type="checkbox"
+						<?php checked( $live_preview ); ?> />
 					Live Preview
 				</label>
 				<button id="get-preview" class="button">Preview</button>
 			</div>
 
-			<h4 id="preview-title">Preview Query</h4>
+			<h4 id="preview-title">
+				<?php _e( 'Preview Query' ); ?>
+				<small><?php _e( 'This preview does not include your theme CSS stylesheet.' ); ?></small>
+			</h4>
 
-			<p><em>This preview does not include your theme's CSS stylesheet.</em></p>
-
-			<div id="query-preview-target">
-				<!-- preview -->
-			</div>
-
-			<div class="qw-clear-gone"><!-- ie hack -->&nbsp;</div>
-
-			<div id="query-details">
-				<div class="group">
-					<div class="qw-setting-header">WP_Query Arguments</div>
-					<div id="qw-show-arguments-target">
-						<!-- args -->
-					</div>
-				</div>
-				<div class="group">
-					<div class="qw-setting-header">PHP WP_Query</div>
-					<div id="qw-show-php_wpquery-target">
-						<!-- php wp_query -->
-					</div>
-				</div>
-				<div class="group">
-					<div class="qw-setting-header">Display Settings</div>
-					<div id="qw-show-display-target">
-						<!-- display -->
-					</div>
-				</div>
-				<div class="group">
-					<div class="qw-setting-header">All Options</div>
-					<div id="qw-show-options-target">
-						<!-- args -->
-					</div>
-				</div>
-				<div class="group">
-					<div class="qw-setting-header">Resulting WP_Query Object</div>
-					<div id="qw-show-wpquery-target">
-						<!-- WP_Query -->
-					</div>
-				</div>
-				<div class="group">
-					<div class="qw-setting-header">Template Suggestions</div>
-					<div id="qw-show-templates-target">
-						<!-- templates -->
-					</div>
-				</div>
-			</div>
-		</div><!-- /query-preview -->
+			<div id="query-preview-target"><?php _e('Preview has not loaded.'); ?></div>
+		</div>
 	</div>
 </div>

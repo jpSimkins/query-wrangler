@@ -34,18 +34,8 @@ var QueryWrangler = {};
           }
 
           // provide meta_value_field key suggestions
-          //$('body').on( 'keyup', '.qw-meta-value-key-autocomplete', QueryWrangler.ajax.meta_value_key_autocomplete );
           $( '.qw-meta-value-key-autocomplete' ).autocomplete( {
             source: QueryWrangler.ajax.metaValueKeySearch
-          } );
-
-          // preview data accordions
-          $( '#query-details' ).accordion( {
-            header: '> div > .qw-setting-header',
-            heightStyle: "content",
-            collapsible: true,
-            active: false,
-            autoHeight: false
           } );
 
           // get our core hook data
@@ -85,14 +75,18 @@ var QueryWrangler = {};
          * @param post_data_form
          * @param callback
          */
-        post: function ( post_data_form, callback ) {
+        post: function ( post_data_form, callback, responseDataType ) {
+          if ( typeof responseDataType == 'undefined' ){
+            responseDataType = 'json';
+          }
+
           // ajax call to get form
-          jQuery.ajax( {
+          $.ajax( {
             url: $( 'form#qw-edit-query-form' ).data( 'ajax-url' ),
             type: 'POST',
             async: false,
             data: post_data_form,
-            dataType: 'json',
+            dataType: responseDataType,
             success: callback
           } );
         },
@@ -146,14 +140,18 @@ var QueryWrangler = {};
 
           // make ajax call
           QueryWrangler.ajax.post( post_data_form, function ( results ) {
-            $( '#query-preview-target' ).html( results.preview );
-            $( '#qw-show-arguments-target' ).html( results.args );
-            $( '#qw-show-php_wpquery-target' ).html( results.php_wpquery );
-            $( '#qw-show-display-target' ).html( results.display );
-            $( '#qw-show-options-target' ).html( results.options );
-            $( '#qw-show-wpquery-target' ).html( results.wpquery );
-            $( '#qw-show-templates-target' ).html( results.templates );
-          } );
+            $( '#query-preview-target' ).html( results );
+
+            // preview data accordions
+            $( '#query-details' ).accordion( {
+              header: '> div > .qw-setting-header',
+              heightStyle: "content",
+              collapsible: true,
+              active: false,
+              autoHeight: false
+            } );
+
+          }, 'html' );
 
           // hide throbber
           $preview_controls.removeClass( 'query-preview-active' ).addClass( 'query-preview-inactive' );
