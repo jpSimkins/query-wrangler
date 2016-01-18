@@ -13,52 +13,9 @@ function qw_admin_templates( $templates ) {
 		'default_path' => QW_PLUGIN_DIR,
 		'arguments'    => array( 'options' => NULL ),
 	);
-	// edit query wrapper template
-	$templates['query_edit_wrapper'] = array(
-		'files'        => 'admin/templates/form-editor.php',
-		'default_path' => QW_PLUGIN_DIR,
-		'arguments'    => array(
-			'theme' => $theme,
-		),
-	);
-	// create query template
-	$templates['query_create'] = array(
-		'files'        => 'admin/templates/form-create.php',
-		'default_path' => QW_PLUGIN_DIR,
-	);
-	// import query template
-	$templates['query_import'] = array(
-		'files'        => 'admin/templates/form-import.php',
-		'default_path' => QW_PLUGIN_DIR,
-	);
-	// import query template
-	$templates['query_settings'] = array(
-		'files'        => 'admin/templates/form-settings.php',
-		'default_path' => QW_PLUGIN_DIR,
-	);
-	// export query template
-	$templates['query_export'] = array(
-		'files'        => 'admin/templates/form-export.php',
-		'default_path' => QW_PLUGIN_DIR,
-		'arguments'    => array(
-			'query_id' => 0,
-		),
-	);
-
-	// generic admin page wrapper
-	$templates['admin_wrapper'] = array(
-		'files'        => array(
-			'admin/templates/page-admin-wrapper.php',
-		),
-		'default_path' => QW_PLUGIN_DIR,
-		'arguments'    => array(
-			'title'   => 'Admin Page',
-			'content' => 'content goes here.',
-		),
-	);
 
 	// editor theme template
-	$templates['query_edit'] = array(
+	$templates['query_editor'] = array(
 		'files'        => 'admin/editors/[theme]/[theme]-editor.php',
 		'default_path' => QW_PLUGIN_DIR,
 		'arguments'    => array(
@@ -374,11 +331,6 @@ function qw_meta_key_autocomplete() {
 			'success' => TRUE,
 			'values'  => $results,
 		) );
-
-		if ( $results ) {
-		} else {
-
-		}
 	}
 	exit;
 }

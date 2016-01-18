@@ -1,16 +1,15 @@
 <?php
-/*
+/**
  * Handle the display of pages and actions
  */
 function qw_page_handler() {
 	$redirect = FALSE;
-	// handle actions
+
 	if ( isset( $_GET['action'] ) ) {
 		$redirect = TRUE;
 		switch ( $_GET['action'] ) {
 			case 'update':
 				qw_update_query( $_POST );
-				// redirect to the edit page
 				qw_admin_redirect( $_GET['edit'] );
 				break;
 
@@ -22,35 +21,33 @@ function qw_page_handler() {
 
 			case 'create':
 				$new_query_id = qw_insert_new_query( $_POST );
-				// forward to the edit page
 				qw_admin_redirect( $new_query_id );
 				break;
 
 			case 'import':
 				$new_query_id = qw_query_import( $_POST );
-				// forward to edit page
 				qw_admin_redirect( $new_query_id );
 				break;
 
 			case 'save_settings':
 				qw_save_settings( $_POST );
-				// forward to edit page
 				qw_admin_redirect( NULL, 'qw-settings' );
 				break;
 		}
 	}
 
-	// see if we're editng a page
+	// see if we're editing a query
 	if ( isset( $_GET['edit'] ) &&
 	     is_numeric( $_GET['edit'] ) &&
-	     ! $redirect
-	) {
-		// show edit form
+	     ! $redirect )
+	{
 		qw_edit_query_form();
-	} // export a query
+	}
+	// export a query
 	else if ( isset( $_GET['export'] ) && is_numeric( $_GET['export'] ) ) {
 		qw_export_page();
-	} // else we need a list of queries
+	}
+	// else we need a list of queries
 	else {
 		include QW_PLUGIN_DIR . '/admin/templates/page-query-list.php';
 		qw_list_queries_form();
@@ -74,10 +71,63 @@ function qw_admin_redirect( $query_id = NULL, $page = 'query-wrangler' ) {
 	exit();
 }
 
-/*
- * Query Edit Page
+/**
+ * Settings - Page
  */
-function qw_edit_query_form() {
+function qw_settings_page() {
+	include_once QW_PLUGIN_DIR . '/admin/templates/form-settings.php';
+}
+
+/**
+ * Settings - Save
+ *
+ * @param $post
+ */
+function qw_save_settings( $post ) {
+	$new = $post['qw-settings'];
+
+	$settings = QW_Settings::get_instance();
+	$settings->set( 'edit_theme', sanitize_text_field( $new['edit_theme'] ) );
+	$settings->set( 'widget_theme_compat', (int) !empty( $new['widget_theme_compat'] ) );
+	$settings->set( 'live_preview',        (int) !empty( $new['live_preview'] ) );
+	$settings->set( 'show_silent_meta',    (int) !empty( $new['show_silent_meta'] ) );
+	$settings->set( 'shortcode_compat',    (int) !empty( $new['shortcode_compat'] ) );
+	$settings->set( 'meta_value_field_handler', absint( $new['meta_value_field_handler'] ) );
+	$settings->save();
+}
+
+/**
+ * Create - Page
+ */
+function qw_create_query_page() {
+	include_once QW_PLUGIN_DIR . '/admin/templates/form-create.php';
+}
+
+/**
+ * Export - Page
+ */
+function qw_export_page() {
+	include_once QW_PLUGIN_DIR . '/admin/templates/form-export.php';
+}
+
+/**
+ * Import - Page
+ */
+function qw_import_page() {
+	include_once QW_PLUGIN_DIR . '/admin/templates/form-import.php';
+}
+
+/**
+ * Edit - Page
+ */
+function qw_edit_query_form(){
+	include_once QW_PLUGIN_DIR . '/admin/templates/form-editor.php';
+}
+
+/**
+ * Editor - Arguments
+ */
+function qw_get_editor_args() {
 	$settings = QW_Settings::get_instance();
 
 	if ( $query_id = qw_admin_get_current_query_id() ) {
@@ -140,17 +190,26 @@ function qw_edit_query_form() {
 		$override['wrapper_form'] = theme( 'query_override', $args );
 	}
 
+	// shortcode compatibility
+	$shortcode = '[query slug="' . $row->slug . '"]';
+
+	if ( $settings->get('shortcode_compat') ){
+		$shortcode = '[qw_query slug="' . $row->slug . '"]';
+	}
+
 	// start building edit page data
-	$edit_args = array(
+	$editor_args = array(
 		// editor theme
 		'theme'               => $theme,
 		// query data
 		'query_id'            => $row->id,
+		'query_slug'          => $row->slug,
+		'query_name'          => $row->name,
+		'query_type'          => $row->type,
+		'shortcode'           => $shortcode,
 		'options'             => $options,
 		'args'                => $options['args'],
 		'display'             => $display,
-		'query_name'          => $row->name,
-		'query_type'          => $row->type,
 		'query_page_title'    => isset( $options['display']['title'] ) ? $options['display']['title'] : '',
 		'basics'              => qw_all_basic_settings(),
 		'filters'             => $handlers['filter']['items'],
@@ -165,8 +224,6 @@ function qw_edit_query_form() {
 		'page_templates'      => get_page_templates(),
 		'post_types'          => qw_all_post_types(),
 		'pager_types'         => qw_all_pager_types(),
-		//'category_ids'  => get_terms('category', array('fields' => 'ids', 'hide_empty' => 0)),
-		//'tags'          => get_tags(array('hide_empty' => false)),
 		'all_overrides'       => qw_all_overrides(),
 		'all_filters'         => qw_all_filters(),
 		'all_fields'          => qw_all_fields(),
@@ -177,118 +234,18 @@ function qw_edit_query_form() {
 
 	// Page Queries
 	if ( $row->type == 'page' ) {
-		$edit_args['query_page_path'] = $row->path;
+		$editor_args['query_page_path'] = $row->path;
 	}
 
 	// overrides
 	if ( $row->type == 'override' ) {
-		$edit_args['query_override_type'] =  isset( $row->override_type ) ? $row->override_type : null;
-	}
-
-	$edit_wrapper_args = array(
-		'query_id' => $row->id,
-		'theme'    => $theme,
-		'editor'   => theme( 'query_edit', $edit_args ),
-	);
-
-	// admin wrapper arguments
-	$admin_args = array(
-		'title'       => 'Edit query <em>' . $edit_args['query_name'] . '</em>',
-		'description' => '[query slug="' . $row->slug . '"]',
-		// content is the query_edit page
-		'content'     => theme( 'query_edit_wrapper', $edit_wrapper_args )
-	);
-
-	// shortcode compatibility
-	if ( $settings->get('shortcode_compat') ){
-		$admin_args['description'] = '[qw_query slug="' . $row->slug . '"]';
+		$editor_args['query_override_type'] =  isset( $row->override_type ) ? $row->override_type : null;
 	}
 
 	// add view link for pages
 	if ( $row->type == 'page' && isset( $row->path ) ) {
-		$admin_args['title'] .= ' <a class="add-new-h2" target="_blank" href="' . get_bloginfo( 'wpurl' ) . '/' . $row->path . '">View</a>';
+		$editor_args['page_link'] .= ' <a class="add-new-h2" target="_blank" href="' . get_bloginfo( 'wpurl' ) . '/' . $row->path . '">View</a>';
 	}
 
-	// include the edit form
-	print theme( 'admin_wrapper', $admin_args );
-}
-
-/**
- * Settings!
- */
-function qw_save_settings( $post ) {
-	$new = $post['qw-settings'];
-
-	$settings = QW_Settings::get_instance();
-	$settings->set( 'edit_theme', sanitize_text_field( $new['edit_theme'] ) );
-	$settings->set( 'widget_theme_compat', (int) !empty( $new['widget_theme_compat'] ) );
-	$settings->set( 'live_preview',        (int) !empty( $new['live_preview'] ) );
-	$settings->set( 'show_silent_meta',    (int) !empty( $new['show_silent_meta'] ) );
-	$settings->set( 'shortcode_compat',    (int) !empty( $new['shortcode_compat'] ) );
-	$settings->set( 'meta_value_field_handler', absint( $new['meta_value_field_handler'] ) );
-	$settings->save();
-}
-
-function qw_settings_page() {
-	$settings = QW_Settings::get_instance();
-
-	$editor_options = array();
-	foreach( qw_all_edit_themes() as $key => $theme ){
-		$editor_options[ $key ] = $theme['title'];
-	}
-
-	$settings_form_args = array(
-		'editor_options' => $editor_options,
-		'meta_value_field_options' => array(
-			0 => __( 'Default handler' ),
-			1 => __( 'New handler (beta)' ),
-		),
-	);
-	$settings_form_args = array_merge( $settings_form_args, $settings->values );
-	$wrapper_args = array(
-		'title'   => __( 'Query Wrangler Settings' ),
-		'content' => theme( 'query_settings', $settings_form_args ),
-	);
-
-	print theme( 'admin_wrapper', $wrapper_args );
-}
-
-/*
- * Create Query Page
- */
-function qw_create_query_page() {
-	$args = array(
-		'title'   => __( 'Create Query' ),
-		'content' => theme( 'query_create' )
-	);
-
-	print theme( 'admin_wrapper', $args );
-}
-
-/*
- * Export Query page
- */
-function qw_export_page() {
-	global $wpdb;
-	$table = $wpdb->prefix . 'query_wrangler';
-	$row   = $wpdb->get_row( $wpdb->prepare( 'SELECT name FROM ' . $table . ' WHERE id = %d ', $_GET['export'] ) );
-
-	$args = array(
-		'title'   => __( 'Export Query' ) . ' <em>' . $row->name . '</em>',
-		'content' => theme( 'query_export',
-			array( 'query_id' => absint( $_GET['export'] ) ) ),
-	);
-	print theme( 'admin_wrapper', $args );
-}
-
-/*
- * Import Query Page
- */
-function qw_import_page() {
-	// show import page
-	$args = array(
-		'title'   => __( 'Import Query' ),
-		'content' => theme( 'query_import' ),
-	);
-	print theme( 'admin_wrapper', $args );
+	return $editor_args;
 }
