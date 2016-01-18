@@ -3,11 +3,16 @@
 // add default filters to the filter
 add_filter( 'qw_filters', 'qw_filter_search' );
 
+/**
+ * @param $filters
+ *
+ * @return mixed
+ */
 function qw_filter_search( $filters ) {
 
 	$filters['search'] = array(
-		'title'               => 'Search',
-		'description'         => 'Searches for keywords',
+		'title'               => __( 'Search' ),
+		'description'         => __( 'Searches for keywords' ),
 		'form_callback'       => 'qw_filter_search_form',
 		'query_args_callback' => 'qw_generate_query_args_search',
 		'query_display_types' => array( 'page', 'widget' ),
@@ -19,26 +24,36 @@ function qw_filter_search( $filters ) {
 	return $filters;
 }
 
+/**
+ * @param $args
+ * @param $filter
+ */
 function qw_generate_query_args_search( &$args, $filter ) {
 	$args['s'] = $filter['values']['search'];
 }
 
+/**
+ * @param $filter
+ */
 function qw_filter_search_form( $filter ) {
-	if ( ! isset( $filter['values']['search'] ) ) {
-		$filter['values']['search'] = '';
-	}
-	?>
-	<p>
-		<input class="qw-js-title"
-		       type="text"
-		       name="<?php print $filter['form_prefix']; ?>[search]"
-		       value="<?php print $filter['values']['search']; ?>"/>
-	</p>
-<?php
+	$form = new QW_Form_Fields( array(
+			'form_field_prefix' => $filter['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+			'type' => 'text',
+			'name' => 'search',
+			'value' => isset( $filter['values']['search'] ) ? $filter['values']['search'] : '',
+			'class' => array( 'qw-js-title' ),
+	) );
 }
 
-/*
+/**
  * Process submitted exposed form values
+ *
+ * @param $args
+ * @param $filter
+ * @param $values
  */
 function qw_filter_search_exposed_process( &$args, $filter, $values ) {
 	// default values if submitted is empty
@@ -54,8 +69,11 @@ function qw_filter_search_exposed_process( &$args, $filter, $values ) {
 	}
 }
 
-/*
+/**
  * Exposed form
+ *
+ * @param $filter
+ * @param $values
  */
 function qw_filter_search_exposed_form( $filter, $values ) {
 	// default values
@@ -64,13 +82,14 @@ function qw_filter_search_exposed_form( $filter, $values ) {
 	<input type="text"
 	       name="<?php print $filter['exposed_key']; ?>"
 	       value="<?php print esc_attr( $values ); ?>"/>
-<?php
+	<?php
 }
 
-//function qw_filter_search_exposed_settings_form($filter){}
-
-/*
+/**
  * Simple helper function to handle default values
+ *
+ * @param $filter
+ * @param $values
  */
 function qw_filter_search_exposed_default_values( $filter, &$values ) {
 	if ( isset( $filter['values']['exposed_default_values'] ) ) {

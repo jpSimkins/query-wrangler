@@ -5,8 +5,8 @@ add_filter( 'qw_filters', 'qw_filter_post_types' );
 
 function qw_filter_post_types( $filters ) {
 	$filters['post_types'] = array(
-		'title'                 => 'Post Types',
-		'description'           => 'Select which post types should be shown.',
+		'title'                 => __( 'Post Types' ),
+		'description'           => __( 'Select which post types should be shown.' ),
 		'form_callback'         => 'qw_filter_post_types_form',
 		'query_args_callback'   => 'qw_filter_post_types_args',
 		'query_display_types'   => array( 'page', 'widget', 'override' ),
@@ -23,31 +23,18 @@ function qw_filter_post_types( $filters ) {
  * Admin form for filter
  */
 function qw_filter_post_types_form( $filter ) {
-	if ( ! isset( $filter['values']['post_types'] ) ) {
-		$filter['values']['post_types'] = array();
-	}
 
-	?>
-	<div class="qw-checkboxes">
-		<?php
-		$post_types = qw_all_post_types();
-		// loop through post types
-		foreach ( $post_types as $post_type ) {
-			$post_type_checked = ( isset( $filter['values']['post_types'][ $post_type ] ) ) ? 'checked="checked"' : '';
-			?>
-			<label class="qw-query-checkbox">
-				<input class="qw-js-title"
-				       type="checkbox"
-				       name="<?php print $filter['form_prefix']; ?>[post_types][<?php print $post_type; ?>]"
-				       value="<?php print $post_type; ?>"
-					<?php print $post_type_checked; ?> />
-				<?php print ucfirst( $post_type ); ?>
-			</label>
-		<?php
-		}
-		?>
-	</div>
-<?php
+	$form = new QW_Form_Fields( array(
+			'form_field_prefix' => $filter['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+			'type' => 'checkboxes',
+			'name' => 'post_types',
+			'value' => isset( $filter['values']['post_types'] ) ? $filter['values']['post_types'] : array(),
+			'options' => qw_all_post_types(),
+			'class' => array( 'qw-js-title' ),
+	) );
 }
 
 /*
@@ -154,7 +141,7 @@ function qw_filter_post_types_exposed_form_select( $filter, &$values ) {
 			?>
 		</select>
 	</div>
-<?php
+	<?php
 }
 
 /*
@@ -191,14 +178,14 @@ function qw_filter_post_types_exposed_form_checkboxes( $filter, &$values ) {
 		}
 		?>
 	</div>
-<?php
+	<?php
 }
 
 /*
  * Simple helper function to determine values with consideration for defaults
  */
 function qw_filter_post_types_exposed_limit_values( $filter, &$post_types ) {
-	if ( isset( $filter['values']['exposed_limit_values'] ) && is_array( $filter['values']['post_types'] ) ) {
+	if ( !empty( $filter['values']['exposed_limit_values'] ) && is_array( $filter['values']['post_types'] ) ) {
 		foreach ( $post_types as $k => $type ) {
 			if ( ! in_array( $type, $filter['values']['post_types'] ) ) {
 				unset( $post_types[ $k ] );
@@ -212,13 +199,14 @@ function qw_filter_post_types_exposed_limit_values( $filter, &$post_types ) {
  */
 function qw_filter_post_types_adjust_for_submitted_values( &$filter, $values ) {
 	// adjust for submitted values
-	if ( ! empty( $values ) ) {
+	if ( !empty( $values ) ) {
 		if ( is_array( $values ) ) {
 			$filter['values']['post_types'] = array();
 			foreach ( $values as $value ) {
 				$filter['values']['post_types'][ $value ] = $value;
 			}
-		} else {
+		}
+		else {
 			$filter['values']['post_types'] = array( $values => $values );
 		}
 	}

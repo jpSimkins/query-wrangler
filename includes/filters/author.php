@@ -16,40 +16,39 @@ function qw_filter_author( $filters ) {
 	return $filters;
 }
 
+/**
+ * @param $filter
+ */
 function qw_filter_author_form( $filter ) {
-	$aut_ops = array(
-		"author"         => "Author ids",
-		"author_name"    => "Author nice name",
-		"author__in"     => "Authors in list of ids",
-		"author__not_in" => "Authors Not in list of author ids",
+	$author_operators = array(
+		"author"         => __( "Author IDs" ),
+		"author_name"    => __( "Author nice name" ),
+		"author__in"     => __( "Authors in list of IDs" ),
+		"author__not_in" => __( "Authors Not in list of author IDs" ),
 	);
-	if ( ! isset( $filter['values']['author_operator'] ) ) {
-		$filter['values']['author_operator'] = '';
-	}
-	if ( ! isset( $filter['values']['author_values'] ) ) {
-		$filter['values']['author_values'] = '';
-	}
-	?>
-  <p><strong>Author Options</strong> - show posts that are from:</p>
-  <p>
-    <select class="qw-field-value qw-js-title" name="<?php print $filter['form_prefix']; ?>[author_operator]">
-      <?php
-	foreach ( $aut_ops as $op => $title ) {
-		$selected = ( $filter['values']['author_operator'] == $op ) ? 'selected="selected"' : '';
-		?>
-		<option
-			value="<?php print $op;?>" <?php print $selected; ?>><?php print $title; ?></option>
-	<?php
-	}
-	?>
-    </select>
-  </p>
-  <p>
-    <strong>Values</strong>
-    <input type="text" size="48" name="<?php print $filter['form_prefix']; ?>[author_values]" class="qw-js-title" value="<?php print $filter['values']['author_values']; ?>" />
-    <p clas="description">Provide the values appropriate for the author option.  Ids should be comma separated.</p>
-  </p>
-  <?php
+
+	$form = new QW_Form_Fields( array(
+            'form_field_prefix' => $filter['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+	    'type' => 'select',
+	    'name' => 'author_operator',
+	    'title' => __( 'Author Options' ),
+	    'description' => __( 'Show posts that are from the listed authors' ),
+	    'value' => isset( $filter['values']['author_operator'] ) ? $filter['values']['author_operator'] : '',
+	    'options' => $author_operators,
+	    'class' => array( 'qw-js-title' ),
+	) );
+
+	print $form->render_field( array(
+	    'type' => 'text',
+	    'name' => 'author_values',
+	    'title' => __( 'Values' ),
+	    'description' => __( 'Provide the values appropriate for the author option.  IDs should be comma separated.' ),
+	    'value' => isset( $filter['values']['author_values'] ) ? $filter['values']['author_values'] : '',
+	    'class' => array( 'qw-js-title' ),
+	) );
 }
 
 

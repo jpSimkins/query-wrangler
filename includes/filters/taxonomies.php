@@ -11,9 +11,9 @@ function qw_filter_taxonomies( $filters ) {
 	if ( count( $ts ) > 0 ) {
 		foreach ( $ts as $t ) {
 			$filters[ 'taxonomy_' . $t->name ] = array(
-				'title'                 => 'Taxonomy: ' . $t->label,
+				'title'                 => __( 'Taxonomy' ) .': '. $t->label,
 				'taxonomy'              => $t,
-				'description'           => 'Creates a taxonomy filter based on terms selected.',
+				'description'           => __( 'Creates a taxonomy filter based on terms selected.' ),
 				'form_callback'         => 'qw_filter_taxonomies_form',
 				'query_args_callback'   => 'qw_filter_taxonomies_args',
 				'query_display_types'   => array( 'page', 'widget' ),
@@ -69,80 +69,65 @@ function qw_filter_taxonomies_form( $filter ) {
 /*
  * Term checkboxes for admin form
  */
-function qw_filter_taxonomies_form_terms_checkboxes( $filter, $terms ) { ?>
-	<div class="qw-checkboxes">
-		<?php
-		// List all categories as checkboxes
-		foreach ( $terms as $term ) {
-			$term_checked = ( isset( $filter['values']['terms'][ $term->term_id ] ) ) ? 'checked="checked"' : '';
-			?>
-			<label class="qw-query-checkbox">
-				<input class="qw-js-title"
-				       type="checkbox"
-				       name="<?php print $filter['form_prefix']; ?>[terms][<?php print $term->term_id; ?>]"
-				       value="<?php print $term->name; ?>"
-					<?php print $term_checked; ?> />
-				<?php print $term->name; ?>
-			</label>
-		<?php
-		}
-		?>
-	</div>
-<?php
+function qw_filter_taxonomies_form_terms_checkboxes( $filter, $terms ) {
+	$options = array();
+	foreach( $terms as $term ){
+		$options[ $term->term_id ] = $term->name;
+	}
+
+	$form = new QW_Form_Fields( array(
+			'form_field_prefix' => $filter['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+			'type' => 'checkboxes',
+			'name' => 'terms',
+			'title' => __( 'Terms' ),
+			'value' => isset( $filter['values']['terms'] ) ? $filter['values']['terms'] : array(),
+			'options' => $options,
+			'class' => array( 'qw-js-title' ),
+	) );
 }
 
 /*
  * Admin operator form
  */
-function qw_filter_taxonomies_form_operator( $filter ) { ?>
-	<div>
-		<p>
-			<label class="qw-label"><?php print $filter['taxonomy']->label; ?>
-				Operator:</label>
-			<select name="<?php print $filter['form_prefix']; ?>[operator]"
-			        class="qw-field-value qw-js-title">
-				<option
-					value="IN" <?php if ( $filter['values']['operator'] == "IN" ) {
-					print 'selected="selected"';
-				} ?>>
-					(In) Posts with term
-				</option>
-				<option
-					value="NOT IN" <?php if ( $filter['values']['operator'] == "NOT IN" ) {
-					print 'selected="selected"';
-				} ?>>
-					(NOT IN) Posts without term
-				</option>
-				<option
-					value="AND" <?php if ( $filter['values']['operator'] == "AND" ) {
-					print 'selected="selected"';
-				} ?>>
-					(ALL) Posts with All terms
-				</option>
-			</select>
-		</p>
-		<p class="description">Test results against the chosen operator.</p>
-	</div>
-<?php
+function qw_filter_taxonomies_form_operator( $filter ) {
+	$form = new QW_Form_Fields( array(
+			'form_field_prefix' => $filter['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+			'type' => 'select',
+			'name' => 'operator',
+			'title' => __( 'Operator' ),
+			'description' => __( 'Test results against the chosen operator.' ),
+			'value' => isset( $filter['values']['operator'] ) ? $filter['values']['operator'] : '',
+			'options' => array(
+				'IN' => __( '(In) Posts with any of the selected terms' ),
+				'NOT IN' => __( '(NOT IN) Posts without any of the selected terms' ),
+				'AND' => __( '(ALL) Posts with All selected terms' ),
+			),
+			'class' => array( 'qw-js-title' ),
+	) );
 }
 
 /*
  * Admin Include Children form
  */
 function qw_filter_taxonomies_form_include_children( $filter ) {
-	$include_children = ( isset( $filter['values']['include_children'] ) ) ? 'checked="checked"' : '';
-	?>
-	<div>
-		<p>
-			<label class="qw-label">Include children:</label>
-			<input type="checkbox"
-			       name="<?php print $filter['form_prefix']; ?>[include_children]"
-				<?php print $include_children; ?> />
-		</p>
+	$form = new QW_Form_Fields( array(
+			'form_field_prefix' => $filter['form_prefix'],
+	) );
 
-		<p class="description clear-left">Include the term's children.</p>
-	</div>
-<?php
+	print $form->render_field( array(
+			'type' => 'checkbox',
+			'name' => 'include_children',
+			'title' => __( 'Include children' ),
+			'help' => __( "Include the term's children." ),
+			'value' => isset( $filter['values']['include_children'] ) ? $filter['values']['include_children'] : 0,
+			'class' => array( 'qw-js-title' ),
+	) );
 }
 
 /*
@@ -281,7 +266,7 @@ function qw_filter_taxonomies_exposed_form_terms_checkboxes(
  */
 function qw_filter_taxonomies_exposed_limit_values( $filter, $terms ) {
 	$limited = array();
-	if ( isset( $filter['values']['exposed_limit_values'] ) && is_array( $filter['values']['terms'] ) ) {
+	if ( isset( $filter['values']['exposed_limit_values'], $filter['values']['terms'] ) && is_array( $filter['values']['terms'] ) ) {
 		foreach ( $terms as $k => $term ) {
 			if ( isset( $filter['values']['terms'][ $term->term_id ] ) ) {
 				$limited[ $k ] = $term;

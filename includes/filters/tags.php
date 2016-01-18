@@ -17,46 +17,32 @@ function qw_filter_tags( $filters ) {
 }
 
 function qw_filter_tags_form( $filter ) {
-	$tag_ops = array(
-		"tag__in"     => "Any of the selected tags",
-		"tag__and"    => "All of the selected tags",
-		"tag__not_in" => "None of the selected tags",
-	);
-	?>
-	<div class="qw-checkboxes">
-		<?php
-		$tags = get_tags( array( 'hide_empty' => FALSE ) );
-		foreach ( $tags as $tag ) {
-			$tag_checked = ( isset( $filter['values']['tags'][ $tag->term_id ] ) ) ? 'checked="checked"' : '';
-			?>
-			<label class="qw-query-checkbox">
-				<input class="qw-js-title"
-				       type="checkbox"
-				       name="<?php print $filter['form_prefix']; ?>[tags][<?php print $tag->term_id; ?>]"
-				       value="<?php print $tag->name; ?>"
-					<?php print $tag_checked; ?> />
-				<?php print $tag->name; ?>
-			</label>
-		<?php
-		}
-		?>
-	</div>
-	<p><strong>Tag Options</strong> - show posts that have:</p>
-	<p>
-		<select class="qw-field-value qw-js-title"
-		        name="<?php print $filter['form_prefix']; ?>[tag_operator]">
-			<?php
-			foreach ( $tag_ops as $op => $title ) {
-				$selected = ( $filter['values']['tag_operator'] == $op ) ? 'selected="selected"' : '';
-				?>
-				<option
-					value="<?php print $op; ?>" <?php print $selected; ?>><?php print $title; ?></option>
-			<?php
-			}
-			?>
-		</select>
-	</p>
-<?php
+	$form = new QW_Form_Fields( array(
+			'form_field_prefix' => $filter['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+			'type' => 'select',
+			'name' => 'tag_operator',
+			'title' => __( 'Tags operator' ),
+			'description' => __( 'Determines how the selected tags are queried.' ),
+			'value' => isset( $filter['values']['tag_operator'] ) ? $filter['values']['tag_operator'] : '',
+			'options' => array(
+				"tag__in"     => "Any of the selected tags",
+				"tag__and"    => "All of the selected tags",
+				"tag__not_in" => "None of the selected tags",
+			),
+			'class' => array( 'qw-js-title' ),
+	) );
+
+	print $form->render_field( array(
+			'type' => 'checkboxes',
+			'name' => 'tags',
+			'title' => __( 'Tags' ),
+			'value' => isset( $filter['values']['tags'] ) ? $filter['values']['tags'] : array(),
+			'options' => get_terms( 'post_tag', array( 'fields' => 'id=>name', 'hide_empty' => 0 ) ),
+			'class' => array( 'qw-js-title' ),
+	) );
 }
 
 function qw_generate_query_args_tags( &$args, $filter ) {

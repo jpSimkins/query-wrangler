@@ -7,22 +7,21 @@ add_filter( 'qw_filters', 'qw_filter_taxonomy_relation' );
  */
 function qw_filter_taxonomy_relation( $filters ) {
 	$filters['taxonomy_relation'] = array(
-		'title'               => 'Taxonomy Relation',
-		'description'         => 'Define how multiple taxonomy filters interact with each other.',
+		'title'               => __( 'Taxonomy Relation' ),
+		'description'         => __( 'Define how multiple taxonomy filters interact with each other.' ),
 		'form_callback'       => 'qw_filter_taxonomy_relation_form',
 		'query_args_callback' => 'qw_filter_taxonomy_relation_args',
 		'query_display_types' => array( 'page', 'widget' ),
-		// exposed
-		//'exposed_form' => 'qw_filter_taxonomy_relation_exposed_form',
-		//'exposed_process' => 'qw_filter_taxonomy_relation_exposed_process',
-		//'exposed_settings_form_callback' => 'qw_filter_taxonomy_relation_exposed_settings_form',
 	);
 
 	return $filters;
 }
 
-/*
+/**
  * Convert values into query args
+ *
+ * @param $args
+ * @param $filter
  */
 function qw_filter_taxonomy_relation_args( &$args, $filter ) {
 	if ( isset( $filter['values']['taxonomy_relation'] ) ) {
@@ -30,46 +29,26 @@ function qw_filter_taxonomy_relation_args( &$args, $filter ) {
 	}
 }
 
-/*
+/**
  * Filter form
+ *
+ * @param $filter
  */
 function qw_filter_taxonomy_relation_form( $filter ) {
-	$tax_rel_ops = array( "AND", "OR" );
-	?>
-	<p>
-		<select class="qw-js-title"
-		        name="<?php print $filter['form_prefix']; ?>[taxonomy_relation]">
-			<?php
-			foreach ( $tax_rel_ops as $op ) {
-				$selected = ( $filter['values']['taxonomy_relation'] == $op ) ? 'selected="selected"' : '';
-				?>
-				<option
-					value="<?php print $op; ?>" <?php print $selected; ?>><?php print $op; ?></option>
-			<?php
-			}
-			?>
-		</select>
-	</p>
-	<p class="description">How do multiple taxonomy filters relate to each
-		other? <br/>
-		AND requires posts to contain at least one term from each taxonomy
-		filter. OR allows posts to contain any terms from all of the taxonomy
-		filters.
-	</p>
-<?php
-}
+	$form = new QW_Form_Fields( array(
+			'form_field_prefix' => $filter['form_prefix'],
+	) );
 
-/*
- * Process submitted exposed form values
- *
-function qw_filter_taxonomy_relation_exposed_process(&$args, $filter, $values){
+	print $form->render_field( array(
+			'type' => 'select',
+			'name' => 'taxonomy_relation',
+			'description' => __( 'How do multiple taxonomy filters relate to each other?' ),
+			'help' => __( 'AND requires posts to contain at least one term from each taxonomy filter. OR allows posts to contain any terms from all of the taxonomy filters.' ),
+			'value' => isset( $filter['values']['taxonomy_relation'] ) ? $filter['values']['taxonomy_relation'] : '',
+			'options' => array(
+				'AND' => 'AND',
+				'OR' => 'OR'
+			),
+			'class' => array( 'qw-js-title' ),
+	) );
 }
-
-/*
- * Exposed form
- *
-function qw_filter_taxonomy_relation_exposed_form($filter, $values)
-{
-
-}
-//*/
