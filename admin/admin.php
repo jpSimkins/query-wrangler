@@ -1,26 +1,5 @@
 <?php
 
-add_action( 'tw_templates', 'qw_admin_templates' );
-
-function qw_admin_templates( $templates ) {
-
-	$settings = QW_Settings::get_instance();
-	$theme = $settings->get( 'edit_theme', QW_DEFAULT_THEME );
-
-	// editor theme template
-	$templates['query_editor'] = array(
-		'files'        => 'admin/editors/[theme]/[theme]-editor.php',
-		'default_path' => QW_PLUGIN_DIR,
-		'arguments'    => array(
-			'theme' => $theme,
-		),
-	);
-
-	// handlers.php will add handler wrapper templates
-
-	return $templates;
-}
-
 /*
  * Create the new Query
  *
@@ -189,28 +168,14 @@ function qw_textarea( $value ) {
 	return stripcslashes( esc_textarea( str_replace( "\\", "", $value ) ) );
 }
 
-/*
- * Run init_callback for all Edit Themes
- */
-function qw_init_edit_theme() {
-	$themes  = qw_all_edit_themes();
-	$current = QW_Settings::get_instance()->get( 'edit_theme' );
-
-	if ( isset( $themes[ $current ] ) ) {
-		$theme = $themes[ $current ];
-	} else {
-		$theme = $themes[ QW_DEFAULT_THEME ];
-	}
-
-	if ( function_exists( $theme['init_callback'] ) ) {
-		$theme['init_callback']();
-	}
-}
-
 // CSS
 function qw_admin_css() {
-	print '<link rel="stylesheet" type="text/css" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/smoothness/jquery-ui.css">
-  <link rel="stylesheet" type="text/css" href="' . QW_PLUGIN_URL . '/admin/css/query-wrangler.css" />';
+	print '<link rel="stylesheet" type="text/css" href="' . QW_PLUGIN_URL . '/admin/css/query-wrangler.css" />';
+}
+
+// views css
+function qw_edit_theme_views_css() {
+	print '<link rel="stylesheet" type="text/css" href="' . QW_PLUGIN_URL . '/admin/css/query-wrangler-views.css" />';
 }
 
 // admin list page
@@ -241,6 +206,19 @@ function qw_admin_js() {
 		array( 'jquery-ui-core' ),
 		QW_VERSION,
 		TRUE );
+
+	wp_enqueue_script( 'qw-edit-theme-views',
+			plugins_url( '/admin/js/query-wrangler-views.js', dirname( __FILE__ ) ),
+			array('qw-admin-js'),
+			QW_VERSION,
+			TRUE );
+
+	// jquery ui rom cdn
+	// @todo - non-cdn version? anything available in wp core?
+	global $wp_scripts;
+	$ui       = $wp_scripts->query( 'jquery-ui-core' );
+	$url      = "//ajax.googleapis.com/ajax/libs/jqueryui/{$ui->ver}/themes/smoothness/jquery-ui.min.css";
+	wp_enqueue_style( 'jquery-ui-smoothness', $url, FALSE, NULL );
 }
 
 // get the current query being edited
@@ -275,7 +253,6 @@ function qw_edit_json( $query_id = NULL ) {
 
 	return json_encode( $data );
 }
-
 
 /*
  * Checking current version of plugin to handle upgrades

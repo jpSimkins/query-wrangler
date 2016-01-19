@@ -121,7 +121,7 @@ function qw_import_page() {
  * Edit - Page
  */
 function qw_edit_query_form(){
-	include_once QW_PLUGIN_DIR . '/admin/templates/form-editor.php';
+	include_once QW_PLUGIN_DIR . '/admin/templates/form-editor-wrapper.php';
 }
 
 /**

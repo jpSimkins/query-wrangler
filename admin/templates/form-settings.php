@@ -31,15 +31,6 @@ $form = new QW_Form_Fields( array(
 		print $form->open();
 
 		print $form->render_field( array(
-				'type' => 'select',
-				'name' => 'edit_theme',
-				'title' => __( 'Editor Theme' ),
-				'description' => __( 'Choose the Query Wrangler editor theme.' ),
-				'value' => $settings->get( 'edit_theme', QW_DEFAULT_THEME ),
-				'options' => $editor_options,
-		) );
-
-		print $form->render_field( array(
 				'type' => 'checkbox',
 				'name' => 'widget_theme_compat',
 				'title' => __( 'Widget Theme Compatibility' ),

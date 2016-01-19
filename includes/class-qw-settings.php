@@ -5,7 +5,6 @@ class QW_Settings {
 	private $option_name = 'qw_settings';
 
 	public $default_settings = array(
-		'edit_theme'               => QW_DEFAULT_THEME,
 		'widget_theme_compat'      => 0,
 		'live_preview'             => 0,
 		'show_silent_meta'         => 0,

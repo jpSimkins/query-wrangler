@@ -33,7 +33,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 define( 'QW_VERSION', 1.539 );
 define( 'QW_PLUGIN_DIR', dirname( __FILE__ ) );
 define( 'QW_PLUGIN_URL', plugins_url( '', __FILE__ ) );
-define( 'QW_DEFAULT_THEME', 'views' );
 define( 'QW_FORM_PREFIX', "qw-query-options" );
 
 
@@ -131,25 +130,21 @@ function qw_admin_init() {
 	include_once QW_PLUGIN_DIR . '/admin/admin.php';
 	include_once QW_PLUGIN_DIR . '/admin/query-admin-pages.php';
 	include_once QW_PLUGIN_DIR . '/admin/ajax.php';
-	include_once QW_PLUGIN_DIR . '/admin/default_editors.php';
 
-	//add_action( 'wp_ajax_nopriv_qw_form_ajax', 'qw_form_ajax' );
 	add_action( 'wp_ajax_qw_form_ajax', 'qw_form_ajax' );
 	add_action( 'wp_ajax_qw_data_ajax', 'qw_data_ajax' );
-
 	add_action( 'wp_ajax_qw_meta_key_autocomplete', 'qw_meta_key_autocomplete' );
-
-	add_action( 'admin_head', 'qw_admin_css' );
 
 	// js
 	if ( isset( $_GET['page'] ) && $_GET['page'] == 'query-wrangler' ) {
+		add_action( 'admin_head', 'qw_admin_css' );
+
 		// edit page & not on export page
 		if ( ! empty( $_GET['edit'] ) &&
 		     empty( $_GET['export'] )
 		) {
-			add_filter( 'wp_enqueue_scripts', 'qw_admin_js', 0 );
 			add_action( 'admin_enqueue_scripts', 'qw_admin_js' );
-			qw_init_edit_theme();
+			add_action( 'admin_head', 'qw_edit_theme_views_css' );
 		}
 
 		// list page
