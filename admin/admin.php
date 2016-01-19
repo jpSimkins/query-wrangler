@@ -174,7 +174,7 @@ function qw_admin_css() {
 }
 
 // views css
-function qw_edit_theme_views_css() {
+function qw_editor_css() {
 	print '<link rel="stylesheet" type="text/css" href="' . QW_PLUGIN_URL . '/admin/css/query-wrangler-views.css" />';
 }
 

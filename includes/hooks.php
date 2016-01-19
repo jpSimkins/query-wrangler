@@ -16,15 +16,6 @@ function qw_all_handlers() {
 }
 
 /*
- * Editor themes
- */
-function qw_all_edit_themes() {
-	$themes = apply_filters( 'qw_edit_themes', array() );
-
-	return $themes;
-}
-
-/*
  * Basic Settings
  */
 function qw_all_basic_settings() {

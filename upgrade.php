@@ -22,9 +22,6 @@ function qu_upgrade_12_to_current() {
  * Upgrade from 1.4 to 1.5
  */
 function qw_upgrade_14_to_15() {
-	// set the edit theme
-	update_option( 'qw_edit_theme', 'views' );
-
 	// get all queries
 	global $wpdb;
 	$table = $wpdb->prefix . "query_wrangler";

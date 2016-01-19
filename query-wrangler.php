@@ -144,7 +144,7 @@ function qw_admin_init() {
 		     empty( $_GET['export'] )
 		) {
 			add_action( 'admin_enqueue_scripts', 'qw_admin_js' );
-			add_action( 'admin_head', 'qw_edit_theme_views_css' );
+			add_action( 'admin_head', 'qw_editor_css' );
 		}
 
 		// list page

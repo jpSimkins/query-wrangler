@@ -2,18 +2,6 @@
 // settings object
 $settings = QW_Settings::get_instance();
 
-// editor themes
-$editor_options = array();
-foreach( qw_all_edit_themes() as $key => $theme ){
-	$editor_options[ $key ] = $theme['title'];
-}
-
-// meta value field (old vs new)
-$meta_value_field_options = array(
-	0 => __( 'Default handler' ),
-	1 => __( 'New handler (beta)' ),
-);
-
 // form helper
 $form = new QW_Form_Fields( array(
 		'action' => admin_url('admin.php') . '?page=query-wrangler&action=save_settings&noheader=true',
@@ -70,7 +58,10 @@ $form = new QW_Form_Fields( array(
 				'help' => __( 'Default - each meta_key is treated as a unique field in the UI.' ) . '<br>'
 				          . __( 'New -  a generic "Custom field" is available in the UI, and you must provide it the meta key.' ),
 				'value' => $settings->get( 'meta_value_field_handler' ),
-				'options' => $meta_value_field_options,
+				'options' => array(
+						0 => __( 'Default handler' ),
+						1 => __( 'New handler (beta)' ),
+				),
 		) );
 
 		print $form->render_field( array(

@@ -84,7 +84,6 @@ class QW_Settings {
 	 */
 	private function unify_old_settings(){
 		$settings = array(
-			'edit_theme'               => get_option( 'qw_edit_theme', QW_DEFAULT_THEME ),
 			'live_preview'             => get_option( 'qw_live_preview', 0 ),
 			'show_silent_meta'         => get_option( 'qw_show_silent_meta', 0 ),
 			'meta_value_field_handler' => get_option( 'qw_meta_value_field_handler', 0 ),

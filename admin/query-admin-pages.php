@@ -87,7 +87,6 @@ function qw_save_settings( $post ) {
 	$new = $post['qw-settings'];
 
 	$settings = QW_Settings::get_instance();
-	$settings->set( 'edit_theme', sanitize_text_field( $new['edit_theme'] ) );
 	$settings->set( 'widget_theme_compat', (int) !empty( $new['widget_theme_compat'] ) );
 	$settings->set( 'live_preview',        (int) !empty( $new['live_preview'] ) );
 	$settings->set( 'show_silent_meta',    (int) !empty( $new['show_silent_meta'] ) );
@@ -141,8 +140,6 @@ function qw_get_editor_args() {
 	$display     = isset( $options['display'] ) ? array_map( 'stripslashes_deep', $options['display'] ) : array();
 	$image_sizes = get_intermediate_image_sizes();
 	$file_styles = qw_all_file_styles();
-
-	$theme = $settings->get('edit_theme');
 
 	// preprocess existing handlers
 	$handlers = qw_preprocess_handlers( $options );
@@ -199,8 +196,6 @@ function qw_get_editor_args() {
 
 	// start building edit page data
 	$editor_args = array(
-		// editor theme
-		'theme'               => $theme,
 		// query data
 		'query_id'            => $row->id,
 		'query_slug'          => $row->slug,
