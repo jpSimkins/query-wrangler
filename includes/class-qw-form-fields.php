@@ -235,16 +235,18 @@ class QW_Form_Fields {
 	/**
 	 * Simple conversion of an array to tml attributes string
 	 *
-	 * @param array
+	 * @param array $array
+	 * @param string $prefix
+	 *
 	 * @return string
 	 */
-	function attributes( $array = array() ){
+	function attributes( $array = array(), $prefix = '' ){
 		$html = '';
 
 		foreach( $array as $key => $value ){
 			if ( !empty( $value ) ) {
 				$value = esc_attr( $value );
-				$html .= " {$key}='{$value}'";
+				$html .= " {$prefix}{$key}='{$value}'";
 			}
 		}
 
@@ -314,7 +316,25 @@ class QW_Form_Fields {
 	function template_checkboxes( $field ){
 		$field['class'].= ' qw-checkboxes-item';
 		$i = 0;
-		foreach( $field['options'] as $value => $label ){
+		foreach( $field['options'] as $value => $details ){
+			// default to assuming not-array
+			$label = $details;
+			$description = null;
+			$data = null;
+
+			// if array is given, get the title, description, and data
+			if ( is_array( $details ) && isset( $details['title'] ) ){
+				$label = $details['title'];
+
+				if ( !empty( $details['description'] ) ){
+					$description = $details['description'];
+				}
+
+				if ( !empty( $details['data'] ) ) {
+					$data = $details['data'];
+				}
+			}
+
 			?>
 				<div class="qw-checkboxes-wrapper">
 					<label for="<?php echo esc_attr( $field['id'] ); ?>--<?php echo $i; ?>">
@@ -324,9 +344,13 @@ class QW_Form_Fields {
 							class="<?php echo esc_attr( $field['class'] ); ?>"
 							value="<?php echo esc_attr( $label ); ?>"
 							<?php checked( isset( $field['value'][ $value ] ) ); ?>
+							<?php if ( $data ) print $this->attributes( $data, 'data-' ); ?>
 		                >
 						<?php echo $label; ?>
 					</label>
+					<?php if ( $description ): ?>
+						<p class="description"><?php echo $description; ?></p>
+					<?php endif; ?>
 				</div>
 			<?php
 			$i++;

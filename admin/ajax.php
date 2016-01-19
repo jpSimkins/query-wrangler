@@ -113,7 +113,7 @@ function qw_data_ajax() {
 		switch ( $_POST['data'] ) {
 			case 'all_hooks':
 				$query_id = isset( $_POST['queryId'] ) ? $_POST['queryId'] : NULL;
-				$data     = qw_edit_json( $query_id );
+				$data     = qw_edit_query_json( $query_id );
 
 				wp_send_json( $data );
 				break;

@@ -9,7 +9,7 @@ Plugin URI:        http://daggerhart.com
 Description:       Query Wrangler provides an intuitive interface for creating complex WP queries as pages or widgets. Based on Drupal Views.
 Author:            Jonathan Daggerhart
 Author URI:        http://daggerhart.com
-Version:           1.5.39
+Version:           1.6.0
 
 ******************************************************************
 
@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 // some useful definitions
-define( 'QW_VERSION', 1.539 );
+define( 'QW_VERSION', '1.6.0' );
 define( 'QW_PLUGIN_DIR', dirname( __FILE__ ) );
 define( 'QW_PLUGIN_URL', plugins_url( '', __FILE__ ) );
 define( 'QW_FORM_PREFIX', "qw-query-options" );
@@ -127,7 +127,6 @@ function qw_init_frontend() {
 }
 
 function qw_admin_init() {
-	include_once QW_PLUGIN_DIR . '/admin/admin.php';
 	include_once QW_PLUGIN_DIR . '/admin/query-admin-pages.php';
 	include_once QW_PLUGIN_DIR . '/admin/ajax.php';
 
@@ -144,7 +143,7 @@ function qw_admin_init() {
 		     empty( $_GET['export'] )
 		) {
 			add_action( 'admin_enqueue_scripts', 'qw_admin_js' );
-			add_action( 'admin_head', 'qw_editor_css' );
+			add_action( 'admin_head', 'qw_edit_query_css' );
 		}
 
 		// list page
@@ -177,7 +176,7 @@ function qw_menu() {
 		__( 'Query Wrangler' ),
 		'manage_options',
 		'query-wrangler',
-		'qw_page_handler',
+			'qw_page_router',
 		'',
 		$menu_placement );
 	$create_page = add_submenu_page( 'query-wrangler',
@@ -199,6 +198,36 @@ function qw_menu() {
 		'qw-settings',
 		'qw_settings_page' );
 	//$debug_page  = add_submenu_page( 'query-wrangler', 'Debug', 'Debug', 'manage_options', 'qw-debug', 'qw_debug');
+}
+
+
+/*
+ * Checking current version of plugin to handle upgrades
+ * @todo - rewrite upgrade approach using data version
+ */
+function qw_check_version() {
+	if ( $last_version = get_option( 'qw_plugin_version' ) ) {
+		// compare versions
+		if ( $last_version < QW_VERSION ) {
+			// include upgrade inc
+			include_once QW_PLUGIN_DIR . '/upgrade.php';
+			$upgrade_function   = 'qw_upgrade_' . qw_make_slug( $last_version ) . '_to_' . qw_make_slug( QW_VERSION );
+			$upgrade_to_current = 'qw_upgrade_' . qw_make_slug( $last_version ) . '_to_current';
+
+			if ( function_exists( $upgrade_function ) ) {
+				$upgrade_function();
+			} else if ( function_exists( $upgrade_to_current ) ) {
+				$upgrade_to_current();
+			}
+			update_option( 'qw_plugin_version', QW_VERSION );
+		}
+	} else {
+		// first upgrade
+		include QW_PLUGIN_DIR . '/upgrade.php';
+		qw_upgrade_12_to_13();
+		// set our version number
+		update_option( 'qw_plugin_version', QW_VERSION );
+	}
 }
 
 

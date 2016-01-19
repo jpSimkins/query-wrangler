@@ -1,20 +1,8 @@
-<?php
-/*
- * Where do all these variables come from?
- * They are coming from the arguments sent along with the theme('query_edit', $args) function in query-wrangler.php
- *
- * All keys in the argument array become variables in the template file
- *
- * See the following link for more details on how that works:
- * https://github.com/daggerhart/Query-Wrangler/wiki/Template-Wrangler
- */
-
-?>
 <div id="qw-query-admin-options-wrap">
 	<!-- left column -->
 	<div class="qw-query-admin-column">
 		<div id="qw-query-args" class="qw-query-admin-options qw-handler-items">
-			<h4>Basic Settings</h4>
+			<h4><?php _e( 'Basic Settings' );?></h4>
 			<?php
 			foreach ( $basics as $basic ) {
 				// no display types set means all querys  || query type is in display types
@@ -56,14 +44,14 @@
 			<div id="qw-query-overrides" class="qw-query-admin-options">
 				<div class="qw-query-add-titles">
             <span class="qw-rearrange-title">
-              Rearrange
+              <?php _e( 'Rearrange' ); ?>
             </span>
             <span class="qw-add-title" data-handler-type="override"
                   data-limit-per-type=1 data-form-id="qw-display-add-overrides">
-              Add
+              <?php _e( 'Add' ); ?>
             </span>
 				</div>
-				<h4>Overrides</h4>
+				<h4><?php _e( 'Overrides' ); ?></h4>
 
 				<div class="qw-clear-gone"><!-- ie hack -->&nbsp;</div>
 				<div id="query-overrides" class="qw-handler-items">
@@ -91,15 +79,15 @@
 		<div id="qw-query-fields" class="qw-query-admin-options">
 			<div class="qw-query-add-titles">
         <span class="qw-rearrange-title">
-          Rearrange
+          <?php _e( 'Rearrange' ); ?>
         </span>
         <span class="qw-add-title" data-handler-type="field"
               data-form-id="qw-display-add-fields">
-          Add
+          <?php _e( 'Add' ); ?>
         </span>
 			</div>
 
-			<h4>Fields</h4>
+			<h4><?php _e( 'Fields' ); ?></h4>
 
 			<div class="qw-clear-gone"><!-- ie hack -->&nbsp;</div>
 			<div id="query-fields" class="qw-handler-items">
@@ -127,14 +115,14 @@
 		<div id="qw-query-sorts" class="qw-query-admin-options">
 			<div class="qw-query-add-titles">
         <span class="qw-rearrange-title">
-          Rearrange
+          <?php _e( 'Rearrange' ); ?>
         </span>
         <span class="qw-add-title" data-handler-type="sort"
               data-form-id="qw-display-add-sorts">
-          Add
+          <?php _e( 'Add' ); ?>
         </span>
 			</div>
-			<h4>Sort Options</h4>
+			<h4><?php _e( 'Sort Options' ); ?></h4>
 
 			<div class="qw-clear-gone"><!-- ie hack -->&nbsp;</div>
 			<div id="query-sorts" class="qw-handler-items">
@@ -157,15 +145,15 @@
 		<div id="qw-query-filters" class="qw-query-admin-options">
 			<div class="qw-query-add-titles">
         <span class="qw-rearrange-title">
-          Rearrange
+          <?php _e( 'Rearrange' ); ?>
         </span>
         <span class="qw-add-title" data-handler-type="filter"
               data-form-id="qw-display-add-filters">
-          Add
+          <?php _e( 'Add' ); ?>
         </span>
 			</div>
 
-			<h4>Filters</h4>
+			<h4><?php _e( 'Filters' ); ?></h4>
 
 			<div class="qw-clear-gone"><!-- ie hack -->&nbsp;</div>
 
@@ -193,7 +181,7 @@
 <div id="qw-options-forms">
 	<!-- all sorts -->
 	<div id="qw-display-add-sorts" class="qw-hidden" data-handler-type="sort">
-		<p class="description">Select options for sorting the query results.</p>
+		<p class="description"><?php _e( 'Select options for sorting the query results.' ); ?></p>
 
 		<div class="qw-checkboxes">
 			<?php
@@ -217,7 +205,7 @@
 
 	<!-- all fields -->
 	<div id="qw-display-add-fields" data-handler-type="field">
-		<p class="description">Select Fields to add to this query's output.</p>
+		<p class="description"><?php _e( 'Select Fields to add to this query\'s output.' ); ?></p>
 
 		<div class="qw-checkboxes">
 			<?php
@@ -241,7 +229,7 @@
 
 	<!-- all filters -->
 	<div id="qw-display-add-filters" data-handler-type="filter">
-		<p class="description">Select filters to affect the query's results.</p>
+		<p class="description"><?php _e( 'Select filters to affect the query\'s results.' ); ?></p>
 
 		<div class="qw-checkboxes">
 			<?php
@@ -269,9 +257,7 @@
 
 	<!-- all overrides -->
 	<div id="qw-display-add-overrides" data-handler-type="override">
-		<p class="description">
-			Select overrides to add to this query.
-			Limit 1 per type.</p>
+		<p class="description"> <?php _e( 'Select overrides to add to this query. Limit 1 per type.' ); ?></p>
 
 		<div class="qw-checkboxes">
 			<?php

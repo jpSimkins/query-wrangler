@@ -1,6 +1,7 @@
 <?php
-$args = qw_get_editor_args();
+$args = qw_edit_query_form_args();
 extract($args);
+
 ob_start();
 	include_once QW_PLUGIN_DIR . '/admin/templates/form-editor.php';
 $editor = ob_get_clean();
@@ -25,9 +26,10 @@ $live_preview = QW_Settings::get_instance()->get('live_preview');
 
 			<div class="description"><?php echo $shortcode; ?></div>
 
-			<div id="message" class="updated qw-changes">
-				<p><strong>*</strong><?php _e( 'Changes have been made that need to be saved.' ); ?></p>
+			<div class="update-nag qw-changes">
+				<strong>*</strong> <?php _e( 'Changes have been made that need to be saved.' ); ?>
 			</div>
+
 			<div class="qw-clear-gone"><!-- ie hack -->&nbsp;</div>
 
 			<?php print $editor; ?>
@@ -37,9 +39,7 @@ $live_preview = QW_Settings::get_instance()->get('live_preview');
 		<div id="query-preview" class="qw-query-option">
 			<div id="query-preview-controls" class="query-preview-inactive">
 				<label>
-					<input id="live-preview"
-						type="checkbox"
-						<?php checked( $live_preview ); ?> />
+					<input id="live-preview" type="checkbox" <?php checked( $live_preview ); ?> />
 					Live Preview
 				</label>
 				<button id="get-preview" class="button">Preview</button>
