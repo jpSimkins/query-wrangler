@@ -1,0 +1,5 @@
+.toplevel_page_query-wrangler .wp-submenu .wp-first-item + li,
+.toplevel_page_query-wrangler .wp-submenu .wp-first-item + li + li,
+.toplevel_page_query-wrangler .wp-submenu .wp-first-item + li + li + li {
+    display: none;
+}

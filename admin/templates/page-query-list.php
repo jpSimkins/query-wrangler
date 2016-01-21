@@ -1,45 +1,59 @@
 <?php
 
-/**
- * Execute custom list page
- */
-function qw_list_queries_form() {
-	$ListTable = new Query_Wrangler_List_Table();
-	$ListTable->prepare_items();
-
-	// if noheader is set, then we're bulk operating
-	if ( ! isset( $_REQUEST['noheader'] ) )
-	{ ?>
-		<div class="wrap">
-			<h2>
-				<?php _e( 'Query Wrangler' ); ?>
-				<a class="add-new-h2" href="admin.php?page=qw-create"><?php _e( 'Add New' ); ?></a>
-			</h2>
-			<form id="queries-filter" method="get">
-				<input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>"/>
-				<input type="hidden" name="noheader" value="true"/>
-				<?php $ListTable->display() ?>
-			</form>
-
-		</div>
-		<?php
-	}
-}
-
 if ( ! class_exists( 'WP_List_Table' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 }
 
+/**
+ * Class Query_Wrangler_List_Table
+ */
 class Query_Wrangler_List_Table extends WP_List_Table {
 
-	function __construct() {
+	protected $admin_page;
+	protected $url;
+
+	/**
+	 * Start the normal table stuff
+	 *
+	 * Query_Wrangler_List_Table constructor.
+	 *
+	 * @param $admin_page QW_Admin_Pages
+	 */
+	function __construct( $admin_page ) {
+		$this->admin_page = $admin_page;
+		$this->url = $admin_page->base_url;
+
 		//Set parent defaults
 		parent::__construct( array(
-			'singular' => 'query',     //singular name of the listed records
-			'plural'   => 'queries',    //plural name of the listed records
-			'ajax'     => FALSE        //does this table support ajax?
+				'singular' => 'query',     //singular name of the listed records
+				'plural'   => 'queries',    //plural name of the listed records
+				'ajax'     => FALSE        //does this table support ajax?
 		) );
+	}
 
+	/**
+	 * Custom function for outputting this table as a page.
+	 */
+	function do_the_deal(){
+		$this->prepare_items();
+
+		// if noheader is set, then we're bulk operating
+		if ( ! isset( $_REQUEST['noheader'] ) )
+		{ ?>
+			<div class="wrap">
+				<h2>
+					<?php print esc_html( get_admin_page_title() ); ?>
+					<a class="add-new-h2" href="<?php echo $this->url; ?>.create"><?php _e( 'Add New' ); ?></a>
+				</h2>
+				<form id="queries-filter" method="get">
+					<input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>"/>
+					<input type="hidden" name="noheader" value="true"/>
+					<?php $this->display() ?>
+				</form>
+
+			</div>
+			<?php
+		}
 	}
 
 	/**
@@ -92,11 +106,11 @@ class Query_Wrangler_List_Table extends WP_List_Table {
 		if ( 'delete' === $this->current_action() ) {
 			if ( is_array( $_REQUEST['query'] ) ) {
 				foreach ( $_REQUEST['query'] as $query_id ) {
-					qw_delete_query( $query_id );
+					$this->admin_page->delete_query( $query_id );
 				}
 			}
 
-			wp_redirect( get_bloginfo( 'wpurl' ) . '/wp-admin/admin.php?page=query-wrangler' );
+			wp_redirect( $this->url );
 		}
 	}
 
@@ -109,19 +123,40 @@ class Query_Wrangler_List_Table extends WP_List_Table {
 	function column_name( $item ) {
 		//Build row actions
 		$actions = array(
-			'edit'   => sprintf( '<a href="?page=query-wrangler&edit=%s">Edit</a>', $item['ID'] ),
-			'export' => sprintf( '<a href="?page=query-wrangler&export=%s">Export</a>', $item['ID'] ),
-			'delete' => sprintf( '<a class="qw-delete-query" href="?page=query-wrangler&noheader=true&action=delete&edit=%s">Delete</a>', $item['ID'] ),
+			'edit'   => sprintf( '<a href="%s.edit&query_id=%s">%s</a>',
+					$this->url,
+					$item['ID'],
+					__( 'Edit' )
+			),
+			'export' => sprintf( '<a href="%s.export&query_id=%s">%s</a>',
+					$this->url,
+					$item['ID'],
+					__( 'Export' )
+			),
+			'delete' => sprintf( '<a href="%s.delete&query_id=%s&noheader=true" class="qw-delete-query" >%s</a>',
+					$this->url,
+					$item['ID'],
+					__( 'Delete' )
+			),
 		);
 
 		// pages
 		if ( $item['type'] == 'page' ) {
-			$actions['view'] = '<a href="' . get_bloginfo( 'wpurl' ) . '/' . $item['path'] . '">View</a>';
+			$actions['view'] = sprintf( '<a href="%s/%s">%s</a>',
+									get_bloginfo( 'wpurl' ),
+									$item['path'],
+									__( 'View' )
+								);
 		}
 
 		//Return the title contents
-		return '<a href="?page=query-wrangler&edit=' . $item['ID'] . '">' . $item['name'] . '</a>' .
-		       ' <span style="color:silver">(ID: '.$item['ID'].')</span>' .
+		return sprintf( '<a href="%s.edit&query_id=%s">%s</a>' .
+		       ' <span style="color:silver">(ID: %s)</span>',
+				$this->url,
+				$item['ID'],
+				$item['name'],
+				$item['ID']
+		       ) .
 		       $this->row_actions( $actions );
 	}
 
@@ -147,10 +182,10 @@ class Query_Wrangler_List_Table extends WP_List_Table {
 
 		if ( $item['type'] != 'override' ) {
 			if ( $settings->get('shortcode_compat') ){
-				$details .= 'Shortcode options:<br />[qw_query id=' . $item['ID'] . ']<br />[qw_query slug="' . $item['slug'] . '"]';
+				$details .= 'Shortcode options:<br />[qw_query slug="' . $item['slug'] . '"]';
 			}
 			else {
-				$details .= 'Shortcode options:<br />[query id=' . $item['ID'] . ']<br />[query slug="' . $item['slug'] . '"]';
+				$details .= 'Shortcode options:<br />[query slug="' . $item['slug'] . '"]';
 			}
 		}
 
@@ -229,5 +264,4 @@ class Query_Wrangler_List_Table extends WP_List_Table {
 			'total_pages' => ceil( $total_items / $per_page )
 		) );
 	}
-
 }

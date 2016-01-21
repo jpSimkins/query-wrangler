@@ -1,13 +1,7 @@
-<?php
+<?php if ( !defined('QW_PLUGIN_DIR') ) exit; ?>
 
-$form = new QW_Form_Fields( array(
-		'action' => admin_url('admin.php') . '?page=query-wrangler&action=create&noheader=true',
-		'form_field_prefix' => 'qw-create',
-) );
-
-?>
 <div class="wrap">
-	<h2><?php _e( 'Create new query' ); ?></h2>
+	<h2><?php print esc_html( get_admin_page_title() ); ?></h2>
 
 	<div id="poststuff" class="admin-content">
 		<div id="qw-create" class="postbox">

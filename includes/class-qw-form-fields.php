@@ -283,10 +283,10 @@ class QW_Form_Fields {
 	function template_input( $field ) {
 		?>
 		<input type="<?php echo esc_attr( $field['type'] ) ?>"
-				name="<?php echo esc_attr( $field['form_name'] ); ?>"
-				id="<?php echo esc_attr( $field['id'] ); ?>"
-				class="<?php echo esc_attr( $field['class'] ); ?>"
-				value="<?php echo esc_attr( $field['value'] ); ?>"
+		       name="<?php echo esc_attr( $field['form_name'] ); ?>"
+		       id="<?php echo esc_attr( $field['id'] ); ?>"
+		       class="<?php echo esc_attr( $field['class'] ); ?>"
+		       value="<?php echo esc_attr( $field['value'] ); ?>"
 				<?php echo $this->attributes( $field['attributes'] ); ?>
 		>
 		<?php
@@ -303,8 +303,18 @@ class QW_Form_Fields {
 				id="<?php echo esc_attr( $field['id'] ); ?>"
 				class="<?php echo esc_attr( $field['class'] ); ?>"
 				<?php echo $this->attributes( $field['attributes'] ); ?>
-		><?php echo qw_textarea( $field['value'] ); ?></textarea>
+		><?php echo $this->esc_textarea( $field['value'] ); ?></textarea>
 		<?php
+	}
+
+	/**
+	 * Help prevent excessive slashes and potential malicious code
+	 *
+	 * @param $value
+	 * @return string
+	 */
+	function esc_textarea( $value ){
+		return stripcslashes( esc_textarea( str_replace( "\\", "", $value ) ) );
 	}
 
 	/**

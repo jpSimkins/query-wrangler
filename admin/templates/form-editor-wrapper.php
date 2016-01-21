@@ -1,19 +1,10 @@
-<?php
-$args = qw_edit_query_form_args();
-extract($args);
+<?php if ( !defined('QW_PLUGIN_DIR') ) exit; ?>
 
-ob_start();
-	include_once QW_PLUGIN_DIR . '/admin/templates/form-editor.php';
-$editor = ob_get_clean();
-
-$live_preview = QW_Settings::get_instance()->get('live_preview');
-
-?>
 <div class="wrap">
-	<h2><?php _e( 'Edit query ' ); ?> <em><?php print $query_name; ?></em></h2>
+	<h2><?php print esc_html( get_admin_page_title() ); ?> <em><?php print $query_name; ?></em></h2>
 	<div class="admin-content">
 		<form id="qw-edit-query-form"
-		      action="<?php print admin_url( "admin.php?page=query-wrangler&action=update&edit=$query_id&noheader=true" ); ?>"
+		      action="<?php print $form_action; ?>"
 		      method='post'
 		      data-query-id="<?php print $query_id; ?>"
 		      data-ajax-url="<?php print admin_url( 'admin-ajax.php' ); ?>">

@@ -193,11 +193,8 @@ li.qw-sortable span.qw-setting-value {
 	border-bottom: none;
 }
 
-.ui-dialog .qw-weight {
-}
-
-.ui-dialog {
-	z-index: 9991;
+.query-wrangler_page_query-wrangler-edit .ui-dialog {
+	z-index: 10001;
 	top: 0px !important;
 	margin-top: 58px;
 	left: 8%;
@@ -211,7 +208,9 @@ li.qw-sortable span.qw-setting-value {
 
 .ui-widget-overlay {
 	position: fixed;
+	z-index: 10000;
 }
+
 
 .qw-disabled-add-handler {
 	background: #eee;

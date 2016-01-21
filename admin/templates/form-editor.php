@@ -1,3 +1,5 @@
+<?php if ( !defined('QW_PLUGIN_DIR') ) exit; ?>
+
 <div id="qw-query-admin-options-wrap">
 	<!-- left column -->
 	<div class="qw-query-admin-column">

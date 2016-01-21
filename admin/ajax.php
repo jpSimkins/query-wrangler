@@ -281,3 +281,32 @@ function qw_get_edit_preview_data(){
 
 	return $data;
 }
+
+/**
+ * Edit - JSON data for js
+ *
+ * @param null $query_id
+ * @return mixed|string|void
+ */
+function qw_edit_query_json( $query_id = NULL ) {
+	$data = array(
+			'allFields'      => qw_all_fields(),
+			'allStyles'      => qw_all_styles(),
+			'allRowStyles'   => qw_all_row_styles(),
+			'allPostTypes'   => qw_all_post_types(),
+			'allPagerTypes'  => qw_all_pager_types(),
+			'allImageSizes'  => get_intermediate_image_sizes(),
+			'allFileStyles'  => qw_all_file_styles(),
+			'allFilters'     => qw_all_filters(),
+			'allSortOptions' => qw_all_sort_options(),
+			'allOverrides'   => qw_all_overrides(),
+	);
+
+	// editing a query
+	if ( $query_id && $row = qw_get_query_by_id( $query_id ) ) {
+		$row->options  = $row->data;
+		$data['query'] = $row;
+	}
+
+	return json_encode( $data );
+}

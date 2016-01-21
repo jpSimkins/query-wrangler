@@ -1,17 +1,7 @@
-<?php
-// settings object
-$settings = QW_Settings::get_instance();
+<?php if ( !defined('QW_PLUGIN_DIR') ) exit; ?>
 
-// form helper
-$form = new QW_Form_Fields( array(
-		'action' => admin_url('admin.php') . '?page=query-wrangler&action=save_settings&noheader=true',
-		'form_field_prefix' => 'qw-settings',
-		'id' => 'qw-edit-settings',
-		'form_style' => 'settings_table',
-) );
-?>
 <div class="wrap">
-	<h2><?php _e( 'Query Wrangler Settings' ); ?></h2>
+	<h2><?php print esc_html( get_admin_page_title() ); ?></h2>
 
 	<div class="admin-content">
 		<?php
