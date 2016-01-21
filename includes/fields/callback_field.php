@@ -52,7 +52,7 @@ function qw_execute_the_callback( $post, $field, $tokens ) {
 			$returned = call_user_func_array( $field['custom_output_callback'], $callback_params );
 		}
 		else {
-			$returned = $field['custom_output_callback']();
+			$returned = call_user_func( $field['custom_output_callback'] );
 		}
 	}
 	$echoed = ob_get_clean();

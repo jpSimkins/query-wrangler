@@ -9,7 +9,7 @@ function qw_all_handlers() {
 	$handlers = apply_filters( 'qw_handlers', array() );
 	foreach ( $handlers as $hook_key => $handler ) {
 		$handlers[ $hook_key ]['hook_key']  = $hook_key;
-		$handlers[ $hook_key ]['all_items'] = $handler['all_callback']();
+		$handlers[ $hook_key ]['all_items'] = call_user_func( $handler['all_callback'] );
 	}
 
 	return $handlers;

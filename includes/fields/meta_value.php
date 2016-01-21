@@ -134,7 +134,7 @@ function qw_display_post_meta_value( $post, $field ) {
 	$meta_values = array();
 
 	if ( function_exists( $handler['callback'] ) ) {
-		$meta_values = $handler['callback']( $post, $field );
+		$meta_values = call_user_func( $handler['callback'], $post, $field );
 
 		// ensure we're working with an array
 		if ( ! is_array( $meta_values ) ) {
