@@ -66,8 +66,8 @@ function qw_filter_post_id_form( $filter ) {
  * @param $filter
  */
 function qw_generate_query_args_post_id( &$args, $filter ) {
-	if ( isset( $filter['values']['post_ids_callback'] ) && function_exists( $filter['values']['post_ids_callback'] ) ) {
-		$pids = $filter['values']['post_ids_callback']( $args );
+	if ( isset( $filter['values']['post_ids_callback'] ) && is_callable( $filter['values']['post_ids_callback'] ) ) {
+		$pids = call_user_func( $filter['values']['post_ids_callback'], $args );
 	} else {
 	    $values = qw_contextual_tokens_replace( $filter['values']['post_ids'] );
 		$pids = explode( ",", $values );

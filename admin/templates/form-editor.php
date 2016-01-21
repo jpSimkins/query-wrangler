@@ -16,8 +16,7 @@
 					?>
 					<div id="qw-basic-<?php print $basic['hook_key']; ?>"
 					     class="qw-item-form">
-						<?php $basic['form_callback']( $basic,
-							$options[ $basic['option_type'] ] ); ?>
+						<?php call_user_func( $basic['form_callback'], $basic, $options[ $basic['option_type'] ] ); ?>
 					</div>
 					<?php
 					$basic['form'] = ob_get_clean();

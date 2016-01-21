@@ -49,7 +49,7 @@ function qw_filter_callback_form( $filter ) {
  * @param $filter
  */
 function qw_filter_callback_execute( &$args, $filter ) {
-	if ( isset( $filter['values']['callback'] ) && function_exists( $filter['values']['callback'] ) ) {
-		$args = $filter['values']['callback']( $args, $filter );
+	if ( isset( $filter['values']['callback'] ) && is_callable( $filter['values']['callback'] ) ) {
+		$args = call_user_func( $filter['values']['callback'], $args, $filter );
 	}
 }

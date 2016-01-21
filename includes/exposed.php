@@ -11,7 +11,7 @@ function qw_generate_exposed_handlers( $options ) {
 			// loop through each exposed item
 			foreach ( $exposed['sorts'] as $name => $item ) {
 				// show the exposed form
-				if ( function_exists( $item['exposed_form'] ) ) {
+				if ( is_callable( $item['exposed_form'] ) ) {
 					$item['name'] = $name;
 					$output['sorts'] .= qw_theme_single_exposed_handler( $item );
 				}
@@ -23,7 +23,7 @@ function qw_generate_exposed_handlers( $options ) {
 			// loop through each exposed item
 			foreach ( $exposed['filters'] as $name => $item ) {
 				// show the exposed form
-				if ( function_exists( $item['exposed_form'] ) ) {
+				if ( is_callable( $item['exposed_form'] ) ) {
 					$item['name'] = $name;
 					$output['filters'] .= qw_theme_single_exposed_handler( $item );
 				}
@@ -141,7 +141,7 @@ function qw_theme_single_exposed_handler( $item ) {
 			</label>
 		<?php } ?>
 		<!-- exposed-<?php print $item['name']; ?> -->
-		<?php $item['exposed_form']( $item, $values ); ?>
+		<?php call_user_func( $item['exposed_form'], $item, $values ); ?>
 
 		<?php if ( ! empty( $item['values']['exposed_desc'] ) ) { ?>
 			<div

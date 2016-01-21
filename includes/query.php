@@ -142,9 +142,10 @@ function qw_generate_query_args( $options = array() ) {
 
 				// Alter the query args
 				// look for callback, and run it
-				if ( isset( $item['query_args_callback'] ) && function_exists( $item['query_args_callback'] ) ) {
-					$item['query_args_callback']( $args, $item );
-				} else if ( isset( $item['orderby_key'] ) && isset( $item['order_key'] ) ) {
+				if ( isset( $item['query_args_callback'] ) && is_callable( $item['query_args_callback'] ) ) {
+					call_user_func_array( $item['query_args_callback'], array( &$args, $item ) );
+				}
+				else if ( isset( $item['orderby_key'] ) && isset( $item['order_key'] ) ) {
 					// else, default to type as WP_Query argument key
 					// arguments passed to query
 					$args[ $item['orderby_key'] ] = $item['type'];
@@ -153,9 +154,9 @@ function qw_generate_query_args( $options = array() ) {
 
 				// Process submitted exposed values
 				// exposed items
-				if ( isset( $item['values']['is_exposed'], $submitted_data[ $item['exposed_key'] ] ) && function_exists( $item['exposed_process'] ) ) {
+				if ( isset( $item['values']['is_exposed'], $submitted_data[ $item['exposed_key'] ] ) && is_callable( $item['exposed_process'] ) ) {
 					$value = $submitted_data[ $item['exposed_key'] ];
-					$item['exposed_process']( $args, $item, $value );
+					call_user_func( $item['exposed_process'], $args, $item, $value );
 				}
 				//*/
 			}

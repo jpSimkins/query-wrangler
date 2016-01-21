@@ -114,12 +114,12 @@ $form = new QW_Form_Fields( array(
 						'values' => isset( $filter['values']['exposed_key'] ) ? $filter['values']['exposed_key'] : '',
 				) );
 
-				if ( isset( $filter['exposed_settings_form'] ) )
+				if ( isset( $filter['exposed_settings_form'] ) && is_callable( $filter['exposed_settings_form'] ) )
 				{ ?>
 					<div class="qw-exposed-settings-form">
 						<?php
 						ob_start();
-						$filter['exposed_settings_form']( $filter );
+						call_user_func( $filter['exposed_settings_form'], $filter );
 						print ob_get_clean(); ?>
 					</div>
 					<?php

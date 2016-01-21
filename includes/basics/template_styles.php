@@ -77,14 +77,14 @@ function qw_basic_display_style_form( $item, $display ) {
 	<div id="display-style-settings">
 		<?php
 		foreach ( $styles as $type => $style ) {
-			if ( isset( $style['settings_callback'] ) && function_exists( $style['settings_callback'] ) ) {
+			if ( isset( $style['settings_callback'] ) && is_callable( $style['settings_callback'] ) ) {
 				$style['values'] = $display[ $style['settings_key'] ];
 				?>
 				<div id="tab-style-settings-<?php print $style['hook_key']; ?>" class="qw-query-content">
 					<span class="qw-setting-header"><?php print $style['title']; ?> <?php _e( 'Settings' ); ?></span>
 
 					<div class="qw-setting-group">
-						<?php print $style['settings_callback']( $style ); ?>
+						<?php print call_user_func( $style['settings_callback'], $style ); ?>
 					</div>
 				</div>
 			<?php

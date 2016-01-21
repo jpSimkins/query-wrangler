@@ -69,9 +69,9 @@ function qw_form_ajax() {
 	$item['form_prefix'] = qw_make_form_prefix( $handler, $item['name'] );
 
 	// handler item's form
-	if ( isset( $item['form_callback'] ) && function_exists( $item['form_callback'] ) ) {
+	if ( isset( $item['form_callback'] ) && is_callable( $item['form_callback'] ) ) {
 		ob_start();
-		$item['form_callback']( $item );
+		call_user_func( $item['form_callback'], $item );
 		$item['form'] = ob_get_clean();
 	}
 

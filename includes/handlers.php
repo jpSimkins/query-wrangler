@@ -79,8 +79,8 @@ function qw_preprocess_handlers( $options ) {
 	$handlers = qw_all_handlers();
 	// Retrieve the handler items from the query array
 	foreach ( $handlers as $k => $handler ) {
-		if ( function_exists( $handler['data_callback'] ) ) {
-			$handlers[ $k ]['items'] = $handler['data_callback']( $options );
+		if ( is_callable( $handler['data_callback'] ) ) {
+			$handlers[ $k ]['items'] = call_user_func( $handler['data_callback'], $options );
 		}
 	}
 
@@ -134,25 +134,24 @@ function qw_preprocess_handlers( $options ) {
  */
 function qw_handler_make_form( &$handler ) {
 	// this handler's form
-	if ( isset( $handler['form_callback'] ) && function_exists( $handler['form_callback'] ) ) {
+	if ( isset( $handler['form_callback'] ) && is_callable( $handler['form_callback'] ) ) {
 		ob_start();
-		$handler['form_callback']( $handler );
+		call_user_func( $handler['form_callback'], $handler );
 		$handler['form'] = ob_get_clean();
 	}
 
 	/*
 	  // see if item has an exposed settings form
-	  if (isset($handler['exposed_settings_form_callback']) && function_exists($handler['exposed_settings_form_callback'])) {
+	  if (isset($handler['exposed_settings_form_callback']) && is_callable($handler['exposed_settings_form_callback'])) {
 		ob_start();
-		  $handler['exposed_settings_form_callback']($handler);
+		  call_user_func( $handler['exposed_settings_form_callback'], $handler);
 		$handler['exposed_settings_form'] = ob_get_clean();
 	  }
 	*/
-	// Contextual Filter override form
 	// see if item has an exposed settings form
-	if ( isset( $handler['override_form_callback'] ) && function_exists( $handler['override_form_callback'] ) ) {
+	if ( isset( $handler['override_form_callback'] ) && is_callable( $handler['override_form_callback'] ) ) {
 		ob_start();
-		$handler['override_form_callback']( $handler );
+		call_user_func( $handler['override_form_callback'], $handler );
 		$handler['override_form'] = ob_get_clean();
 	}
 }

@@ -99,7 +99,7 @@ function qw_basic_display_row_style_form( $item, $display ) {
 	<div id="row-style-settings">
 		<?php
 		foreach ( qw_all_row_styles() as $type => $row_style ) {
-			if ( isset( $row_style['settings_callback'] ) && function_exists( $row_style['settings_callback'] ) ) {
+			if ( isset( $row_style['settings_callback'] ) && is_callable( $row_style['settings_callback'] ) ) {
 				$row_style['values'] = ( isset( $row_style['settings_key'] ) && isset( $display[ $row_style['settings_key'] . '_settings' ] ) ) ? $display[ $row_style['settings_key'] . '_settings' ] : array();
 				?>
 				<div id="tab-row-style-settings-<?php print $row_style['hook_key']; ?>"
@@ -107,7 +107,7 @@ function qw_basic_display_row_style_form( $item, $display ) {
 					<h3><?php print $row_style['title']; ?> <?php _e( 'Settings' ); ?></h3>
 
 					<div class="qw-setting-group">
-						<?php print $row_style['settings_callback']( $row_style, $display ); ?>
+						<?php print call_user_func( $row_style['settings_callback'], $row_style, $display ); ?>
 					</div>
 				</div>
 			<?php

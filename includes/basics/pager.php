@@ -135,15 +135,14 @@ function qw_make_pager( $pager, &$qw_query ) {
 	$pagers       = qw_all_pager_types();
 
 	//set callback if function exists
-	if ( function_exists( $pagers[ $pager['type'] ]['callback'] ) ) {
+	if ( is_callable( $pagers[ $pager['type'] ]['callback'] ) ) {
 		$callback = $pagers[ $pager['type'] ]['callback'];
 	} else {
 		$callback = $pagers['default']['callback'];
 	}
 
 	// execute callback
-	$pager_themed = call_user_func_array( $callback,
-		array( $pager, $qw_query ) );
+	$pager_themed = call_user_func( $callback, $pager, $qw_query );
 
 	return $pager_themed;
 }
