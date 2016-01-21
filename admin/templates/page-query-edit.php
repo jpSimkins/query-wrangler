@@ -11,7 +11,7 @@
 
 			<div id="qw-query-action-buttons">
 				<div id="query-actions">
-					<input type="submit" class="button-primary" value="<?php _e('Save'); ?>"> | <a href="<?php print admin_url( "admin.php?page=query-wrangler&export=$query_id" ); ?>"><?php _e( 'Export' ); ?></a>
+					<input type="submit" class="button-primary" value="<?php _e('Save'); ?>"> | <a href="<?php print admin_url( "admin.php?page=query-wrangler.export&query_id=$query_id" ); ?>"><?php _e( 'Export' ); ?></a>
 				</div>
 			</div>
 

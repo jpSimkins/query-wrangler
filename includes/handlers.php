@@ -1,6 +1,5 @@
 <?php
 add_filter( 'qw_handlers', 'qw_handlers_default' );
-add_filter( 'tw_templates', 'qw_handlers_templates' );
 
 /*
  * Default handlers
@@ -13,7 +12,6 @@ function qw_handlers_default( $handlers ) {
 		'all_callback'     => 'qw_all_fields',
 		// relative to base
 		'form_prefix'      => '[display][field_settings][fields]',
-		'wrapper_template' => 'query_field',
 	);
 	$handlers['sort']     = array(
 		'title'            => 'Sort Option',
@@ -22,7 +20,6 @@ function qw_handlers_default( $handlers ) {
 		'all_callback'     => 'qw_all_sort_options',
 		// relative to base
 		'form_prefix'      => '[args][sorts]',
-		'wrapper_template' => 'query_sort',
 	);
 	$handlers['filter']   = array(
 		'title'            => 'Filter',
@@ -31,7 +28,6 @@ function qw_handlers_default( $handlers ) {
 		'all_callback'     => 'qw_all_filters',
 		// relative to base
 		'form_prefix'      => '[args][filters]',
-		'wrapper_template' => 'query_filter',
 	);
 	$handlers['override'] = array(
 		'title'            => 'Override',
@@ -40,46 +36,9 @@ function qw_handlers_default( $handlers ) {
 		'all_callback'     => 'qw_all_overrides',
 		// relative to base
 		'form_prefix'      => '[override]',
-		'wrapper_template' => 'query_override',
 	);
 
 	return $handlers;
-}
-
-/**
- * Filter to add handler wrapper templates to tw
- *
- * @param $templates
- *
- * @return mixed
- */
-function qw_handlers_templates( $templates ) {
-	$handlers = qw_all_handlers();
-
-	foreach ( $handlers as $type => $handler ) {
-		// wrapper edit form
-		$templates[ $handler['wrapper_template'] ] = array(
-			'files'        => 'admin/templates/handler-' . $type . '.php',
-			'default_path' => QW_PLUGIN_DIR,
-		);
-
-		// all handler items
-		$all = $handler['all_callback']();
-
-		// look for templates within all items
-		foreach ( $all as $type => $item ) {
-			// form template
-			if ( isset( $item['form_template'] ) ) {
-				$templates[ $item['form_template'] ] = array(
-					'arguments' => array(
-						$type => array()
-					)
-				);
-			}
-		}
-	}
-
-	return $templates;
 }
 
 /*
@@ -179,21 +138,14 @@ function qw_handler_make_form( &$handler ) {
 		ob_start();
 		$handler['form_callback']( $handler );
 		$handler['form'] = ob_get_clean();
-	} // provide template wrangler support
-	else if ( isset( $handler['form_template'] ) ) {
-		$handler['form'] = theme( $handler['form_template'],
-			array( 'this' => $handler ) );
 	}
+
 	/*
 	  // see if item has an exposed settings form
 	  if (isset($handler['exposed_settings_form_callback']) && function_exists($handler['exposed_settings_form_callback'])) {
 		ob_start();
 		  $handler['exposed_settings_form_callback']($handler);
 		$handler['exposed_settings_form'] = ob_get_clean();
-	  }
-	  // provide template wrangler support
-	  else if (isset($handler['exposed_settings_form_template'])){
-		$handler['exposed_settings_form'] = theme($handler['exposed_settings_form_template'], array('this' => $handler));
 	  }
 	*/
 	// Contextual Filter override form
@@ -202,9 +154,5 @@ function qw_handler_make_form( &$handler ) {
 		ob_start();
 		$handler['override_form_callback']( $handler );
 		$handler['override_form'] = ob_get_clean();
-	} // provide template wrangler support
-	else if ( isset( $handler['override_form_template'] ) ) {
-		$handler['override_form'] = theme( $handler['override_form_template'],
-			array( 'this' => $handler ) );
 	}
 }

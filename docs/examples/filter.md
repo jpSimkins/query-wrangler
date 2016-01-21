@@ -25,12 +25,9 @@ function qw_filter_example($filters)
 		// if confused what this is for, don't use this
 		'type' => 'filter_type',
 
-		// ! This or a form_template must be used
+		// ! This must be used if you want to allow user input
 		// * (optional) callback for form
 		'form_callback' => 'qw_filter_example_form_callback',
-
-		// * (optional) template wrangler theme function or template file
-		'form_template' => 'my_tw_template_hook',
 
 		// (optional) generate_args callback
 		// determines how form data becomes WP_Query arguments

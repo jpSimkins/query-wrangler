@@ -128,7 +128,7 @@ function qw_all_sort_options() {
 		}
 
 		// default form_callback
-		if ( ! isset( $option['form_callback'] ) && ! isset( $option['form_template'] ) ) {
+		if ( ! isset( $option['form_callback'] ) ) {
 			$sort_options[ $type ]['form_callback'] = 'qw_form_default_sort_order_options';
 		}
 

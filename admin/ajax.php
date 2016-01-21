@@ -37,38 +37,23 @@ function qw_form_ajax() {
 			break;
 
 		case 'sort_form':
-			$template = 'query_sort';
+			$template = 'handler-sort';
 			$all      = qw_all_sort_options();
 			break;
 
 		case 'field_form':
-			$template = 'query_field';
+			$template = 'handler-field';
 			$all      = qw_all_fields();
 			break;
 
 		case 'filter_form':
-			$template = 'query_filter';
+			$template = 'handler-filter';
 			$all      = qw_all_filters();
 			break;
 
 		case 'override_form':
-			$template = 'query_override';
+			$template = 'handler-override';
 			$all      = qw_all_overrides();
-			break;
-
-		case 'sort_sortable':
-			$template = 'query_sort_sortable';
-			$all      = qw_all_sort_options();
-			break;
-
-		case 'field_sortable':
-			$template = 'query_field_sortable';
-			$all      = qw_all_fields();
-			break;
-
-		case 'filter_sortable':
-			$template = 'query_filter_sortable';
-			$all      = qw_all_filters();
 			break;
 	}
 
@@ -88,10 +73,6 @@ function qw_form_ajax() {
 		ob_start();
 		$item['form_callback']( $item );
 		$item['form'] = ob_get_clean();
-	} // provide template wrangler support
-	else if ( isset( $item['form_template'] ) ) {
-		$item['form'] = theme( $item['form_template'],
-			array( $handler => $item ) );
 	}
 
 	$args = array(
@@ -102,7 +83,12 @@ function qw_form_ajax() {
 		$args['weight'] = $_POST['next_weight'];
 	}
 
-	wp_send_json( array( 'template' => theme( $template, $args ) ) );
+	// todo - this could be better... a lot of work just to get a template function
+	$settings = QW_Settings::get_instance();
+	global $wpdb;
+	$admin = new QW_Admin_Pages( $settings, $wpdb );
+
+	wp_send_json( array( 'template' => $admin->template( $template, $args ) ) );
 }
 
 /*

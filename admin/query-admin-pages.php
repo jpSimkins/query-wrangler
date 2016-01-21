@@ -151,37 +151,39 @@ class QW_Admin_Pages {
 				// @todo - non-cdn version? anything available in wp core?
 				global $wp_scripts;
 				$ui = $wp_scripts->query( 'jquery-ui-core' );
-				$url = "//ajax.googleapis.com/ajax/libs/jqueryui/{$ui->ver}/themes/smoothness/jquery-ui.min.css";
-				wp_enqueue_style( 'jquery-ui-smoothness', $url, FALSE, NULL );
+				wp_enqueue_style( 'jquery-ui-smoothness',
+						"//ajax.googleapis.com/ajax/libs/jqueryui/{$ui->ver}/themes/smoothness/jquery-ui.min.css",
+						FALSE,
+						NULL );
 
 				wp_enqueue_style( 'qw-admin-edit',
-						$dir . '/css/query-wrangler-views.css',
+						"{$dir}/css/query-wrangler-views.css",
 						array(),
-						QW_VERSION);
+						QW_VERSION );
 
-
+				// js
 				wp_enqueue_script( 'qw-unserialize-form',
-						$dir . '/js/jquery.unserialize-form.js',
+						"{$dir}/js/jquery.unserialize-form.js",
 						array(),
 						QW_VERSION,
 						TRUE );
 
 				wp_enqueue_script( 'qw-admin-js',
-						$dir . '/js/query-wrangler.js',
+						"$dir/js/query-wrangler.js",
 						array(
-								'jquery',
-								'jquery-ui-core',
-								'jquery-ui-accordion',
-								'jquery-ui-autocomplete',
-								'jquery-ui-dialog',
-								'jquery-ui-sortable',
-								'qw-unserialize-form',
+							'jquery',
+							'jquery-ui-core',
+							'jquery-ui-accordion',
+							'jquery-ui-autocomplete',
+							'jquery-ui-dialog',
+							'jquery-ui-sortable',
+							'qw-unserialize-form',
 						),
 						QW_VERSION,
 						TRUE );
 
 				wp_enqueue_script( 'qw-edit-theme-views',
-						plugins_url( '/admin/js/query-wrangler-views.js', dirname( __FILE__ ) ),
+						"{$dir}/js/query-wrangler-views.js",
 						array( 'qw-admin-js' ),
 						QW_VERSION,
 						TRUE );
@@ -191,8 +193,6 @@ class QW_Admin_Pages {
 
 	/**
 	 * Routing for admin page actions
-	 *
-	 * @todo - none of these actions should use the query_id from _GET
 	 */
 	function actions_router(){
 		$query_id = $this->get_current_query_id();
@@ -202,7 +202,7 @@ class QW_Admin_Pages {
 			switch ( $action ) {
 				case 'update':
 					if ( $query_id && !empty( $_POST[ QW_FORM_PREFIX ] ) ){
-						$this->update_query( $_POST[ QW_FORM_PREFIX ] );
+						$this->update_query( $query_id, $_POST[ QW_FORM_PREFIX ] );
 						$this->redirect( 'query-wrangler.edit', $query_id );
 					}
 					break;
@@ -271,16 +271,17 @@ class QW_Admin_Pages {
 	 * Settings - Page
 	 */
 	function settings_page() {
-		$settings = $this->settings;
-
 		$form = new QW_Form_Fields( array(
-				'action' => $this->base_url . '.actions&noheader=true&action=save_settings',
-				'form_field_prefix' => QW_FORM_PREFIX,
-				'id' => 'qw-edit-settings',
-				'form_style' => 'settings_table',
+			'action' => $this->base_url . '.actions&noheader=true&action=save_settings',
+			'form_field_prefix' => QW_FORM_PREFIX,
+			'id' => 'qw-edit-settings',
+			'form_style' => 'settings_table',
 		) );
 
-		include_once QW_PLUGIN_DIR . '/admin/templates/form-settings.php';
+		print $this->template( 'page-settings', array(
+			'form' => $form,
+			'settings' => $this->settings,
+		) );
 	}
 
 	/**
@@ -304,11 +305,13 @@ class QW_Admin_Pages {
 	function create_page() {
 
 		$form = new QW_Form_Fields( array(
-				'action' => $this->base_url . '.actions&noheader=true&action=create',
-				'form_field_prefix' => QW_FORM_PREFIX,
+			'action' => $this->base_url . '.actions&noheader=true&action=create',
+			'form_field_prefix' => QW_FORM_PREFIX,
 		) );
 
-		include_once QW_PLUGIN_DIR . '/admin/templates/form-create.php';
+		print $this->template( 'page-query-create', array(
+			'form' => $form,
+		) );
 	}
 
 	/**
@@ -321,11 +324,11 @@ class QW_Admin_Pages {
 	 */
 	function create_query( $new ) {
 		$values = array(
-				'name' => sanitize_text_field( $new['name'] ),
-				'slug' => sanitize_title( $new['name'] ),
-				'type' => sanitize_text_field( $new['type'] ),
-				'path' => NULL,
-				'data' => qw_serialize( qw_default_query_data() ),
+			'name' => sanitize_text_field( $new['name'] ),
+			'slug' => sanitize_title( $new['name'] ),
+			'type' => sanitize_text_field( $new['type'] ),
+			'path' => NULL,
+			'data' => qw_serialize( qw_default_query_data() ),
 		);
 
 		$this->wpdb->insert( $this->db_table, $values );
@@ -337,13 +340,16 @@ class QW_Admin_Pages {
 	 * Export - Page
 	 */
 	function export_page() {
-		if ( !empty( $_GET['query_id'] ) ) {
-			$qw_query = qw_get_query( absint( $_GET['query_id'] ) );
-			$form     = new QW_Form_Fields();
-			$query_name = $qw_query->name;
-			$exported_query = $this->export_query( $qw_query->id );
+		$query_id = $this->get_current_query_id();
 
-			include_once QW_PLUGIN_DIR . '/admin/templates/form-export.php';
+		if ( $query_id ) {
+			$qw_query = qw_get_query( $query_id );
+
+			print $this->template( 'page-query-export', array(
+				'form' => new QW_Form_Fields(),
+				'query_name' => $qw_query->name,
+				'exported_query' => $this->export_query( $qw_query->id )
+			) );
 		}
 	}
 
@@ -365,13 +371,14 @@ class QW_Admin_Pages {
 	 * Import - Page
 	 */
 	function import_page() {
-
 		$form = new QW_Form_Fields( array(
-				'action' => $this->base_url . '.actions&noheader=true&action=import',
-				'form_field_prefix' => QW_FORM_PREFIX,
+			'action' => $this->base_url . '.actions&noheader=true&action=import',
+			'form_field_prefix' => QW_FORM_PREFIX,
 		) );
 
-		include_once QW_PLUGIN_DIR . '/admin/templates/form-import.php';
+		print $this->template( 'page-query-import', array(
+			'form' => $form,
+		) );
 	}
 
 	/**
@@ -404,139 +411,70 @@ class QW_Admin_Pages {
 	 * Edit - Page
 	 */
 	function edit_page(){
-		$__args = $this->edit_page_args();
-		extract($__args);
+		$query_id = $this->get_current_query_id();
+		if ( !$query_id ) return;
 
-		ob_start();
-		include_once QW_PLUGIN_DIR . '/admin/templates/form-editor.php';
-		$editor = ob_get_clean();
+		$qw_query = qw_get_query( $query_id );
+		if ( !$qw_query ) return;
 
-		$live_preview = $this->settings->get('live_preview');
+		$args = $this->edit_page_args( $qw_query );
+		$args['editor']       = $this->template( 'form-editor', $args );
+		$args['live_preview'] = $this->settings->get('live_preview');
 
-		include_once QW_PLUGIN_DIR . '/admin/templates/form-editor-wrapper.php';
+		print $this->template( 'page-query-edit', $args );
 	}
 
 	/**
 	 * Edit - Arguments
+	 *
+	 * @param $qw_query
+	 *
+	 * @return array
 	 */
-	function edit_page_args() {
-		$query_id = $this->get_current_query_id();
-		if ( ! $query_id ) {
-			return;
-		}
-
-		$qw_query = qw_get_query( $query_id );
-		if ( ! $qw_query ) {
-			return;
-		}
-
-		$row         = $qw_query->row;
-		$settings    = $this->settings;
-		$options     = $row->data;
-		$display     = isset( $options['display'] ) ? array_map( 'stripslashes_deep', $options['display'] ) : array();
-		$image_sizes = get_intermediate_image_sizes();
-		$file_styles = qw_all_file_styles();
+	function edit_page_args( $qw_query ) {
+		$options = $qw_query->row->data;
+		$display = isset( $options['display'] ) ? array_map( 'stripslashes_deep', $options['display'] ) : array();
 
 		// preprocess existing handlers
 		$handlers = qw_preprocess_handlers( $options );
-
-		// go ahead and make existing items wrapper forms
-		// filters
-		foreach ( $handlers['filter']['items'] as $k => &$filter ) {
-			$args = array(
-					'filter' => $filter,
-					'weight' => $filter['weight'],
-			);
-			$filter['wrapper_form'] = theme( 'query_filter', $args );
-		}
-		// sorts
-		foreach ( $handlers['sort']['items'] as $k => &$sort ) {
-			$args = array(
-					'sort'   => $sort,
-					'weight' => $sort['weight'],
-			);
-			$sort['wrapper_form'] = theme( 'query_sort', $args );
-		}
-
-		$tokens = array();
-		// fields
-		foreach ( $handlers['field']['items'] as $k => &$field ) {
-			$tokens[ $field['name'] ] = '{{' . $field['name'] . '}}';
-			$args = array(
-					'image_sizes' => $image_sizes,
-					'file_styles' => $file_styles,
-					'field'       => $field,
-					'weight'      => $field['weight'],
-					'options'     => $options,
-					'display'     => $display,
-					'tokens'      => $tokens,
-			);
-			$field['wrapper_form'] = theme( 'query_field', $args );
-		}
-
-		// overrides
-		foreach ( $handlers['override']['items'] as $k => &$override ) {
-			$args = array(
-					'override' => $override,
-					'weight'   => $override['weight'],
-			);
-			$override['wrapper_form'] = theme( 'query_override', $args );
-		}
-
-		// shortcode compatibility
-		$shortcode = '[query slug="' . $row->slug . '"]';
-
-		if ( $settings->get('shortcode_compat') ){
-			$shortcode = '[qw_query slug="' . $row->slug . '"]';
-		}
+		$handlers = $this->make_handler_wrapper_forms( $handlers, $options );
 
 		// start building edit page data
 		$editor_args = array(
-				'form_action'         => admin_url( "admin.php?page=query-wrangler.actions&action=update&query_id=$query_id&noheader=true" ),
-			// query data
-				'query_id'            => $row->id,
-				'query_slug'          => $row->slug,
-				'query_name'          => $row->name,
-				'query_type'          => $row->type,
-				'shortcode'           => $shortcode,
-				'options'             => $options,
-				'args'                => $options['args'],
-				'display'             => $display,
-				'query_page_title'    => isset( $options['display']['title'] ) ? $options['display']['title'] : '',
-				'basics'              => qw_all_basic_settings(),
-				'filters'             => $handlers['filter']['items'],
-				'fields'              => $handlers['field']['items'],
-				'sorts'               => $handlers['sort']['items'],
-				'overrides'           => $handlers['override']['items'],
-			// all datas
-				'post_statuses'       => qw_all_post_statuses(),
-				'styles'              => qw_all_styles(),
-				'row_styles'          => qw_all_row_styles(),
-				'row_complete_styles' => qw_all_row_complete_styles(),
-				'page_templates'      => get_page_templates(),
-				'post_types'          => qw_all_post_types(),
-				'pager_types'         => qw_all_pager_types(),
-				'all_overrides'       => qw_all_overrides(),
-				'all_filters'         => qw_all_filters(),
-				'all_fields'          => qw_all_fields(),
-				'all_sorts'           => qw_all_sort_options(),
-				'image_sizes'         => $image_sizes,
-				'file_styles'         => $file_styles,
+			'form_action'         => admin_url( "admin.php?page=query-wrangler.actions&action=update&query_id={$qw_query->id}&noheader=true" ),
+
+			'query_id'            => $qw_query->id,
+			'query_slug'          => $qw_query->slug,
+			'query_name'          => $qw_query->name,
+			'query_type'          => $qw_query->type,
+			'shortcode'           => '[query slug="' . $qw_query->slug . '"]',
+			'options'             => $options,
+			'args'                => $options['args'],
+			'display'             => $display,
+			'basics'              => qw_all_basic_settings(),
+			'filters'             => $handlers['filter']['items'],
+			'fields'              => $handlers['field']['items'],
+			'sorts'               => $handlers['sort']['items'],
+			'overrides'           => $handlers['override']['items'],
+
+			'post_statuses'       => qw_all_post_statuses(),
+			'styles'              => qw_all_styles(),
+			'row_styles'          => qw_all_row_styles(),
+			'row_complete_styles' => qw_all_row_complete_styles(),
+			'page_templates'      => get_page_templates(),
+			'post_types'          => qw_all_post_types(),
+			'pager_types'         => qw_all_pager_types(),
+			'all_overrides'       => qw_all_overrides(),
+			'all_filters'         => qw_all_filters(),
+			'all_fields'          => qw_all_fields(),
+			'all_sorts'           => qw_all_sort_options(),
+			'image_sizes'         => get_intermediate_image_sizes(),
+			'file_styles'         => qw_all_file_styles(),
 		);
 
-		// Page Queries
-		if ( $row->type == 'page' ) {
-			$editor_args['query_page_path'] = $row->path;
-		}
-
-		// overrides
-		if ( $row->type == 'override' ) {
-			$editor_args['query_override_type'] =  isset( $row->override_type ) ? $row->override_type : null;
-		}
-
-		// add view link for pages
-		if ( $row->type == 'page' && isset( $row->path ) ) {
-			$editor_args['page_link'] .= ' <a class="add-new-h2" target="_blank" href="' . get_bloginfo( 'wpurl' ) . '/' . $row->path . '">View</a>';
+		// shortcode compatibility
+		if ( $this->settings->get('shortcode_compat') ){
+			$editor_args['shortcode'] = '[qw_query slug="' . $qw_query->slug . '"]';
 		}
 
 		return $editor_args;
@@ -545,81 +483,110 @@ class QW_Admin_Pages {
 	/**
 	 * Update - existing query
 	 *
+	 * @param $query_id
 	 * @param $options
 	 */
-	function update_query( $options ) {
+	function update_query( $query_id, $options ) {
+		$qw_query = qw_get_query( $query_id );
+		if ( ! $qw_query ){
+			return;
+		}
+
+		/*
+		 * Hook to allow alterations before saving
+		 */
+		$options = apply_filters( 'qw_pre_save', $options, $query_id );
 		$options = array_map( 'stripslashes_deep', $options );
 
-		// look for obvious errors
-		if ( empty( $options['args']['posts_per_page'] ) ) {
-			$options['args']['posts_per_page'] = 5;
-		}
-		if ( empty( $options['args']['offset'] ) ) {
-			$options['args']['offset'] = 0;
-		}
-		if ( empty( $options['args']['post_status'] ) ) {
-			$options['args']['post_status'] = 'publish';
-		}
-
-		// handle page settings
-		if ( isset( $options['display']['page']['template-file'] ) ) {
-			// handle template name
-			if ( $options['display']['page']['template-file'] == 'index.php' ) {
-				$options['display']['page']['template-name'] = 'Default';
-			} else {
-				$page_templates = get_page_templates();
-				foreach ( $page_templates as $name => $file ) {
-					if ( $options['display']['page']['template-file'] == $file ) {
-						$options['display']['page']['template-name'] = $name;
-					}
-				}
-			}
-		}
-
-		// hook for presave
-		// @todo - get query_id from posted data
-		$query_id = $this->get_current_query_id();
-		$options  = apply_filters( 'qw_pre_save', $options, $query_id );
-		$new_data = qw_serialize( $options );
+		$data = array(
+			'data' => qw_serialize( $options )
+		);
 
 		// update for pages
-		// @todo - detect by query type
-		if ( $options['display']['page']['path'] ) {
-			$page_path = ( $options['display']['page']['path'] ) ? $options['display']['page']['path'] : '';
+		if ( $qw_query->type == 'page' ) {
+			$data['path'] = !empty( $options['display']['page']['path'] ) ? ltrim( $options['display']['page']['path'], '/' ) : '';
+		}
 
-			// handle opening slash
-			// checking against $wp_query->query['pagename'], so, no slash
-			if ( substr( $page_path, 0, 1 ) == '/' ) {
-				$page_path = ltrim( $page_path, '/' );
+		$this->wpdb->update( $this->db_table, $data, array( 'id' => $query_id ) );
+	}
+
+	/**
+	 *
+	 * @param $handlers
+	 * @param $options
+	 *
+	 * @return mixed
+	 */
+	function make_handler_wrapper_forms( $handlers, $options ){
+		$display     = array_map( 'stripslashes_deep', $options['display'] );
+		$image_sizes = get_intermediate_image_sizes();
+		$file_styles = qw_all_file_styles();
+
+		// filters
+		if ( !empty( $handlers['filter']['items'] ) ) {
+			foreach ( $handlers['filter']['items'] as $k => &$filter ) {
+				$args = array(
+						'filter' => $filter,
+						'weight' => $filter['weight'],
+				);
+				$filter['wrapper_form'] = $this->template( 'handler-filter', $args );
 			}
+		}
 
-			$sql = "UPDATE " . $this->db_table . " SET data = %s, path = %s WHERE id = %d LIMIT 1";
-			$this->wpdb->query( $this->wpdb->prepare( $sql,
-					$new_data,
-					$page_path,
-					$query_id ) );
+		// sorts
+		if ( !empty( $handlers['sort']['items'] ) ) {
+			foreach ( $handlers['sort']['items'] as $k => &$sort ) {
+				$args = array(
+						'sort'   => $sort,
+						'weight' => $sort['weight'],
+				);
+				$sort['wrapper_form'] = $this->template( 'handler-sort', $args );
+			}
 		}
-		// update for widgets
-		else {
-			$sql = "UPDATE " . $this->db_table . " SET data = %s WHERE id = %d LIMIT 1";
-			$this->wpdb->query( $this->wpdb->prepare( $sql, $new_data, $query_id ) );
+
+		// fields
+		if ( !empty( $handlers['field']['items'] ) ) {
+			$tokens = array();
+			foreach ( $handlers['field']['items'] as $k => &$field ) {
+				$tokens[ $field['name'] ] = '{{' . $field['name'] . '}}';
+				$args = array(
+						'image_sizes' => $image_sizes,
+						'file_styles' => $file_styles,
+						'field'       => $field,
+						'weight'      => $field['weight'],
+						'options'     => $options,
+						'display'     => $display,
+						'tokens'      => $tokens,
+				);
+				$field['wrapper_form'] = $this->template( 'handler-field', $args );
+			}
 		}
+
+		// overrides
+		if ( !empty( $handlers['override']['items'] ) ) {
+			foreach ( $handlers['override']['items'] as $k => &$override ) {
+				$args = array(
+						'override' => $override,
+						'weight'   => $override['weight'],
+				);
+				$override['wrapper_form'] = $this->template( 'handler-override', $args );
+			}
+		}
+
+		return $handlers;
 	}
 
 	/**
 	 * Get the current query being edited
 	 *
-	 * @todo - improve. look in POST
-	 *
 	 * @return int|false
 	 */
 	function get_current_query_id() {
-		if ( isset( $_GET['page'] ) && $_GET['page'] == 'query-wrangler' && isset( $_GET['edit'] ) ) {
-			die( __FUNCTION__ . '  -- this part should never happen');
-			return $_GET['edit'];
-		}
+		$screen = get_current_screen();
+		$flip = array_flip( $this->pages );
 
-		if ( !empty( $_GET['query_id'] ) ) {
+		// ensure we're on one of our pages
+		if ( !empty( $flip[ $screen->base ] ) && !empty( $_GET['query_id'] ) ) {
 			return absint( $_GET['query_id'] );
 		}
 
@@ -641,5 +608,26 @@ class QW_Admin_Pages {
 
 		wp_redirect( $url );
 		exit();
+	}
+
+	/**
+	 * Simple template function for admin stuff
+	 *
+	 * @param $__template_name
+	 * @param array $__args
+	 *
+	 * @return string
+	 */
+	function template( $__template_name, $__args = array() ){
+		$__template_file = QW_PLUGIN_DIR . "/admin/templates/{$__template_name}.php";
+
+		if ( file_exists( $__template_file ) ){
+			ob_start();
+			extract( $__args );
+			include $__template_file;
+			return ob_get_clean();
+		}
+
+		return '';
 	}
 }

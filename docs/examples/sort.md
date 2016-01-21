@@ -52,9 +52,6 @@ function qw_example_sort_options($sort_options)
     // if callback and template both aren't set,
     //   defaults to:  'qw_sorts_default_form_callback'
     'form_callback' => 'my_sort_option_form_callback',
-
-    // (optional) a template wrangler form template
-    'form_template' => 'my_tw_form_template',
   );
   return $sort_options;
 }
