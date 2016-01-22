@@ -99,7 +99,8 @@ function qw_generate_query_options(
  * @return array Query Arguments
  */
 function qw_generate_query_args( $options = array() ) {
-	$handlers = qw_preprocess_handlers( $options );
+	// @todo - remove
+	$handlers = qw_get_query_handlers( $options );
 
 	$paged = NULL;
 	// if pager_key is enabled, trick qw_get_page_number
@@ -392,7 +393,7 @@ function qw_unserialize( $serial_str ) {
  */
 function qw_get_hook_key( $all, $single ) {
 	// default to new custom_field (meta_value_new)
-	$hook_key = 'custom_field';
+	$hook_key = '';
 
 	// see if hook key is set
 	if ( ! empty( $single['hook_key'] ) && isset( $all[ $single['hook_key'] ] ) ) {

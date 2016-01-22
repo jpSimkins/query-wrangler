@@ -31,164 +31,179 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 // some useful definitions
 define( 'QW_VERSION', '1.6.0' );
+define( 'QW_DB_VERSION', '2001' );
 define( 'QW_PLUGIN_DIR', dirname( __FILE__ ) );
 define( 'QW_PLUGIN_URL', plugins_url( '', __FILE__ ) );
 define( 'QW_FORM_PREFIX', "qw-query-options" );
 
 
-include_once QW_PLUGIN_DIR . '/includes/class-qw-form-fields.php';
-include_once QW_PLUGIN_DIR . '/includes/class-qw-settings.php';
-include_once QW_PLUGIN_DIR . '/includes/class-qw-query.php';
-include_once QW_PLUGIN_DIR . '/widget.query.php';
+class Query_Wrangler {
 
-/*
- * Init functions
- */
-function qw_init_frontend() {
-	$settings = QW_Settings::get_instance();
+	private $handlers;
+	private $settings;
 
-	// include Template Wrangler
-	if ( ! function_exists( 'theme' ) ) {
-		include_once QW_PLUGIN_DIR . '/template-wrangler.php';
-	}
-	// Wordpress hooks
-	include_once QW_PLUGIN_DIR . '/includes/hooks.php';
-	include_once QW_PLUGIN_DIR . '/includes/exposed.php';
-	include_once QW_PLUGIN_DIR . '/includes/handlers.php';
-	include_once QW_PLUGIN_DIR . '/includes/class-qw-shortcodes.php';
-	QW_Shortcodes::register();
-
-	// basics
-	include_once QW_PLUGIN_DIR . '/includes/basics/display_title.php';
-	include_once QW_PLUGIN_DIR . '/includes/basics/template_styles.php';
-	include_once QW_PLUGIN_DIR . '/includes/basics/row_styles.php';
-	include_once QW_PLUGIN_DIR . '/includes/basics/posts_per_page.php';
-	include_once QW_PLUGIN_DIR . '/includes/basics/post_status.php';
-	include_once QW_PLUGIN_DIR . '/includes/basics/offset.php';
-	include_once QW_PLUGIN_DIR . '/includes/basics/header.php';
-	include_once QW_PLUGIN_DIR . '/includes/basics/footer.php';
-	include_once QW_PLUGIN_DIR . '/includes/basics/empty.php';
-	include_once QW_PLUGIN_DIR . '/includes/basics/wrapper_settings.php';
-	include_once QW_PLUGIN_DIR . '/includes/basics/page_path.php';
-	include_once QW_PLUGIN_DIR . '/includes/basics/page_template.php';
-	include_once QW_PLUGIN_DIR . '/includes/basics/pager.php';
-	include_once QW_PLUGIN_DIR . '/includes/basics/ignore_sticky_posts.php';
-
-	// fields
-	include_once QW_PLUGIN_DIR . '/includes/fields/default_fields.php';
-	include_once QW_PLUGIN_DIR . '/includes/fields/post_author.php';
-	include_once QW_PLUGIN_DIR . '/includes/fields/post_author_avatar.php';
-	include_once QW_PLUGIN_DIR . '/includes/fields/file_attachment.php';
-	include_once QW_PLUGIN_DIR . '/includes/fields/image_attachment.php';
-	include_once QW_PLUGIN_DIR . '/includes/fields/featured_image.php';
-	include_once QW_PLUGIN_DIR . '/includes/fields/callback_field.php';
-
-	// meta value field as a setting
-	$meta_value_handler = $settings->get( 'meta_value_field_handler', 0 );
-
-	if ( $meta_value_handler == 1 ) {
-		include_once QW_PLUGIN_DIR . '/includes/fields/meta_value_new.php';
-	} else {
-		include_once QW_PLUGIN_DIR . '/includes/fields/meta_value.php';
-	}
-
-	// filters
-	include_once QW_PLUGIN_DIR . '/includes/filters/author.php';
-	include_once QW_PLUGIN_DIR . '/includes/filters/callback.php';
-	include_once QW_PLUGIN_DIR . '/includes/filters/post_types.php';
-	include_once QW_PLUGIN_DIR . '/includes/filters/post_id.php';
-	include_once QW_PLUGIN_DIR . '/includes/filters/meta_key.php';
-	include_once QW_PLUGIN_DIR . '/includes/filters/meta_key_value.php';
-	include_once QW_PLUGIN_DIR . '/includes/filters/meta_query.php';
-	include_once QW_PLUGIN_DIR . '/includes/filters/meta_value.php';
-	include_once QW_PLUGIN_DIR . '/includes/filters/tags.php';
-	include_once QW_PLUGIN_DIR . '/includes/filters/categories.php';
-	include_once QW_PLUGIN_DIR . '/includes/filters/post_parent.php';
-	include_once QW_PLUGIN_DIR . '/includes/filters/taxonomies.php';
-	include_once QW_PLUGIN_DIR . '/includes/filters/taxonomy_relation.php';
-	include_once QW_PLUGIN_DIR . '/includes/filters/search.php';
-
-	// sorts
-	include_once QW_PLUGIN_DIR . '/includes/sorts/default_sorts.php';
-
-	// overrides
-	include_once QW_PLUGIN_DIR . '/includes/overrides/categories.php';
-	include_once QW_PLUGIN_DIR . '/includes/overrides/post_type_archive.php';
-	include_once QW_PLUGIN_DIR . '/includes/overrides/tags.php';
-	include_once QW_PLUGIN_DIR . '/includes/overrides/taxonomies.php';
-
-	// Necessary functions to show a query
-	include_once QW_PLUGIN_DIR . '/includes/query.php';
-	include_once QW_PLUGIN_DIR . '/includes/theme.php';
-	include_once QW_PLUGIN_DIR . '/includes/pages.php';
-	include_once QW_PLUGIN_DIR . '/includes/class-qw-override.php';
-	QW_Override::register();
-
-}
-
-function qw_admin_init() {
-	include_once QW_PLUGIN_DIR . '/admin/ajax.php';
-
-	add_action( 'wp_ajax_qw_form_ajax', 'qw_form_ajax' );
-	add_action( 'wp_ajax_qw_data_ajax', 'qw_data_ajax' );
-	add_action( 'wp_ajax_qw_meta_key_autocomplete', 'qw_meta_key_autocomplete' );
-}
-
-
-function _qw_new_admin(){
-	include_once QW_PLUGIN_DIR . '/admin/query-admin-pages.php';
-
-	global $wpdb;
-	$settings = QW_Settings::get_instance();
-
-	QW_Admin_Pages::register( $settings, $wpdb );
-}
-
-add_action( 'init', 'qw_init_frontend' );
-add_action( 'init', '_qw_new_admin' );
-//add_action( 'admin_menu', 'qw_menu', 9999 );
-add_action( 'admin_init', 'qw_admin_init' );
-add_action( 'admin_init', 'qw_check_version', 901 );
-
-/*
- * Checking current version of plugin to handle upgrades
- * @todo - rewrite upgrade approach using data version
- */
-function qw_check_version() {
-	if ( $last_version = get_option( 'qw_plugin_version' ) ) {
-		// compare versions
-		if ( $last_version < QW_VERSION ) {
-			// include upgrade inc
-			include_once QW_PLUGIN_DIR . '/upgrade.php';
-			$upgrade_function   = 'qw_upgrade_' . qw_make_slug( $last_version ) . '_to_' . qw_make_slug( QW_VERSION );
-			$upgrade_to_current = 'qw_upgrade_' . qw_make_slug( $last_version ) . '_to_current';
-
-			if ( function_exists( $upgrade_function ) ) {
-				$upgrade_function();
-			} else if ( function_exists( $upgrade_to_current ) ) {
-				$upgrade_to_current();
-			}
-			update_option( 'qw_plugin_version', QW_VERSION );
+	/**
+	 * Query_Wrangler constructor.
+	 */
+	function __construct(){
+		// include Template Wrangler
+		if ( ! function_exists( 'theme' ) ) {
+			include_once QW_PLUGIN_DIR . '/template-wrangler.php';
 		}
-	} else {
-		// first upgrade
-		include QW_PLUGIN_DIR . '/upgrade.php';
-		qw_upgrade_12_to_13();
-		// set our version number
-		update_option( 'qw_plugin_version', QW_VERSION );
+		include_once QW_PLUGIN_DIR . '/includes/hooks.php';
+		include_once QW_PLUGIN_DIR . '/includes/pages.php';
+		include_once QW_PLUGIN_DIR . '/includes/query.php';
+		include_once QW_PLUGIN_DIR . '/includes/theme.php';
+
+		spl_autoload_register( array( $this, 'autoload' ) );
+
+
+
+		$last_db_version = get_option( 'qw_db_version', '2000' );
+		$update = new QW_Update( $last_db_version, QW_DB_VERSION );
+		if ( $update->needed() ){
+			$update->perform_updates();
+		}
+	}
+
+	/**
+	 * Instantiate and hook into WordPress
+	 */
+	static public function register(){
+		$plugin = new self();
+
+		add_action( 'widgets_init', array( $plugin, 'widgets_init' ) );
+		add_action( 'init', array( $plugin, 'init' ) );
+	}
+
+	/**
+	 * Register WordPress widgets
+	 */
+	function widgets_init(){
+		register_widget( 'Query_Wrangler_Widget' );
+	}
+
+	/**
+	 * Initialize
+	 */
+	function init(){
+		$this->load_common();
+
+		if ( is_admin() ){
+			$this->load_admin();
+		}
+	}
+
+	/**
+	 * Load files common to both the frontend and admin pages
+	 */
+	function load_common(){
+		//include_once QW_PLUGIN_DIR . '/widget.query.php';
+		include_once QW_PLUGIN_DIR . '/includes/exposed.php';
+
+		// basics
+		include_once QW_PLUGIN_DIR . '/includes/basics/display_title.php';
+		include_once QW_PLUGIN_DIR . '/includes/basics/template_styles.php';
+		include_once QW_PLUGIN_DIR . '/includes/basics/row_styles.php';
+		include_once QW_PLUGIN_DIR . '/includes/basics/posts_per_page.php';
+		include_once QW_PLUGIN_DIR . '/includes/basics/post_status.php';
+		include_once QW_PLUGIN_DIR . '/includes/basics/offset.php';
+		include_once QW_PLUGIN_DIR . '/includes/basics/header.php';
+		include_once QW_PLUGIN_DIR . '/includes/basics/footer.php';
+		include_once QW_PLUGIN_DIR . '/includes/basics/empty.php';
+		include_once QW_PLUGIN_DIR . '/includes/basics/wrapper_settings.php';
+		include_once QW_PLUGIN_DIR . '/includes/basics/page_path.php';
+		include_once QW_PLUGIN_DIR . '/includes/basics/page_template.php';
+		include_once QW_PLUGIN_DIR . '/includes/basics/pager.php';
+		include_once QW_PLUGIN_DIR . '/includes/basics/ignore_sticky_posts.php';
+
+		// fields
+		include_once QW_PLUGIN_DIR . '/includes/fields/default_fields.php';
+		include_once QW_PLUGIN_DIR . '/includes/fields/post_author.php';
+		include_once QW_PLUGIN_DIR . '/includes/fields/post_author_avatar.php';
+		include_once QW_PLUGIN_DIR . '/includes/fields/file_attachment.php';
+		include_once QW_PLUGIN_DIR . '/includes/fields/image_attachment.php';
+		include_once QW_PLUGIN_DIR . '/includes/fields/featured_image.php';
+		include_once QW_PLUGIN_DIR . '/includes/fields/callback_field.php';
+		// meta field below
+
+		// filters
+		include_once QW_PLUGIN_DIR . '/includes/filters/author.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/callback.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/post_types.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/post_id.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/meta_key.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/meta_key_value.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/meta_query.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/meta_value.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/tags.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/categories.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/post_parent.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/taxonomies.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/taxonomy_relation.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/search.php';
+
+		// sorts
+		include_once QW_PLUGIN_DIR . '/includes/sorts/default_sorts.php';
+
+		// overrides
+		include_once QW_PLUGIN_DIR . '/includes/overrides/categories.php';
+		include_once QW_PLUGIN_DIR . '/includes/overrides/post_type_archive.php';
+		include_once QW_PLUGIN_DIR . '/includes/overrides/tags.php';
+		include_once QW_PLUGIN_DIR . '/includes/overrides/taxonomies.php';
+
+
+		$this->settings = QW_Settings::get_instance();
+
+		QW_Override::register();
+		QW_Shortcodes::register( $this->settings );
+
+		// meta value field as a setting
+		if ( $this->settings->get( 'meta_value_field_handler', 0 ) ) {
+			include_once QW_PLUGIN_DIR . '/includes/fields/meta_value_new.php';
+		}
+		else {
+			include_once QW_PLUGIN_DIR . '/includes/fields/meta_value.php';
+		}
+
+		$this->handlers = QW_Handlers::get_instance();
+	}
+
+	/**
+	 * Load admin files
+	 */
+	function load_admin(){
+		global $wpdb;
+		include_once QW_PLUGIN_DIR . '/admin/ajax.php';
+
+		QW_Admin_Pages::register( $this->settings, $wpdb );
+
+		add_action( 'wp_ajax_qw_form_ajax', 'qw_form_ajax' );
+		add_action( 'wp_ajax_qw_data_ajax', 'qw_data_ajax' );
+		add_action( 'wp_ajax_qw_meta_key_autocomplete', 'qw_meta_key_autocomplete' );
+
+	}
+
+	// QW_Admin_Pages
+	// class-qw-admin-pages.php
+	function autoload($class) {
+		$dirs = array(
+			QW_PLUGIN_DIR . '/includes/',
+			QW_PLUGIN_DIR . '/admin/'
+		);
+
+		$filename = 'class-'.strtolower( str_replace( '_', '-', $class) ). '.php';
+
+		foreach ( $dirs as $dir ){
+			if ( file_exists( $dir . $filename ) ) {
+				require  $dir . $filename;
+				break;
+			}
+		}
 	}
 }
 
-/**
- * Slug creation
- * @deprecated in favor of sanitize_title()
- */
-function qw_make_slug( $string ) {
-	$search = array( "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "+", "=", "{", "}", "[", "]", "\\", "|", ":", ";", "'", "<", ",", ">", ".", "?", "/", "~", "`");
-
-	return str_replace( " ", "_", strtolower( str_replace( $search, "", strip_tags( $string ) ) ) );
-}
-
+Query_Wrangler::register();
 
 /*===================================== DB TABLES =========================================*/
 /*
@@ -212,19 +227,3 @@ UNIQUE KEY id (id)
 }
 
 register_activation_hook( __FILE__, 'qw_query_wrangler_table' );
-
-// override terms table
-function qw_query_override_terms_table() {
-	global $wpdb;
-	$table_name = $wpdb->prefix . "query_override_terms";
-	$sql        = "CREATE TABLE " . $table_name . " (
-query_id mediumint(9) NOT NULL,
-term_id bigint(20) NOT NULL,
-UNIQUE KEY query_term (query_id,term_id)
-);";
-
-	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-	dbDelta( $sql );
-}
-
-register_activation_hook( __FILE__, 'qw_query_override_terms_table' );

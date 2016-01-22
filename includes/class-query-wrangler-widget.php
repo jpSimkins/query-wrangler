@@ -1,19 +1,4 @@
 <?php
-/**
- * Add function to widgets_init that'll load our widget.
- *
- * @since 0.1
- */
-add_action( 'widgets_init', 'qw_wp_widget' );
-/**
- * Register our widget.
- * 'Query_Wrangler_Widget' is the widget class used below.
- *
- * @since 0.1
- */
-function qw_wp_widget() {
-	register_widget( 'Query_Wrangler_Widget' );
-}
 
 /**
  * Query Wrangler Widget class.

@@ -1,14 +1,17 @@
 <?php
 
 class QW_Shortcodes {
+	private $settings;
+
+	function __construct( $settings ) {
+		$this->settings = $settings;
+	}
 
 	/**
 	 * Register hooks with wordpress
 	 */
-	static public function register(){
-		$self = new self();
-
-		$settings = QW_Settings::get_instance();
+	static public function register( $settings ){
+		$self = new self( $settings );
 
 		if ( $settings->get('shortcode_compat') ){
 			add_shortcode( 'qw_query', array( $self, 'query_shortcode' ) );

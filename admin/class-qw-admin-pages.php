@@ -436,7 +436,7 @@ class QW_Admin_Pages {
 		$display = isset( $options['display'] ) ? array_map( 'stripslashes_deep', $options['display'] ) : array();
 
 		// preprocess existing handlers
-		$handlers = qw_preprocess_handlers( $options );
+		$handlers = qw_get_query_handlers( $options );
 		$handlers = $this->make_handler_wrapper_forms( $handlers, $options );
 
 		// start building edit page data
