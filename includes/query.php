@@ -248,35 +248,6 @@ function qw_get_all_widgets() {
 }
 
 /*
- * Get all query pages
- *
- * @return array Query pages in WP post format
- */
-function qw_get_all_pages() {
-	global $wpdb;
-	$table_name = $wpdb->prefix . "query_wrangler";
-	$sql        = "SELECT id,name,path FROM " . $table_name . " WHERE type = 'page'";
-	$rows       = $wpdb->get_results( $sql );
-
-	if ( is_array( $rows ) ) {
-		$pages    = array();
-		$blog_url = get_bloginfo( 'wpurl' );
-
-		$i = 0;
-		foreach ( $rows as $row ) {
-			$pages[ $i ]             = new stdClass();
-			$pages[ $i ]->ID         = $row->id;
-			$pages[ $i ]->title      = $row - name;
-			$pages[ $i ]->post_title = $row->name;
-			$pages[ $i ]->guid       = $blog_url . $row->path;
-			$pages[ $i ]->post_type  = 'page';
-		}
-
-		return $pages;
-	}
-}
-
-/*
  * Helper function: Get the current page number
  * @param object $qw_query - the query being displayed
  *
@@ -308,50 +279,6 @@ function qw_get_page_number( $qw_query = NULL ) {
 	}
 
 	return $page;
-}
-
-/*
- * Get full term data
- *
- * @param $term
- *   - either term id or term slug based on 2nd parameter
- * @param $by
- *   - either 'id' or 'slug': what you want the get term by
- * @param $return_type
- *  - OBJECT, ARRAY_A, ARRAY_N
- *
- * @return
- *  - term, format depending on 3rd parameter
- *  - false if not found
- */
-function qw_get_term( $term, $by = 'id', $return_type = OBJECT ) {
-	global $wpdb;
-	switch ( $by ) {
-		case 'id':
-			$where = 't.term_id = ' . $term;
-			break;
-
-		case 'slug':
-			$where = 't.slug = "' . $term . '"';
-			break;
-	}
-
-	$sql = "SELECT
-            t.term_id,t.name,t.slug,t.term_group,tax.taxonomy,tax.description,tax.parent,tax.count
-          FROM " . $wpdb->prefix . "terms as t
-          LEFT JOIN " . $wpdb->prefix . "term_taxonomy as tax ON t.term_id = tax.term_id
-          WHERE " . $where;
-	$t   = $wpdb->get_row( $sql, $return_type );
-
-	if ( $t->term_id ) {
-		// http://web.archiveorange.com/archive/v/XZYvyS8D7kDM3sQgrvJF
-		$t->link = get_term_link( (int) $t->term_id, $t->taxonomy );
-
-		// return term if found
-		return $t;
-	} else {
-		return FALSE;
-	}
 }
 
 /*
@@ -496,7 +423,6 @@ function qw_cmp( $a, $b ) {
  * @return array Default query settings
  */
 function qw_default_query_data() {
-
 	return
 	array (
 		'display' => array (

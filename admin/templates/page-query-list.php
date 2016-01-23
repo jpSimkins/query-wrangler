@@ -181,16 +181,17 @@ class Query_Wrangler_List_Table extends WP_List_Table {
 		$settings = QW_Settings::get_instance();
 
 		if ( $item['type'] != 'override' ) {
+			$details.= __( 'Shortcode' ) . '<br>';
 			if ( $settings->get('shortcode_compat') ){
-				$details .= 'Shortcode options:<br />[qw_query slug="' . $item['slug'] . '"]';
+				$details .= '<code>[qw_query slug="' . $item['slug'] . '"]</code>';
 			}
 			else {
-				$details .= 'Shortcode options:<br />[query slug="' . $item['slug'] . '"]';
+				$details .= '<code>[query slug="' . $item['slug'] . '"]</code>';
 			}
 		}
 
 		if ( $item['type'] == 'override' ) {
-			$details = 'Overriding: ';
+			$details = _( 'Overriding' );
 
 			$row = qw_get_query_by_id( $item['ID'] );
 			if ( isset( $row->data['override'] ) ) {
@@ -202,11 +203,13 @@ class Query_Wrangler_List_Table extends WP_List_Table {
 
 						$details .= '<br>'.$override['title'] . ': ';
 
-						if ( is_array( $values['values'] ) ) {
-							$details.= implode( ", ", $values['values'] );
-						}
-						else {
-							$details.= ", ". $values['values'];
+						if ( !empty( $values['values'] ) ){
+							if ( is_array( $values['values'] ) ) {
+								$details.= implode( ", ", $values['values'] );
+							}
+							else {
+								$details.= ", ". $values['values'];
+							}
 						}
 					}
 				}
