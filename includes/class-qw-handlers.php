@@ -88,8 +88,8 @@ class QW_Handlers {
 	 * @return mixed|void
 	 */
 	function get_query_handlers( $options ){
+		// loop through all handlers and prepare existing items
 		$handlers = $this->all_handlers;
-
 		foreach ( $handlers as $handler_type => $handler ) {
 			$items = array();
 
@@ -124,28 +124,29 @@ class QW_Handlers {
 	 */
 	function preprocess_handler_items( $handler_type, $existing_items ){
 		$handler = $this->all_handlers[ $handler_type ];
-		$all_item_types = $handler['all_items'];
+		$existing_items = $this->enforce_required_items( $handler_type, $existing_items );
 
-		// generate the form name prefixes
+		// loop through all existing items and prepare them for output
 		foreach ( $existing_items as $name => $values ) {
 			// load sort type data
-			$hook_key = qw_get_hook_key( $all_item_types, $values );
+			$hook_key = qw_get_hook_key( $handler['all_items'], $values );
 
 			if ( empty( $hook_key ) ) {
 				$hook_key = ! empty( $values['hook_key'] ) ? $values['hook_key'] : $name;
 			}
 
-			$this_item = $all_item_types[ $hook_key ];
-
-			// copy important details to top level of array
-			$this_item['name']        = $name;
-			$this_item['type']        = ! empty( $values['type'] ) ? $values['type'] : $name;
-			$this_item['weight']      = ! empty( $values['weight'] ) ? $values['weight'] : 0;
-			$this_item['hook_key']    = $hook_key;
-			$this_item['form_prefix'] = QW_FORM_PREFIX . $handler['form_prefix'] . '[' . $name . ']';
-
-			// values on their own for handler forms
-			$this_item['values']      = $values;
+			// this_item is a combination of the default item and the saved item
+			$this_item = array_replace(
+				$handler['all_items'][ $hook_key ],
+				array(
+					'name' => $name,
+					'type' => !empty( $values['type'] ) ? $values['type'] : $name,
+					'weight' => !empty( $values['weight'] ) ? $values['weight'] : 0,
+					'hook_key' => $hook_key,
+					'form_prefix' => QW_FORM_PREFIX . $handler['form_prefix'] . '[' . $name . ']',
+					'values' => $values,
+				)
+			);
 
 			// this handler's form
 			if ( isset( $this_item['form_callback'] ) && is_callable( $this_item['form_callback'] ) ) {
@@ -162,6 +163,49 @@ class QW_Handlers {
 		}
 
 		return $existing_items;
+	}
+
+	/**
+	 * Ensure that required item typess of a handler type exist
+	 *
+	 * @param $handler_type
+	 * @param array $items
+	 *
+	 * @return array
+	 */
+	function enforce_required_items( $handler_type, $items = array() ){
+		$required = $this->get_required_item_types( $handler_type );
+
+		foreach( $required as $required_key => $required_item ){
+			if ( empty( $items[ $required_key ] ) ){
+				$items[ $required_key ] = array(
+					'name' => $required_item['type'],
+					'type' => $required_item['type'],
+					'hook_key' => $required_item['hook_key'],
+				);
+			}
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Get item types of a handler type that are required
+	 *
+	 * @param $handler_type
+	 * @return array
+	 */
+	function get_required_item_types( $handler_type ){
+		$handler = $this->all_handlers[ $handler_type ];
+		$required = array();
+
+		foreach( $handler['all_items'] as $item_type => $item ){
+			if ( !empty( $item['required'] ) ){
+				$required[ $item_type ] = $item;
+			}
+		}
+
+		return $required;
 	}
 
 	/**
