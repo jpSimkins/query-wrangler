@@ -176,10 +176,8 @@ var QueryWrangler = {};
           // prepare post data for form and sortable form
           var post_data_form = {
             'action': 'qw_form_ajax',
-            'form': handler + '_form',
-            'name': (
-            item_count > 0
-            ) ? item_type + "_" + item_count : item_type,
+            'form': 'handler-' + handler,
+            'name': ( item_count > 0 ) ? item_type + "_" + item_count : item_type,
             'handler': handler,
             'hook_key': hook_key,
             'type': item_type,

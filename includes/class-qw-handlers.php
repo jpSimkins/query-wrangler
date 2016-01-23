@@ -98,6 +98,9 @@ class QW_Handlers {
 				$items = call_user_func( $handler['data_callback'], $options );
 			}
 
+			// handle missing required item types
+			$items = $this->enforce_required_items( $handler_type, $items );
+
 			// preprocess existing handler items
 			if ( !empty( $items ) ) {
 				$items = $this->preprocess_handler_items( $handler_type, $items );
@@ -124,7 +127,6 @@ class QW_Handlers {
 	 */
 	function preprocess_handler_items( $handler_type, $existing_items ){
 		$handler = $this->all_handlers[ $handler_type ];
-		$existing_items = $this->enforce_required_items( $handler_type, $existing_items );
 
 		// loop through all existing items and prepare them for output
 		foreach ( $existing_items as $name => $values ) {

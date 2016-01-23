@@ -168,3 +168,20 @@ function qw_display_post_meta_value( $post, $field ) {
 
 	return implode( $separator, $values );
 }
+
+/*
+ * Function for grabbing meta keys
+ *
+ * @return array All meta keys in WP
+ */
+function qw_get_meta_keys() {
+	global $wpdb;
+
+	$keys = $wpdb->get_col( "
+			SELECT meta_key
+			FROM $wpdb->postmeta
+			GROUP BY meta_key
+			ORDER BY meta_key" );
+
+	return $keys;
+}

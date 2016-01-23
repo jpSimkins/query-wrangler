@@ -342,41 +342,6 @@ function qw_get_hook_key( $all, $single ) {
 }
 
 /*
- * Generate form prefixes for handlers
- *
- * @param string
- *    $type = sort, field, filter, override
- */
-function qw_make_form_prefix( $type, $name ) {
-	$handlers = qw_all_handlers();
-
-	if ( isset( $handlers[ $type ]['form_prefix'] ) ) {
-		$output = QW_FORM_PREFIX . $handlers[ $type ]['form_prefix'] . '[' . $name . ']';
-	} else {
-		$output = QW_FORM_PREFIX . "[" . $name . "]";
-	}
-
-	return $output;
-}
-
-/*
- * Function for grabbing meta keys
- *
- * @return array All meta keys in WP
- */
-function qw_get_meta_keys() {
-	global $wpdb;
-
-	$keys = $wpdb->get_col( "
-			SELECT meta_key
-			FROM $wpdb->postmeta
-			GROUP BY meta_key
-			ORDER BY meta_key" );
-
-	return $keys;
-}
-
-/*
  * Replace contextual tokens within a string
  *
  * @params string $args - a query argument string

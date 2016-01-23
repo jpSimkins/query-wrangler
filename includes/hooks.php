@@ -150,7 +150,31 @@ function qw_all_sort_options() {
  * Post Statuses
  */
 function qw_all_post_statuses() {
-	$post_statuses = apply_filters( 'qw_post_statuses', array() );
+	$default = array(
+		'publish' => array(
+			'title' => __( 'Published' ),
+		) ,
+		'pending' => array(
+			'title' => __( 'Pending' ),
+		) ,
+		'draft' => array(
+			'title' => __( 'Draft' ),
+		) ,
+		'future' => array(
+			'title' => __( 'Future (Scheduled)' ),
+		) ,
+		'trash' => array(
+			'title' => __( 'Trashed' ),
+		) ,
+		'private' => array(
+			'title' => __( 'Private' ),
+		) ,
+		'any' => array(
+			'title' => __( 'Any' ),
+		) ,
+	);
+
+	$post_statuses = apply_filters( 'qw_post_statuses', $default );
 
 	return $post_statuses;
 }

@@ -1,94 +1,50 @@
 <?php
 
 /**
- * Ajax callback for meta_key autocomplete
- */
-function qw_meta_key_autocomplete() {
-	if ( isset( $_POST['qw_meta_key_autocomplete'] ) ) {
-		$meta_key = sanitize_text_field( $_POST['qw_meta_key_autocomplete'] );
-
-		global $wpdb;
-		$like = $wpdb->esc_like( $meta_key );
-		$query = $wpdb->prepare(
-				"SELECT DISTINCT(`meta_key`) FROM {$wpdb->postmeta} WHERE `meta_key` LIKE '%s' LIMIT 15",
-				'%' . $like. '%'
-		);
-		$results = $wpdb->get_col( $query );
-
-		wp_send_json( array(
-				'success' => TRUE,
-				'values'  => $results,
-		) );
-	}
-	exit;
-}
-
-/**
  * Ajax for form templates
  */
 function qw_form_ajax() {
-	switch ( $_POST['form'] ) {
-		/*
-		 * Preview, special case
-		 */
-		case 'preview':
-			include_once QW_PLUGIN_DIR . '/admin/templates/preview.php';
-			exit;
-			break;
-
-		case 'sort_form':
-			$template = 'handler-sort';
-			$all      = qw_all_sort_options();
-			break;
-
-		case 'field_form':
-			$template = 'handler-field';
-			$all      = qw_all_fields();
-			break;
-
-		case 'filter_form':
-			$template = 'handler-filter';
-			$all      = qw_all_filters();
-			break;
-
-		case 'override_form':
-			$template = 'handler-override';
-			$all      = qw_all_overrides();
-			break;
+	if ( $_POST['form'] == 'preview' ){
+		include_once QW_PLUGIN_DIR . '/admin/templates/preview.php';
+		exit;
 	}
+	//$template = $_POST['form'];
 
-	/*
-	   * Generate handler item forms and data
-	   */
-	$handler = $_POST['handler'];
-	$item    = array();
+	$qw_handlers = QW_Handlers::get_instance();
 
-	$hook_key            = qw_get_hook_key( $all, $_POST );
-	$item                = $all[ $hook_key ];
-	$item['name']        = $_POST['name'];
-	$item['form_prefix'] = qw_make_form_prefix( $handler, $item['name'] );
-
-	// handler item's form
-	if ( isset( $item['form_callback'] ) && is_callable( $item['form_callback'] ) ) {
+	if ( isset( $_POST['hook_key'], $_POST['handler'], $_POST['name'] ) ){
+		// buffer the whole process in case of php warnings/notices
 		ob_start();
-		call_user_func( $item['form_callback'], $item );
-		$item['form'] = ob_get_clean();
+
+		$handler_type = $_POST['handler'];
+		$name         = $_POST['name'];
+		$hook_key     = $_POST['hook_key'];
+		$weight       = !empty( $_POST['next_weight'] ) ? $_POST['next_weight'] : 0;
+
+		$handler = $qw_handlers->all_handlers[ $handler_type ];
+		$template = 'handler-' . $handler_type;
+
+		// prepare and item and preprocess it
+		$item = $handler['all_items'][ $hook_key ];
+		$item['name']   = $name;
+		$item['weight'] = $weight;
+
+		$items = $qw_handlers->preprocess_handler_items( $handler_type, array( $name => $item ) );
+		$item  = $items[ $name ];
+
+		// todo - this could be better... a lot of work just to get a template function
+		$settings = QW_Settings::get_instance();
+		global $wpdb;
+		$admin = new QW_Admin_Pages( $settings, $wpdb );
+
+		print $admin->template( $template,  array( $handler_type => $item ) );
+
+		wp_send_json( array(
+			'template' => ob_get_clean(),
+		) );
 	}
 
-	$args = array(
-		$handler => $item,
-	);
-	// weight for sortable handler items
-	if ( isset( $_POST['next_weight'] ) ) {
-		$args['weight'] = $_POST['next_weight'];
-	}
-
-	// todo - this could be better... a lot of work just to get a template function
-	$settings = QW_Settings::get_instance();
-	global $wpdb;
-	$admin = new QW_Admin_Pages( $settings, $wpdb );
-
-	wp_send_json( array( 'template' => $admin->template( $template, $args ) ) );
+	exit;
 }
 
 /*
@@ -295,4 +251,47 @@ function qw_edit_query_json( $query_id = NULL ) {
 	}
 
 	return json_encode( $data );
+}
+
+/**
+ * Ajax callback for meta_key autocomplete
+ */
+function qw_meta_key_autocomplete() {
+	if ( isset( $_POST['qw_meta_key_autocomplete'] ) ) {
+		$meta_key = sanitize_text_field( $_POST['qw_meta_key_autocomplete'] );
+
+		global $wpdb;
+		$like = $wpdb->esc_like( $meta_key );
+		$query = $wpdb->prepare(
+				"SELECT DISTINCT(`meta_key`) FROM {$wpdb->postmeta} WHERE `meta_key` LIKE '%s' LIMIT 15",
+				'%' . $like. '%'
+		);
+		$results = $wpdb->get_col( $query );
+
+		wp_send_json( array(
+				'success' => TRUE,
+				'values'  => $results,
+		) );
+	}
+	exit;
+}
+
+
+
+/*
+ * Generate form prefixes for handlers
+ *
+ * @param string
+ *    $type = sort, field, filter, override
+ */
+function qw_make_form_prefix( $type, $name ) {
+	$handlers = qw_all_handlers();
+
+	if ( isset( $handlers[ $type ]['form_prefix'] ) ) {
+		$output = QW_FORM_PREFIX . $handlers[ $type ]['form_prefix'] . '[' . $name . ']';
+	} else {
+		$output = QW_FORM_PREFIX . "[" . $name . "]";
+	}
+
+	return $output;
 }

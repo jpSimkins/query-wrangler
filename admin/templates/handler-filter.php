@@ -7,7 +7,9 @@ $form = new QW_Form_Fields( array(
 ?>
 <!-- <?php print $filter['name']; ?> -->
 <div id="qw-filter-<?php print $filter['name']; ?>" class="qw-filter qw-sortable-item qw-item-form">
-	<div class="qw-remove button"> Remove </div>
+	<?php if ( empty( $filter['required'] ) ) : ?>
+		<div class="qw-remove button"> Remove </div>
+	<?php endif; ?>
 	<div class="qw-weight-container">
 		<?php
 		print $form->render_field( array(
