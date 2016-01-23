@@ -7,35 +7,24 @@ function qw_filter_post_types( $filters ) {
 	$filters['post_types'] = array(
 		'title'                 => __( 'Post Types' ),
 		'description'           => __( 'Select which post types should be shown.' ),
-		'form_callback'         => 'qw_filter_post_types_form',
+		'required'              => true,
 		'query_args_callback'   => 'qw_filter_post_types_args',
 		'query_display_types'   => array( 'page', 'widget', 'override' ),
-		'required' => true,
-		// exposed
 		'exposed_form'          => 'qw_filter_post_types_exposed_form',
 		'exposed_process'       => 'qw_filter_post_types_exposed_process',
 		'exposed_settings_form' => 'qw_filter_post_types_exposed_settings_form',
+		'form_fields' => array(
+			'post_types' => array(
+				'type' => 'checkboxes',
+				'name' => 'post_types',
+				'default_value' => array( 'post' => 'post'),
+				'options' => qw_all_post_types(),
+				'class' => array( 'qw-js-title' ),
+			)
+		)
 	);
 
 	return $filters;
-}
-
-/*
- * Admin form for filter
- */
-function qw_filter_post_types_form( $filter ) {
-
-	$form = new QW_Form_Fields( array(
-			'form_field_prefix' => $filter['form_prefix'],
-	) );
-
-	print $form->render_field( array(
-			'type' => 'checkboxes',
-			'name' => 'post_types',
-			'value' => isset( $filter['values']['post_types'] ) ? $filter['values']['post_types'] : array(),
-			'options' => qw_all_post_types(),
-			'class' => array( 'qw-js-title' ),
-	) );
 }
 
 /*

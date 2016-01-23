@@ -153,11 +153,36 @@ class QW_Handlers {
 				call_user_func( $this_item['form_callback'], $this_item );
 				$this_item['form'] = ob_get_clean();
 			}
+			// automatic form fields
+			else if ( !empty( $this_item['form_fields'] ) && is_array( $this_item['form_fields'] ) ) {
+				$this_item['form'] = $this->make_item_form_fields( $this_item );
+			}
 
 			$existing_items[ $name ] = $this_item;
 		}
 
 		return $existing_items;
+	}
+
+	/**
+	 * @param $item
+	 *
+	 * @return string
+	 */
+	function make_item_form_fields( $item ){
+		$form = new QW_Form_Fields( array(
+			'form_field_prefix' => $item['form_prefix'],
+		) );
+
+		$output = '';
+
+		foreach( $item['form_fields'] as $key => $form_field ){
+			$default_value = !empty( $form_field['default_value'] ) ? $form_field['default_value'] : '';
+			$form_field['value'] = !empty( $item['values'][ $form_field['name'] ] ) ? $item['values'][ $form_field['name'] ] : $default_value;
+			$output.= $form->render_field( $form_field );
+		}
+
+		return $output;
 	}
 
 	/**

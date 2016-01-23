@@ -13,12 +13,17 @@ function qw_filter_search( $filters ) {
 	$filters['search'] = array(
 		'title'               => __( 'Search' ),
 		'description'         => __( 'Searches for keywords' ),
-		'form_callback'       => 'qw_filter_search_form',
 		'query_args_callback' => 'qw_generate_query_args_search',
 		'query_display_types' => array( 'page', 'widget' ),
-		// exposed
 		'exposed_form'        => 'qw_filter_search_exposed_form',
 		'exposed_process'     => 'qw_filter_search_exposed_process',
+		'form_fields' => array(
+			'search' =>  array(
+				'type' => 'text',
+				'name' => 'search',
+				'class' => array( 'qw-js-title' ),
+			)
+		),
 	);
 
 	return $filters;
@@ -30,22 +35,6 @@ function qw_filter_search( $filters ) {
  */
 function qw_generate_query_args_search( &$args, $filter ) {
 	$args['s'] = $filter['values']['search'];
-}
-
-/**
- * @param $filter
- */
-function qw_filter_search_form( $filter ) {
-	$form = new QW_Form_Fields( array(
-			'form_field_prefix' => $filter['form_prefix'],
-	) );
-
-	print $form->render_field( array(
-			'type' => 'text',
-			'name' => 'search',
-			'value' => isset( $filter['values']['search'] ) ? $filter['values']['search'] : '',
-			'class' => array( 'qw-js-title' ),
-	) );
 }
 
 /**

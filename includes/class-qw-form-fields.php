@@ -268,7 +268,7 @@ class QW_Form_Fields {
 		));
 		$this->template_input( $hidden );
 
-		if ( isset( $field['value'] ) && $field['value'] ) {
+		if ( !empty( $field['value'] ) ) {
 			$field['attributes']['checked'] = 'checked';
 		}
 		$field['value'] = 'on';
@@ -326,6 +326,10 @@ class QW_Form_Fields {
 	function template_checkboxes( $field ){
 		$field['class'].= ' qw-checkboxes-item';
 		$i = 0;
+		if ( !is_array( $field['value'] ) ) {
+			$field['value'] = array( $field['value'] => $field['value'] );
+		}
+
 		foreach( $field['options'] as $value => $details ){
 			// default to assuming not-array
 			$label = $details;
@@ -352,7 +356,7 @@ class QW_Form_Fields {
 							name="<?php echo esc_attr( $field['form_name'] ); ?>[<?php echo esc_attr( $value ); ?>]"
 							id="<?php echo esc_attr( $field['id'] ); ?>--<?php echo $i; ?>"
 							class="<?php echo esc_attr( $field['class'] ); ?>"
-							value="<?php echo esc_attr( $label ); ?>"
+							value="<?php echo esc_attr( $value ); ?>"
 							<?php checked( isset( $field['value'][ $value ] ) ); ?>
 							<?php if ( $data ) print $this->attributes( $data, 'data-' ); ?>
 		                >

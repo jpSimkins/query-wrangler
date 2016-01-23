@@ -11,54 +11,40 @@ function qw_filter_post_id( $filters ) {
 	$filters['post_id'] = array(
 		'title'               => __( 'Post IDs' ),
 		'description'         => __( 'Provide a list of post_ids to show or not show.' ),
-		'form_callback'       => 'qw_filter_post_id_form',
 		'query_args_callback' => 'qw_generate_query_args_post_id',
 		'query_display_types' => array( 'page', 'widget', 'override' ),
-		// exposed
 		'exposed_form'        => 'qw_filter_post_id_exposed_form',
 		'exposed_process'     => 'qw_filter_post_id_exposed_process',
+		'form_fields' => array(
+			'post_ids' => array(
+				'type' => 'text',
+				'name' => 'post_ids',
+				'title' => __( 'Provide post_ids as a comma separated list' ),
+				'class' => array( 'qw-js-title' ),
+			),
+			'post_ids_callback' => array(
+				'type' => 'text',
+				'name' => 'post_ids_callback',
+				'title' => __( 'Or, provide a callback function name that returns an array of post_ids' ),
+				'description' => __( 'Note: you cannot expose a filter if using a callback.' ),
+				'class' => array( 'qw-js-title' ),
+			),
+			'compare' => array(
+				'type' => 'select',
+				'name' => 'compare',
+				'title' => __( 'Compare' ),
+				'description' => __( 'How to treat these post IDs.' ),
+				'default_value' => 'post__in',
+				'options' => array(
+					'post__in' => __( 'Only these posts' ),
+					'post__not_in' => __( 'Not these posts' ),
+				),
+				'class' => array( 'qw-js-title' ),
+			)
+		)
 	);
 
 	return $filters;
-}
-
-/**
- * @param $filter
- */
-function qw_filter_post_id_form( $filter ) {
-	$form = new QW_Form_Fields( array(
-	    'form_field_prefix' => $filter['form_prefix'],
-	) );
-
-	print $form->render_field( array(
-	    'type' => 'text',
-	    'name' => 'post_ids',
-	    'title' => __( 'Provide post_ids as a comma separated list' ),
-	    'value' => isset( $filter['values']['post_ids'] ) ? $filter['values']['post_ids'] : '',
-	    'class' => array( 'qw-js-title' ),
-	) );
-
-	print $form->render_field( array(
-	    'type' => 'text',
-	    'name' => 'post_ids_callback',
-	    'title' => __( 'Or, provide a callback function name that returns an array of post_ids' ),
-	    'description' => __( 'Note: you cannot expose a filter if using a callback.' ),
-	    'value' => isset( $filter['values']['post_ids_callback'] ) ? $filter['values']['post_ids_callback'] : '',
-	    'class' => array( 'qw-js-title' ),
-	) );
-
-	print $form->render_field( array(
-	    'type' => 'select',
-	    'name' => 'compare',
-	    'title' => __( 'Compare' ),
-	    'description' => __( 'How to treat these post IDs.' ),
-	    'value' => isset( $filter['values']['compare'] ) ? $filter['values']['compare'] : '',
-	    'options' => array(
-	        'post__in' => __( 'Only these posts' ),
-	        'post__not_in' => __( 'Not these posts' ),
-	    ),
-	    'class' => array( 'qw-js-title' ),
-	) );
 }
 
 /**
