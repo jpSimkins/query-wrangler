@@ -114,10 +114,10 @@ function qw_generate_query_args( $options = array() ) {
 
 	// standard arguments
 	$args['paged']               = ( $paged ) ? $paged : qw_get_page_number();
-	$args['posts_per_page']      = ( $options['args']['posts_per_page'] ) ? $options['args']['posts_per_page'] : 5;
-	$args['offset']              = ( $options['args']['offset'] ) ? $options['args']['offset'] : 0;
-	$args['post_status']         = $options['args']['post_status'];
-	$args['ignore_sticky_posts'] = isset( $options['args']['ignore_sticky_posts'] ) ? $options['args']['ignore_sticky_posts'] : 0;
+	//$args['posts_per_page']      = ( $options['args']['posts_per_page'] ) ? $options['args']['posts_per_page'] : 5;
+	//$args['offset']              = ( $options['args']['offset'] ) ? $options['args']['offset'] : 0;
+	//$args['post_status']         = $options['args']['post_status'];
+	//$args['ignore_sticky_posts'] = isset( $options['args']['ignore_sticky_posts'] ) ? $options['args']['ignore_sticky_posts'] : 0;
 
 	// having any offset will break pagination
 	if ( $args['paged'] > 1 ){
@@ -496,49 +496,76 @@ function qw_cmp( $a, $b ) {
  * @return array Default query settings
  */
 function qw_default_query_data() {
-	return array(
-		'display' => array(
-			'title'           => '',
-			'style'           => 'unformatted',
-			'row_style'       => 'posts',
-			'post_settings'   => array(
+
+	return
+	array (
+		'display' => array (
+			'title' => '',
+			'style' => 'unformatted',
+			'row_style' => 'posts',
+			'post_settings' => array (
 				'size' => 'complete',
 			),
-			'header'          => '',
-			'footer'          => '',
-			'empty'           => '',
+			'field_settings' => array (
+				'group_by_field' => '__none__',
+			),
+			'template_part_settings' => array (
+				'path' => '',
+				'name' => '',
+			),
+			'header' => '',
+			'footer' => '',
+			'empty' => '',
 			'wrapper-classes' => '',
-			'page'            => array(
-				'pager' => array(
-					'type'     => 'default',
+			'page' => array (
+				'pager' => array (
+					'active' => '0',
+					'type' => 'default',
 					'previous' => '',
-					'next'     => '',
+					'next' => '',
 				),
 			),
 		),
-		'args'    => array(
-			'posts_per_page' => '5',
-			'offset'         => 0,
-			'post_status'    => 'publish',
-			'filters'        => array(
-				'post_types' => array(
-					'type'       => 'post_types',
-					'hook_key'   => 'post_types',
-					'name'       => 'post_types',
-					'weight'     => '0',
-					'post_types' =>
-						array(
-							'post' => 'post',
-						),
+		'args' => array (
+			'sorts' => array (
+				'date' => array (
+					'weight' => '0',
+					'type' => 'date',
+					'hook_key' => 'post_date',
+					'name' => 'date',
+					'order_value' => 'DESC',
 				),
 			),
-			'sorts'          => array(
-				'date' => array(
-					'type'        => 'date',
-					'hook_key'    => 'post_date',
-					'name'        => 'date',
-					'weight'      => '0',
-					'order_value' => 'DESC',
+			'filters' => array (
+				'posts_per_page' => array (
+					'weight' => '0',
+					'type' => 'posts_per_page',
+					'hook_key' => 'posts_per_page',
+					'name' => 'posts_per_page',
+					'posts_per_page' => '5',
+				),
+				'post_status' => array (
+					'weight' => '1',
+					'type' => 'post_status',
+					'hook_key' => 'post_status',
+					'name' => 'post_status',
+					'post_status' => array( 'publish' ),
+				),
+				'post_types' => array (
+					'weight' => '2',
+					'type' => 'post_types',
+					'hook_key' => 'post_types',
+					'name' => 'post_types',
+					'post_types' => array (
+						'post' => 'post',
+					),
+				),
+				'ignore_sticky_posts' => array (
+					'weight' => '3',
+					'type' => 'ignore_sticky_posts',
+					'hook_key' => 'ignore_sticky_posts',
+					'name' => 'ignore_sticky_posts',
+					'ignore_sticky_posts' => 'on',
 				),
 			),
 		),

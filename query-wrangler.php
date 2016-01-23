@@ -30,11 +30,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 // some useful definitions
-define( 'QW_VERSION', '1.6.0' );
-define( 'QW_DB_VERSION', '2001' );
-define( 'QW_PLUGIN_DIR', dirname( __FILE__ ) );
-define( 'QW_PLUGIN_URL', plugins_url( '', __FILE__ ) );
-define( 'QW_FORM_PREFIX', "qw-query-options" );
+define( 'QW_VERSION',     '1.6.0' );
+define( 'QW_DB_VERSION',  '2000' );
+define( 'QW_PLUGIN_DIR',  dirname( __FILE__ ) );
+define( 'QW_PLUGIN_URL',  plugins_url( '', __FILE__ ) );
+define( 'QW_FORM_PREFIX', 'qw-query-options' );
 
 
 class Query_Wrangler {
@@ -54,6 +54,7 @@ class Query_Wrangler {
 		include_once QW_PLUGIN_DIR . '/includes/pages.php';
 		include_once QW_PLUGIN_DIR . '/includes/query.php';
 		include_once QW_PLUGIN_DIR . '/includes/theme.php';
+		include_once QW_PLUGIN_DIR . '/includes/exposed.php';
 
 		spl_autoload_register( array( $this, 'autoload' ) );
 
@@ -98,16 +99,10 @@ class Query_Wrangler {
 	 * Load files common to both the frontend and admin pages
 	 */
 	function load_common(){
-		//include_once QW_PLUGIN_DIR . '/widget.query.php';
-		include_once QW_PLUGIN_DIR . '/includes/exposed.php';
-
 		// basics
 		include_once QW_PLUGIN_DIR . '/includes/basics/display_title.php';
 		include_once QW_PLUGIN_DIR . '/includes/basics/template_styles.php';
 		include_once QW_PLUGIN_DIR . '/includes/basics/row_styles.php';
-		include_once QW_PLUGIN_DIR . '/includes/basics/posts_per_page.php';
-		include_once QW_PLUGIN_DIR . '/includes/basics/post_status.php';
-		include_once QW_PLUGIN_DIR . '/includes/basics/offset.php';
 		include_once QW_PLUGIN_DIR . '/includes/basics/header.php';
 		include_once QW_PLUGIN_DIR . '/includes/basics/footer.php';
 		include_once QW_PLUGIN_DIR . '/includes/basics/empty.php';
@@ -115,7 +110,6 @@ class Query_Wrangler {
 		include_once QW_PLUGIN_DIR . '/includes/basics/page_path.php';
 		include_once QW_PLUGIN_DIR . '/includes/basics/page_template.php';
 		include_once QW_PLUGIN_DIR . '/includes/basics/pager.php';
-		include_once QW_PLUGIN_DIR . '/includes/basics/ignore_sticky_posts.php';
 
 		// fields
 		include_once QW_PLUGIN_DIR . '/includes/fields/default_fields.php';
@@ -142,6 +136,11 @@ class Query_Wrangler {
 		include_once QW_PLUGIN_DIR . '/includes/filters/taxonomies.php';
 		include_once QW_PLUGIN_DIR . '/includes/filters/taxonomy_relation.php';
 		include_once QW_PLUGIN_DIR . '/includes/filters/search.php';
+		// new
+		include_once QW_PLUGIN_DIR . '/includes/filters/posts_per_page.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/post_status.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/offset.php';
+		include_once QW_PLUGIN_DIR . '/includes/filters/ignore_sticky_posts.php';
 
 		// sorts
 		include_once QW_PLUGIN_DIR . '/includes/sorts/default_sorts.php';
@@ -227,3 +226,4 @@ UNIQUE KEY id (id)
 }
 
 register_activation_hook( __FILE__, 'qw_query_wrangler_table' );
+

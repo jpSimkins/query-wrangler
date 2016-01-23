@@ -481,5 +481,58 @@ class QW_Form_Fields {
 	function form_close_flat(){
 		return '</div>';
 	}
+
+	/**
+	 * Get the value of a form field from the submitted array, by using
+	 *  the field's complete "name" attribute.
+	 *
+	 * @param $form_name - string of field form name
+	 *                   - like: some-prefix[top][middle][another]
+	 * @param $data - an array of submitted data
+	 *
+	 * @return array
+	 */
+	function get_field_value_from_data( $form_name, $data ){
+		$temp = explode( '[', $form_name );
+		$keys = array_map( 'sanitize_title_with_dashes', $temp);
+
+		return $this->array_query( $keys, $data );
+	}
+
+	/**
+	 * Using an array of keys as a path, find a value in a multi-dimensional array
+	 *
+	 * @param $keys
+	 * @param $data
+	 *
+	 * @return mixed|null
+	 */
+	function array_query( $keys, $data ){
+		if ( empty( $keys ) ){
+			return $data;
+		}
+
+		$key = array_shift( $keys );
+
+		if ( isset( $data[ $key ] ) ) {
+
+			// if this was the last key, we have found the value
+			if ( empty( $keys ) ){
+				return $data[ $key ];
+			}
+			// if there are remaining keys and this key leads to an array,
+			// recurse using the remaining keys
+			else if ( is_array( $data[ $key ] ) ) {
+				return $this->array_query( $keys, $data[ $key ] );
+			}
+			// there are remaining keys, but this item is not an array
+			else {
+				return null;
+			}
+		}
+
+		return null;
+	}
+
 }
 

@@ -69,6 +69,11 @@ class QW_Update {
 	 *
 	 */
 	function update_2001(){
-		// update goes here
+		// @todo - move the following basic args to filters:
+		// posts_per_page
+		// ignore_sticky_posts
+		// post_status
+		// offset
+
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 // hook into qw_basics
-add_filter( 'qw_basics', 'qw_basic_settings_post_status' );
+add_filter( 'qw_filters', 'qw_basic_settings_post_status' );
 
 // add default fields to the hook filter
 add_filter( 'qw_post_statuses', 'qw_default_post_statuses', 0 );
@@ -13,9 +13,11 @@ function qw_basic_settings_post_status( $basics ) {
 	$basics['post_status'] = array(
 		'title'         => __( 'Posts Status' ),
 		'description'   => __( 'Select the post status of the items displayed.' ),
-		'option_type'   => 'args',
 		'form_callback' => 'qw_basic_post_status_form',
-		'weight'        => 0,
+
+		'query_args_callback' => 'qw_generate_query_args_post_status',
+		'query_display_types' => array( 'page', 'widget', 'override' ),
+		'required' => true,
 	);
 
 	return $basics;
@@ -51,25 +53,29 @@ function qw_default_post_statuses( $post_statuses ) {
 }
 
 /**
- * @param $item
+ * @param $filter
  * @param $args
  */
-function qw_basic_post_status_form( $item, $args ) {
-	$post_statuses = array();
-	foreach( qw_all_post_statuses() as $key => $details ) {
-		$post_statuses[ $key ] = $details['title'];
-	}
+function qw_basic_post_status_form( $filter ) {
+//	$post_statuses = array();
+//	foreach( qw_all_post_statuses() as $key => $details ) {
+//		$post_statuses[ $key ] = $details['title'];
+//	}
 
 	$form = new QW_Form_Fields( array(
-		'form_field_prefix' => $item['form_prefix'],
+		'form_field_prefix' => $filter['form_prefix'],
 	) );
 
 	print $form->render_field( array(
-		'type' => 'select',
+		'type' => 'checkboxes',
 		'name' => 'post_status',
-		'description' => $item['description'],
-		'value' => isset( $args['post_status'] ) ? $args['post_status'] : '',
-		'options' => $post_statuses,
+		'description' => $filter['description'],
+		'value' => isset( $filter['values']['post_status'] ) ? $filter['values']['post_status'] : '',
+		'options' => qw_all_post_statuses(),
 		'class' => array( 'qw-js-title' ),
 	) );
+}
+
+function qw_generate_query_args_post_status( &$args, $filter ) {
+	$args['post_status'] = $filter['values']['post_status'];
 }

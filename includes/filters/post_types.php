@@ -10,6 +10,7 @@ function qw_filter_post_types( $filters ) {
 		'form_callback'         => 'qw_filter_post_types_form',
 		'query_args_callback'   => 'qw_filter_post_types_args',
 		'query_display_types'   => array( 'page', 'widget', 'override' ),
+		'required' => true,
 		// exposed
 		'exposed_form'          => 'qw_filter_post_types_exposed_form',
 		'exposed_process'       => 'qw_filter_post_types_exposed_process',
