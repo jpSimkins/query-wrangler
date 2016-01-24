@@ -183,7 +183,30 @@ function qw_all_post_statuses() {
  * Styles Hook
  */
 function qw_all_styles() {
-	$styles = apply_filters( 'qw_styles', array() );
+	$styles = array(
+		'unformatted' => array(
+			'title'        => __( 'Unformatted' ),
+			'template'     => 'query-unformatted',
+			'default_path' => QW_PLUGIN_DIR, // do not include last slash
+		 ),
+		'unordered_list' => array(
+			'title'        => __( 'Unordered List' ),
+			'template'     => 'query-unordered_list',
+			'default_path' => QW_PLUGIN_DIR,
+		 ),
+		'ordered_list' => array(
+			'title'        => __( 'Ordered List' ),
+			'template'     => 'query-ordered_list',
+			'default_path' => QW_PLUGIN_DIR,
+		 ),
+		'table' => array(
+			'title'        => __( 'Table' ),
+			'template'     => 'query-table',
+			'default_path' => QW_PLUGIN_DIR,
+		 ),
+	);
+
+	$styles = apply_filters( 'qw_styles', $styles );
 
 	foreach ( $styles as $hook_key => $style ) {
 		$styles[ $hook_key ]['hook_key']    = $hook_key;
@@ -219,7 +242,7 @@ function qw_all_row_complete_styles() {
 }
 
 /*
- * Row Style 'Fields' Stlyes Hook
+ * Row Style 'Fields' Styles Hook
  */
 function qw_all_row_fields_styles() {
 	$row_fields_styles = apply_filters( 'qw_row_fields_styles', array() );

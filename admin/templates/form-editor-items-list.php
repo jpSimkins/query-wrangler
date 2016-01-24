@@ -25,8 +25,7 @@
 		<?php
 		foreach ( $items as $item ) { ?>
 			<div class="qw-handler-item">
-				<div
-					class="qw-handler-item-title"><?php print $item['title']; ?></div>
+				<div class="qw-handler-item-title"><?php print $item['title']; ?></div>
 				<div class="qw-handler-item-form <?php if ( empty( $item['required'] ) ) { print "can-remove"; } ?>">
 					<?php print $item['wrapper_form']; ?>
 				</div>

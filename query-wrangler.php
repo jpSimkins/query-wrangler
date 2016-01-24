@@ -50,6 +50,7 @@ class Query_Wrangler {
 		if ( ! function_exists( 'theme' ) ) {
 			include_once QW_PLUGIN_DIR . '/template-wrangler.php';
 		}
+		include_once QW_PLUGIN_DIR . '/includes/functions.php';
 		include_once QW_PLUGIN_DIR . '/includes/hooks.php';
 		include_once QW_PLUGIN_DIR . '/includes/pages.php';
 		include_once QW_PLUGIN_DIR . '/includes/query.php';
@@ -100,15 +101,9 @@ class Query_Wrangler {
 	 */
 	function load_common(){
 		// basics
-		include_once QW_PLUGIN_DIR . '/includes/basics/display_title.php';
+		include_once QW_PLUGIN_DIR . '/includes/basics/basics_simple.php';
 		include_once QW_PLUGIN_DIR . '/includes/basics/template_styles.php';
 		include_once QW_PLUGIN_DIR . '/includes/basics/row_styles.php';
-		include_once QW_PLUGIN_DIR . '/includes/basics/header.php';
-		include_once QW_PLUGIN_DIR . '/includes/basics/footer.php';
-		include_once QW_PLUGIN_DIR . '/includes/basics/empty.php';
-		include_once QW_PLUGIN_DIR . '/includes/basics/wrapper_settings.php';
-		include_once QW_PLUGIN_DIR . '/includes/basics/page_path.php';
-		include_once QW_PLUGIN_DIR . '/includes/basics/page_template.php';
 		include_once QW_PLUGIN_DIR . '/includes/basics/pager.php';
 
 		// fields

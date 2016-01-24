@@ -1,8 +1,6 @@
 <?php
 // hook into qw_basics
 add_filter( 'qw_basics', 'qw_basic_settings_style' );
-// add default template styles to the hook
-add_filter( 'qw_styles', 'qw_template_styles_default' );
 
 /*
  * Styles with settings
@@ -17,36 +15,6 @@ function qw_basic_settings_style( $basics ) {
 	);
 
 	return $basics;
-}
-
-/**
- * All Field Styles and settings
- *
- * @return array Field Styles
- */
-function qw_template_styles_default( $styles ) {
-	$styles['unformatted']    = array(
-		'title'        => __( 'Unformatted' ),
-		'template'     => 'query-unformatted',
-		'default_path' => QW_PLUGIN_DIR, // do not include last slash
-	);
-	$styles['unordered_list'] = array(
-		'title'        => __( 'Unordered List' ),
-		'template'     => 'query-unordered_list',
-		'default_path' => QW_PLUGIN_DIR, // do not include last slash
-	);
-	$styles['ordered_list']   = array(
-		'title'        => __( 'Ordered List' ),
-		'template'     => 'query-ordered_list',
-		'default_path' => QW_PLUGIN_DIR, // do not include last slash
-	);
-	$styles['table']          = array(
-		'title'        => __( 'Table' ),
-		'template'     => 'query-table',
-		'default_path' => QW_PLUGIN_DIR, // do not include last slash
-	);
-
-	return $styles;
 }
 
 /**

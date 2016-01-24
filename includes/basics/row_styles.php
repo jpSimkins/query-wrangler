@@ -5,10 +5,7 @@ add_filter( 'qw_basics', 'qw_basic_settings_row_style' );
 // add default field styles to the filter
 add_filter( 'qw_row_styles', 'qw_default_row_styles', 0 );
 
-// add default field styles to the filter
-add_filter( 'qw_row_fields_styles', 'qw_default_row_fields_styles', 0 );
-
-// add default field styles to the filter
+// add row complete (post rows) styles
 add_filter( 'qw_row_complete_styles', 'qw_default_row_complete_styles', 0 );
 
 /*

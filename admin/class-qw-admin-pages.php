@@ -260,6 +260,9 @@ class QW_Admin_Pages {
 
 		$this->wpdb->delete( $this->db_table, array( 'id' => absint( $query_id ) ) );
 
+		/**
+		 * Hook `qw_delete_query` allows for additional operations on delete
+		 */
 		do_action( 'qw_delete_query', $query_id );
 
 		// @todo - move this somewhere that subscribes to the action
@@ -436,19 +439,10 @@ class QW_Admin_Pages {
 
 		// preprocess existing handlers
 		$handlers = qw_get_query_handlers( $options );
-		$handlers = $this->make_handler_wrapper_forms( $handlers, $options );
+		$handlers = $this->make_handler_wrapper_forms( $handlers );
 
 		$basics = qw_all_basic_settings();
-
-		// process all the basic forms
-		// TODO handle this elsewhere
-		foreach( $basics as $key => $basic ) {
-			ob_start();
-			if ( isset( $basic['form_callback'] ) && is_callable( $basic['form_callback'] ) ) {
-				call_user_func( $basic['form_callback'], $basic, $options[ $basic['option_type'] ] );
-			}
-			$basics[ $key ]['wrapper_form'] = ob_get_clean();
-		}
+		$basics = $this->make_basics_wrapper_forms( $basics, $options );
 
 		// start building edit page data
 		$editor_args = array(
@@ -503,8 +497,8 @@ class QW_Admin_Pages {
 			return;
 		}
 
-		/*
-		 * Hook to allow alterations before saving
+		/**
+		 * Hook `qw_pre_save` allows alterations before saving
 		 */
 		$options = apply_filters( 'qw_pre_save', $options, $query_id );
 		$options = array_map( 'stripslashes_deep', $options );
@@ -523,68 +517,87 @@ class QW_Admin_Pages {
 
 	/**
 	 *
-	 * @param $handlers
-	 * @param $options
 	 *
+	 * @param $handlers
 	 * @return mixed
 	 */
-	function make_handler_wrapper_forms( $handlers, $options ){
-		$display     = array_map( 'stripslashes_deep', $options['display'] );
-		$image_sizes = get_intermediate_image_sizes();
-		$file_styles = qw_all_file_styles();
+	function make_handler_wrapper_forms( $handlers ){
+		$tokens = array();
 
-		// filters
-		if ( !empty( $handlers['filter']['items'] ) ) {
-			foreach ( $handlers['filter']['items'] as $k => &$filter ) {
-				$args = array(
-						'filter' => $filter,
-						'weight' => $filter['weight'],
-				);
-				$filter['wrapper_form'] = qw_admin_template( 'handler-filter', $args );
-			}
-		}
+		foreach( $handlers as $handler_type => $handler ){
+			if ( !empty( $handler['items'] ) ) {
+				foreach( $handler['items'] as $k => $item ){
+					$args = array(
+						$handler_type => $item,
+					);
 
-		// sorts
-		if ( !empty( $handlers['sort']['items'] ) ) {
-			foreach ( $handlers['sort']['items'] as $k => &$sort ) {
-				$args = array(
-						'sort'   => $sort,
-						'weight' => $sort['weight'],
-				);
-				$sort['wrapper_form'] = qw_admin_template( 'handler-sort', $args );
-			}
-		}
+					// fields need token
+					if ( $handler_type == 'field' ){
+						$tokens[ $item['name'] ] = '{{' . $item['name'] . '}}';
+						$args += array(
+							'tokens' => $tokens,
+						);
+					}
 
-		// fields
-		if ( !empty( $handlers['field']['items'] ) ) {
-			$tokens = array();
-			foreach ( $handlers['field']['items'] as $k => &$field ) {
-				$tokens[ $field['name'] ] = '{{' . $field['name'] . '}}';
-				$args = array(
-						'image_sizes' => $image_sizes,
-						'file_styles' => $file_styles,
-						'field'       => $field,
-						'weight'      => $field['weight'],
-						'options'     => $options,
-						'display'     => $display,
-						'tokens'      => $tokens,
-				);
-				$field['wrapper_form'] = qw_admin_template( 'handler-field', $args );
-			}
-		}
-
-		// overrides
-		if ( !empty( $handlers['override']['items'] ) ) {
-			foreach ( $handlers['override']['items'] as $k => &$override ) {
-				$args = array(
-						'override' => $override,
-						'weight'   => $override['weight'],
-				);
-				$override['wrapper_form'] = qw_admin_template( 'handler-override', $args );
+					$handlers[ $handler_type ]['items'][ $k ]['wrapper_form'] =
+							qw_admin_template( 'handler-'.$handler_type, $args );
+				}
 			}
 		}
 
 		return $handlers;
+	}
+
+	/**
+	 * Prepare all the 'basic' forms
+	 *
+	 * @param $basics
+	 * @param $options
+	 * @return mixed
+	 */
+	function make_basics_wrapper_forms( $basics, $options ){
+		foreach( $basics as $basic_key => $basic ) {
+			ob_start();
+			if ( !empty( $basic['form_fields'] ) ) {
+
+				$form = new QW_Form_Fields( array(
+					'form_field_prefix' => $basic['form_prefix'],
+				) );
+
+				foreach( $basic['form_fields'] as $field_key => $field ){
+					$default_value = !empty( $field['default_value'] ) ? $field['default_value'] : '';
+
+					// build the field name for our array_query
+					$field_name = 'display';
+					if ( !empty( $field['name_prefix'] ) ){
+						$field_name.= $field['name_prefix'];
+					}
+					$field_name.= '['.$field['name'].']';
+
+					// look for existing values
+					$field['value'] = $form->get_field_value_from_data( $field_name, $options );
+					if ( is_null( $field['value'] ) ){
+						$field['value'] = $default_value;
+					}
+
+					// for single field basics, the field should inherit the
+					// item's description
+					if ( count( $basic['form_fields'] ) === 1){
+						$field['description'] = $basic['description'];
+					}
+
+					// render the field
+					print $form->render_field( $field );
+				}
+
+			}
+			else if ( isset( $basic['form_callback'] ) && is_callable( $basic['form_callback'] ) ) {
+				call_user_func( $basic['form_callback'], $basic, $options[ $basic['option_type'] ] );
+			}
+			$basics[ $basic_key ]['wrapper_form'] = ob_get_clean();
+		}
+
+		return $basics;
 	}
 
 	/**
