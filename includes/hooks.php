@@ -298,7 +298,24 @@ function qw_all_post_types() {
  * Pager types
  */
 function qw_all_pager_types() {
-	$pagers = apply_filters( 'qw_pager_types', array() );
+	$pagers['default'] = array(
+		'title'    => __( 'Default' ),
+		'callback' => 'qw_theme_pager_default'
+	);
+	$pagers['numbers'] = array(
+		'title'    => __( 'Page Numbers' ),
+		'callback' => 'qw_theme_pager_numbers'
+	);
+
+	// WP PageNavi Plugin
+	if ( function_exists( 'wp_pagenavi' ) ) {
+		$pagers['pagenavi'] = array(
+			'title'    => __( 'PageNavi' ),
+			'callback' => 'wp_pagenavi'
+		);
+	}
+
+	$pagers = apply_filters( 'qw_pager_types', $pagers );
 
 	return $pagers;
 }

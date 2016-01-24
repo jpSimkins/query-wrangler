@@ -583,3 +583,108 @@ function qw_theme_image( $post, $field ) {
 		return $output;
 	}
 }
+
+/*
+ * Custom Pager function
+ *
+ * @param array $pager Query pager details
+ * @param object $qw_query Object
+ * @return HTML processed pager
+ */
+function qw_make_pager( $pager, &$qw_query ) {
+	$pager_themed = '';
+	$pagers       = qw_all_pager_types();
+
+	//set callback if function exists
+	if ( is_callable( $pagers[ $pager['type'] ]['callback'] ) ) {
+		$callback = $pagers[ $pager['type'] ]['callback'];
+	} else {
+		$callback = $pagers['default']['callback'];
+	}
+
+	// execute callback
+	$pager_themed = call_user_func( $callback, $pager, $qw_query );
+
+	return $pager_themed;
+}
+
+/*
+ * Custom Default Pager
+ *
+ * @param array $pager Query options for pager
+ * @param object $qw_query Object
+ */
+function qw_theme_pager_default( $pager, &$qw_query ) {
+	// help figure out the current page
+	$exposed_path_array = explode( '?', $_SERVER['REQUEST_URI'] );
+	$path_array         = explode( '/page/', $exposed_path_array[0] );
+
+	$exposed_path = NULL;
+	if ( isset( $exposed_path_array[1] ) ) {
+		$exposed_path = $exposed_path_array[1];
+	}
+
+	$pager_themed      = '';
+	$pager['next']     = ( $pager['next'] ) ? $pager['next'] : 'Next Page &raquo;';
+	$pager['previous'] = ( $pager['previous'] ) ? $pager['previous'] : '&laquo; Previous Page';
+
+	if ( $page = qw_get_page_number( $qw_query ) ) {
+		$path = rtrim( $path_array[0], '/' );
+
+		$wpurl = get_bloginfo( 'wpurl' );
+
+		// previous link with page number
+		if ( $page >= 3 ) {
+			$url = $wpurl . $path . '/page/' . ( $page - 1 );
+			if ( $exposed_path ) {
+				$url .= '?' . $exposed_path;
+			}
+			$pager_themed .= '<div class="query-prevpage">
+                        <a href="' . $url . '">' . $pager['previous'] . '</a>
+                      </div>';
+		} // previous link with no page number
+		else if ( $page == 2 ) {
+			$url = $wpurl . $path;
+			if ( $exposed_path ) {
+				$url .= '?' . $exposed_path;
+			}
+			$pager_themed .= '<div class="query-prevpage">
+                        <a href="' . $url . '">' . $pager['previous'] . '</a>
+                      </div>';
+		}
+
+		// next link
+		if ( ( $page + 1 ) <= $qw_query->max_num_pages ) {
+			$url = $wpurl . $path . '/page/' . ( $page + 1 );
+			if ( $exposed_path ) {
+				$url .= '?' . $exposed_path;
+			}
+			$pager_themed .= '<div class="query-nextpage">
+                        <a href="' . $url . '">' . $pager['next'] . '</a>
+                      </div>';
+		}
+
+		return $pager_themed;
+	}
+}
+
+/*
+ * Default Pager with page numbers
+ *
+ * @param array $pager Query options for pager
+ * @param object $qw_query Object
+ *
+ * @return string HTML for pager
+ */
+function qw_theme_pager_numbers( $pager, $qw_query ) {
+	$big          = intval( $qw_query->found_posts . '000' );
+	$args         = array(
+			'base'    => str_replace( $big, '%#%', get_pagenum_link( $big ) ),
+			'format'  => '?paged=%#%',
+			'current' => max( 1, qw_get_page_number( $qw_query ) ),
+			'total'   => $qw_query->max_num_pages
+	);
+	$pager_themed = paginate_links( $args );
+
+	return $pager_themed;
+}

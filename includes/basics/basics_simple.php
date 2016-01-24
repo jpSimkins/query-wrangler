@@ -114,5 +114,67 @@ function qw_simple_basic_settings( $basics ) {
 		)
 	);
 
+	$pager_types = array();
+	foreach( qw_all_pager_types() as $key => $details ){
+		$pager_types[ $key ] = $details['title'];
+	}
+
+	$basics['pager'] = array(
+		'title'         => __( 'Pager' ),
+		'description'   => __( 'Select which type of pager to use.' ),
+		'option_type'   => 'display',
+		'weight'        => 0,
+		'form_fields' => array(
+			'use_pager' => array(
+				'type' => 'checkbox',
+				'name_prefix' => '[page][pager]',
+				'name' => 'active',
+				'title' => __( 'Use Pagination' ),
+				'class' => array( 'qw-js-title' ),
+			),
+			'pager_type' => array(
+				'type' => 'select',
+				'name_prefix' => '[page][pager]',
+				'name' => 'type',
+				'title' => __( 'Pager Type' ),
+				'options' => $pager_types,
+				'class' => array( 'qw-js-title' ),
+			),
+			'pager_previous' => array(
+				'type' => 'text',
+				'name_prefix' => '[page][pager]',
+				'name' => 'previous',
+				'title' => __( 'Previous Page Label' ),
+				'description' => __( 'Use the following options to change the Default Pager labels.' ),
+				'class' => array( 'qw-js-title' ),
+			),
+			'pager_next' => array(
+				'type' => 'text',
+				'name_prefix' => '[page][pager]',
+				'name' => 'next',
+				'title' => __( 'Next Page Label' ),
+				'class' => array( 'qw-js-title' ),
+			),
+			/*
+			'use_pager_key' => array(
+				'type' => 'checkbox',
+				'name_prefix' => '[page][pager]',
+				'name' => 'use_pager_key',
+				'title' => __( 'Use pager key' ),
+				'description' => __( 'Use this if you need multiple paginating queries on a single page.' ),
+				'class' => array( 'qw-js-title' ),
+			),
+			'pager_key' => array(
+				'type' => 'text',
+				'name_prefix' => '[page][pager]',
+				'name' => 'pager_key',
+				'title' => __( 'Pager Key' ),
+				'description' => __( 'Pager key should a unique string of lowercase characters with underscores. No spaces.' ),
+				'class' => array( 'qw-js-title' ),
+			),
+			*/
+		),
+	);
+
 	return $basics;
 }
