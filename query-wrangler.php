@@ -112,7 +112,8 @@ class Query_Wrangler {
 		include_once QW_PLUGIN_DIR . '/includes/basics/pager.php';
 
 		// fields
-		include_once QW_PLUGIN_DIR . '/includes/fields/default_fields.php';
+		include_once QW_PLUGIN_DIR . '/includes/fields/template_tags.php';
+		include_once QW_PLUGIN_DIR . '/includes/fields/post_properties.php';
 		include_once QW_PLUGIN_DIR . '/includes/fields/post_author.php';
 		include_once QW_PLUGIN_DIR . '/includes/fields/post_author_avatar.php';
 		include_once QW_PLUGIN_DIR . '/includes/fields/file_attachment.php';
@@ -173,6 +174,7 @@ class Query_Wrangler {
 	 */
 	function load_admin(){
 		global $wpdb;
+		include_once QW_PLUGIN_DIR . '/admin/admin-functions.php';
 		include_once QW_PLUGIN_DIR . '/admin/ajax.php';
 
 		QW_Admin_Pages::register( $this->settings, $wpdb );

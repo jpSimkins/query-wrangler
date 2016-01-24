@@ -182,7 +182,7 @@ var QueryWrangler = {};
             'hook_key': hook_key,
             'type': item_type,
             'query_type': QueryWrangler.query.type,
-            'next_weight': $( '#query-' + handler + 's .qw-handler-item' ).length
+            'next_weight': $( '#query-' + handler + ' .qw-handler-item' ).length
           };
 
           var original_handler;

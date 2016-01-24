@@ -211,6 +211,9 @@ class QW_Handlers {
 	}
 
 	/**
+	 * Render the form_fields associated with a handler item type,
+	 * for an existing item.
+	 *
 	 * @param $item
 	 *
 	 * @return string

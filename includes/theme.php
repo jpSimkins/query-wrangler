@@ -487,3 +487,99 @@ function qw_row_classes( $i, $last_row ) {
 
 	return implode( " ", $row_classes );
 }
+
+
+/*
+ * Turn a list of images into html
+ *
+ * @param $post
+ * @param $field
+ */
+function qw_theme_featured_image( $post, $field ) {
+	$style = $field['image_display_style'];
+	if ( has_post_thumbnail( $post->ID ) ) {
+		$image_id = get_post_thumbnail_id( $post->ID );
+
+		return wp_get_attachment_image( $image_id, $style );
+	}
+}
+
+
+/**
+ * Get and theme attached post files
+ *
+ * @param $post
+ * @param $field
+ * @return string
+ */
+function qw_theme_file( $post, $field ) {
+	$style = ( $field['file_display_style'] ) ? $field['file_display_style'] : 'link';
+	$count = ( $field['file_display_count'] ) ? $field['file_display_count'] : 0;
+
+	$files = qw_get_post_files( $post->ID );
+	if ( is_array( $files ) ) {
+		$output = '';
+		$i      = 0;
+		foreach ( $files as $file ) {
+			if ( ( $count == 0 || ( $i < $count ) ) && substr( $file->post_mime_type,
+							0,
+							5 ) != "image"
+			) {
+				switch ( $style ) {
+					case 'url':
+						$output .= wp_get_attachment_url( $file->ID );
+						break;
+
+					case 'link':
+						// complete file name
+						$file_name = explode( "/", $file->guid );
+						$file_name = $file_name[ count( $file_name ) - 1 ];
+						$output .= '<a href="' . wp_get_attachment_url( $file->ID ) . '" class="query-file-link">' . $file_name . '</a>';
+						break;
+
+					case 'link_url':
+						$output .= '<a href="' . wp_get_attachment_url( $file->ID ) . '" class="query-file-link">' . $file->guid . '</a>';
+						break;
+				}
+			}
+			$i ++;
+		}
+
+		return $output;
+	}
+}
+
+/**
+ * Turn a list of images into html
+ *
+ * @param $post
+ * @param $field
+ *
+ * @return null|string
+ */
+function qw_theme_image( $post, $field ) {
+	$style             = $field['image_display_style'];
+	$count             = $field['image_display_count'];
+	$featured_image_id = isset( $field['featured_image'] ) ? get_post_thumbnail_id( $post->ID ) : NULL;
+	$images            = qw_get_post_images( $post->ID );
+
+	if ( is_array( $images ) ) {
+		$output = '';
+		$i      = 0;
+		foreach ( $images as $image ) {
+			if ( $featured_image_id ) {
+				if ( $image->ID == $featured_image_id ) {
+					$output .= wp_get_attachment_image( $image->ID, $style );
+				}
+
+			} else {
+				if ( $count == 0 || ( $i < $count ) ) {
+					$output .= wp_get_attachment_image( $image->ID, $style );
+				}
+			}
+			$i ++;
+		}
+
+		return $output;
+	}
+}

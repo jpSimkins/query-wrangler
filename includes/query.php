@@ -440,7 +440,7 @@ function qw_default_query_data() {
 					'type' => 'post_status',
 					'hook_key' => 'post_status',
 					'name' => 'post_status',
-					'post_status' => array( 'publish' ),
+					'post_status' => array( 'publish' => 'publish' ),
 				),
 				'post_types' => array (
 					'weight' => '2',

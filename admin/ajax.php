@@ -8,13 +8,11 @@ function qw_form_ajax() {
 		include_once QW_PLUGIN_DIR . '/admin/templates/preview.php';
 		exit;
 	}
-	//$template = $_POST['form'];
-
-	$qw_handlers = QW_Handlers::get_instance();
 
 	if ( isset( $_POST['hook_key'], $_POST['handler'], $_POST['name'] ) ){
 		// buffer the whole process in case of php warnings/notices
 		ob_start();
+		$qw_handlers = QW_Handlers::get_instance();
 
 		$handler_type = $_POST['handler'];
 		$name         = $_POST['name'];
@@ -32,12 +30,7 @@ function qw_form_ajax() {
 		$items = $qw_handlers->preprocess_handler_items( $handler_type, array( $name => $item ) );
 		$item  = $items[ $name ];
 
-		// todo - this could be better... a lot of work just to get a template function
-		$settings = QW_Settings::get_instance();
-		global $wpdb;
-		$admin = new QW_Admin_Pages( $settings, $wpdb );
-
-		print $admin->template( $template,  array( $handler_type => $item ) );
+		print qw_admin_template( $template,  array( $handler_type => $item ) );
 
 		wp_send_json( array(
 			'template' => ob_get_clean(),

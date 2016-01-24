@@ -278,7 +278,7 @@ class QW_Admin_Pages {
 			'form_style' => 'settings_table',
 		) );
 
-		print $this->template( 'page-settings', array(
+		print qw_admin_template( 'page-settings', array(
 			'form' => $form,
 			'settings' => $this->settings,
 		) );
@@ -309,7 +309,7 @@ class QW_Admin_Pages {
 			'form_field_prefix' => QW_FORM_PREFIX,
 		) );
 
-		print $this->template( 'page-query-create', array(
+		print qw_admin_template( 'page-query-create', array(
 			'form' => $form,
 		) );
 	}
@@ -345,7 +345,7 @@ class QW_Admin_Pages {
 		if ( $query_id ) {
 			$qw_query = qw_get_query( $query_id );
 
-			print $this->template( 'page-query-export', array(
+			print qw_admin_template( 'page-query-export', array(
 				'form' => new QW_Form_Fields(),
 				'query_name' => $qw_query->name,
 				'exported_query' => $this->export_query( $qw_query->id )
@@ -376,7 +376,7 @@ class QW_Admin_Pages {
 			'form_field_prefix' => QW_FORM_PREFIX,
 		) );
 
-		print $this->template( 'page-query-import', array(
+		print qw_admin_template( 'page-query-import', array(
 			'form' => $form,
 		) );
 	}
@@ -418,10 +418,9 @@ class QW_Admin_Pages {
 		if ( !$qw_query ) return;
 
 		$args = $this->edit_page_args( $qw_query );
-		$args['editor']       = $this->template( 'form-editor', $args );
 		$args['live_preview'] = $this->settings->get('live_preview');
 
-		print $this->template( 'page-query-edit', $args );
+		print qw_admin_template( 'page-query-edit', $args );
 	}
 
 	/**
@@ -439,6 +438,18 @@ class QW_Admin_Pages {
 		$handlers = qw_get_query_handlers( $options );
 		$handlers = $this->make_handler_wrapper_forms( $handlers, $options );
 
+		$basics = qw_all_basic_settings();
+
+		// process all the basic forms
+		// TODO handle this elsewhere
+		foreach( $basics as $key => $basic ) {
+			ob_start();
+			if ( isset( $basic['form_callback'] ) && is_callable( $basic['form_callback'] ) ) {
+				call_user_func( $basic['form_callback'], $basic, $options[ $basic['option_type'] ] );
+			}
+			$basics[ $key ]['wrapper_form'] = ob_get_clean();
+		}
+
 		// start building edit page data
 		$editor_args = array(
 			'form_action'         => admin_url( "admin.php?page=query-wrangler.actions&action=update&query_id={$qw_query->id}&noheader=true" ),
@@ -451,7 +462,7 @@ class QW_Admin_Pages {
 			'options'             => $options,
 			'args'                => $options['args'],
 			'display'             => $display,
-			'basics'              => qw_all_basic_settings(),
+			'basics'              => $basics,
 			'filters'             => $handlers['filter']['items'],
 			'fields'              => $handlers['field']['items'],
 			'sorts'               => $handlers['sort']['items'],
@@ -529,7 +540,7 @@ class QW_Admin_Pages {
 						'filter' => $filter,
 						'weight' => $filter['weight'],
 				);
-				$filter['wrapper_form'] = $this->template( 'handler-filter', $args );
+				$filter['wrapper_form'] = qw_admin_template( 'handler-filter', $args );
 			}
 		}
 
@@ -540,7 +551,7 @@ class QW_Admin_Pages {
 						'sort'   => $sort,
 						'weight' => $sort['weight'],
 				);
-				$sort['wrapper_form'] = $this->template( 'handler-sort', $args );
+				$sort['wrapper_form'] = qw_admin_template( 'handler-sort', $args );
 			}
 		}
 
@@ -558,7 +569,7 @@ class QW_Admin_Pages {
 						'display'     => $display,
 						'tokens'      => $tokens,
 				);
-				$field['wrapper_form'] = $this->template( 'handler-field', $args );
+				$field['wrapper_form'] = qw_admin_template( 'handler-field', $args );
 			}
 		}
 
@@ -569,7 +580,7 @@ class QW_Admin_Pages {
 						'override' => $override,
 						'weight'   => $override['weight'],
 				);
-				$override['wrapper_form'] = $this->template( 'handler-override', $args );
+				$override['wrapper_form'] = qw_admin_template( 'handler-override', $args );
 			}
 		}
 
@@ -608,26 +619,5 @@ class QW_Admin_Pages {
 
 		wp_redirect( $url );
 		exit();
-	}
-
-	/**
-	 * Simple template function for admin stuff
-	 *
-	 * @param $__template_name
-	 * @param array $__args
-	 *
-	 * @return string
-	 */
-	function template( $__template_name, $__args = array() ){
-		$__template_file = QW_PLUGIN_DIR . "/admin/templates/{$__template_name}.php";
-
-		if ( file_exists( $__template_file ) ){
-			ob_start();
-			extract( $__args );
-			include $__template_file;
-			return ob_get_clean();
-		}
-
-		return '';
 	}
 }

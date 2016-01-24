@@ -231,7 +231,20 @@ function qw_all_row_fields_styles() {
  * File Styles Hook
  */
 function qw_all_file_styles() {
-	$styles = apply_filters( 'qw_file_styles', array() );
+
+	$default = array(
+		'link' => array(
+			'title' => __( 'Filename Link to File' ),
+		),
+		'link_url' => array(
+			'title' => __( 'URL Link to File' ),
+		),
+		'url' => array(
+			'title' => __( 'URL of File' ),
+		),
+	);
+
+	$styles = apply_filters( 'qw_file_styles', $default );
 
 	return $styles;
 }

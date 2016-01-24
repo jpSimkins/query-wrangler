@@ -139,7 +139,7 @@
                       '</div>';
 
                   // append the results
-                  $( '#query-' + handler + 's' ).append( item );
+                  $( '#query-' + handler ).append( item );
 
                   // uncheck the box
                   $box.removeAttr( 'checked' );

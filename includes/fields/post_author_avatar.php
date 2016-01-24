@@ -14,9 +14,24 @@ function qw_field_author_avatar( $fields ) {
 	$fields['post_author_avatar'] = array(
 		'title'            => __( 'Post Author Avatar' ),
 		'description'      => __( 'Avatar for the author of a post.' ),
-		'form_callback'    => 'qw_field_author_avatar_form',
 		'output_callback'  => 'qw_get_avatar',
 		'output_arguments' => TRUE,
+		'form_fields' => array(
+			'size' => array(
+				'type' => 'number',
+				'name' => 'size',
+				'title' => __( 'Avatar Size' ),
+				'description' => __( 'Desired avatar size in pixels.' ),
+				'default_value' => 96,
+				'class' => array( 'qw-js-title' ),
+			),
+			'link_to_author' => array(
+				'type' => 'checkbox',
+				'name' => 'link_to_author',
+				'title' => __( 'Link to author page' ),
+				'class' => array( 'qw-js-title' ),
+			)
+		)
 	);
 
 	return $fields;
@@ -40,32 +55,4 @@ function qw_get_avatar( $post, $field ) {
 	}
 
 	return $output;
-}
-
-/**
- * Avatar form callback
- *
- * @param $field
- */
-function qw_field_author_avatar_form( $field ) {
-	$form = new QW_Form_Fields( array(
-		'form_field_prefix' => $field['form_prefix'],
-	) );
-
-	print $form->render_field( array(
-		'type' => 'number',
-		'name' => 'size',
-		'title' => __( 'Avatar Size' ),
-		'description' => __( 'Desired avatar size in pixels.' ),
-		'value' => isset( $field['values']['size'] ) ? $field['values']['size'] : '',
-		'class' => array( 'qw-js-title' ),
-	) );
-
-	print $form->render_field( array(
-		'type' => 'checkbox',
-		'name' => 'link_to_author',
-		'title' => __( 'Link to author page' ),
-		'value' => isset( $field['values']['link_to_author'] ) ? $field['values']['link_to_author'] : false,
-		'class' => array( 'qw-js-title' ),
-	) );
 }

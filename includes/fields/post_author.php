@@ -13,9 +13,29 @@ function qw_field_author( $fields ) {
 	$fields['post_author'] = array(
 		'title'            => __( 'Post Author' ),
 		'description'      => __( 'Information relating to the author of a post.' ),
-		'form_callback'    => 'qw_field_author_form',
 		'output_callback'  => 'qw_get_the_author',
 		'output_arguments' => TRUE,
+		'form_fields' => array(
+			'output_type' => array(
+				'type' => 'select',
+				'name' => 'output_type',
+				'title' => __( 'Author Field Settings' ),
+				'description' => __( '' ),
+				'options' => array(
+					'name' => __( 'Author Name' ),
+					'ID'   => __( 'Author ID' ),
+				),
+				'class' => array( 'qw-js-title' ),
+			),
+			'link_to_author' => array(
+				'type' => 'checkbox',
+				'name' => 'link_to_author',
+				'title' => __( 'Link to author page' ),
+				'description' => __( '' ),
+				'default_value' => 0,
+				'class' => array( 'qw-js-title' ),
+			)
+		),
 	);
 
 	return $fields;
@@ -46,37 +66,4 @@ function qw_get_the_author( $post, $field ) {
 	}
 
 	return $author;
-}
-
-/**
- * Author form callback
- *
- * @param $field
- */
-function qw_field_author_form( $field ) {
-	$form = new QW_Form_Fields( array(
-		'form_field_prefix' => $field['form_prefix'],
-	) );
-
-	print $form->render_field( array(
-		'type' => 'select',
-		'name' => 'output_type',
-		'title' => __( 'Author Field Settings' ),
-		'description' => __( '' ),
-		'value' => isset( $field['values']['output_type'] ) ? $field['values']['output_type'] : '',
-		'options' => array(
-			'name' => __( 'Author Name' ),
-			'ID'   => __( 'Author ID' ),
-		),
-		'class' => array( 'qw-js-title' ),
-	) );
-
-	print $form->render_field( array(
-		'type' => 'checkbox',
-		'name' => 'link_to_author',
-		'title' => __( 'Link to author page' ),
-		'description' => __( '' ),
-		'value' => isset( $field['values']['link_to_author'] ) ? $field['values']['link_to_author'] : false,
-		'class' => array( 'qw-js-title' ),
-	) );
 }
