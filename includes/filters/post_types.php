@@ -8,7 +8,7 @@ function qw_filter_post_types( $filters ) {
 		'title'                 => __( 'Post Types' ),
 		'description'           => __( 'Select which post types should be shown.' ),
 		'required'              => true,
-		'query_args_callback'   => 'qw_filter_post_types_args',
+		'query_args_callback'   => 'qw_simple_filter_args_callback',
 		'query_display_types'   => array( 'page', 'widget', 'override' ),
 		'exposed_form'          => 'qw_filter_post_types_exposed_form',
 		'exposed_process'       => 'qw_filter_post_types_exposed_process',
@@ -30,11 +30,11 @@ function qw_filter_post_types( $filters ) {
 /*
  * Add query args as necessary
  */
-function qw_filter_post_types_args( &$args, $filter ) {
-	if ( isset( $filter['values']['post_types'] ) ) {
-		$args['post_type'] = $filter['values']['post_types'];
-	}
-}
+//function qw_filter_post_types_args( &$args, $filter ) {
+//	if ( isset( $filter['values']['post_types'] ) ) {
+//		$args['post_type'] = $filter['values']['post_types'];
+//	}
+//}
 
 /*
  * Exposed settings form

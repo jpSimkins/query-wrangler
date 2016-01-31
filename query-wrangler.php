@@ -117,25 +117,18 @@ class Query_Wrangler {
 		// meta field below
 
 		// filters
+		include_once QW_PLUGIN_DIR . '/includes/filters/filters_simple.php';
 		include_once QW_PLUGIN_DIR . '/includes/filters/author.php';
 		include_once QW_PLUGIN_DIR . '/includes/filters/callback.php';
 		include_once QW_PLUGIN_DIR . '/includes/filters/post_types.php';
 		include_once QW_PLUGIN_DIR . '/includes/filters/post_id.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/meta_key.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/meta_key_value.php';
 		include_once QW_PLUGIN_DIR . '/includes/filters/meta_query.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/meta_value.php';
 		include_once QW_PLUGIN_DIR . '/includes/filters/tags.php';
 		include_once QW_PLUGIN_DIR . '/includes/filters/categories.php';
 		include_once QW_PLUGIN_DIR . '/includes/filters/post_parent.php';
 		include_once QW_PLUGIN_DIR . '/includes/filters/taxonomies.php';
 		include_once QW_PLUGIN_DIR . '/includes/filters/taxonomy_relation.php';
 		include_once QW_PLUGIN_DIR . '/includes/filters/search.php';
-		// new
-		include_once QW_PLUGIN_DIR . '/includes/filters/posts_per_page.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/post_status.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/offset.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/ignore_sticky_posts.php';
 
 		// sorts
 		include_once QW_PLUGIN_DIR . '/includes/sorts/default_sorts.php';

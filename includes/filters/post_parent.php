@@ -13,7 +13,7 @@ function qw_filter_post_parent( $filters ) {
 	$filters['post_parent'] = array(
 		'title'               => __( 'Post Parent' ),
 		'description'         => __( 'Use only with post type "Page" to show results with the chosen parent ID.' ),
-		'query_args_callback' => 'qw_generate_query_args_post_parent',
+		'query_args_callback' => 'qw_simple_filter_args_callback',
 		'query_display_types' => array( 'page', 'widget' ),
 		'exposed_form'        => 'qw_filter_post_parent_exposed_form',
 		'exposed_process'     => 'qw_filter_post_parent_exposed_process',
@@ -33,9 +33,9 @@ function qw_filter_post_parent( $filters ) {
  * @param $args
  * @param $filter
  */
-function qw_generate_query_args_post_parent( &$args, $filter ) {
-	$args['post_parent'] = $filter['values']['post_parent'];
-}
+//function qw_generate_query_args_post_parent( &$args, $filter ) {
+//	$args['post_parent'] = $filter['values']['post_parent'];
+//}
 
 /**
  * Process submitted exposed form values
