@@ -47,27 +47,34 @@ class Query_Wrangler_Widget extends WP_Widget {
 				$options_override['shortcode_args'] = html_entity_decode( $instance['qw-shortcode-args'] );
 			}
 
-			$options = qw_generate_query_options( $instance['qw-widget'] );
-			$widget_content = qw_execute_query( $instance['qw-widget'], $options_override );
+			$qw_query = qw_get_query( $instance['qw-widget'] );
+			$qw_query
+				->override_options( $options_override )
+				->execute( true );
 
-			// pre_render hook
-			$options = apply_filters( 'qw_pre_render', $options );
-
-			$show_title = ( isset( $instance['qw-show-widget-title'] ) && ! empty( $instance['qw-show-widget-title'] ) );
-			$title      = ( $show_title && $options['display']['title'] ) ? $args['before_title'] . $options['display']['title'] . $args['after_title'] : '';
+			$title = '';
+			if ( isset( $instance['qw-show-widget-title'] ) &&
+			     ! empty( $instance['qw-show-widget-title'] ) &&
+			     !empty( $qw_query->options['display']['title'] ) )
+			{
+				$title = $args['before_title'] .
+				            $qw_query->options['display']['title'] .
+				         $args['after_title'];
+			}
 
 
 			if ( $settings->get( 'widget_theme_compat' ) ) {
 				$output = $args['before_widget'] .
 				            $title .
-				            $widget_content .
+				            $qw_query->output .
 				          $args['after_widget'];
 
 			}
 			else {
-				$output = $title . $widget_content;
+				$output = $title . $qw_query->output;
 			}
 		}
+
 		print $output;
 	}
 
@@ -92,8 +99,7 @@ class Query_Wrangler_Widget extends WP_Widget {
 	function form( $instance ) {
 		// Set up some default widget settings.
 		$defaults          = array(
-			'title'                => __( 'QW Widget',
-				'querywranglerwidget' ),
+			'title'                => __( 'QW Widget', 'querywranglerwidget' ),
 			'qw-widget'            => '',
 			'qw-shortcode-args'    => '',
 			'qw-show-widget-title' => ''

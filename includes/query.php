@@ -1,5 +1,10 @@
 <?php
-/*
+
+add_filter( 'qw_generate_query_args', 'qw_generate_filter_callback_args', 0, 2 );
+add_filter( 'qw_generate_query_args', 'qw_generate_pager_query_args', 20, 2 );
+add_filter( 'qw_generate_query_args', 'qw_generate_exposed_filter_callback_args', 30, 2 );
+
+/**
  * Primary function for building and displaying a query
  *
  * @param int $query_id Id for the query
@@ -7,102 +12,25 @@
  * @param bool $reset_post_data Reset the $wp_query after execution
  * @return string Can return a string of html based on parameter $return
  */
-function qw_execute_query(
-	$query_id,
-	$options_override = array(),
-	$reset_post_data = TRUE
-) {
-	// get the query options
-	$options = qw_generate_query_options( $query_id, $options_override );
+function qw_execute_query( $query_id, $options_override = array(), $reset_post_data = TRUE )
+{
+	$qw_query = qw_get_query( $query_id );
+	$qw_query
+		->override_options( $options_override, false )
+		->execute( $reset_post_data );
 
-	// get formatted query arguments
-	$args = qw_generate_query_args( $options );
-
-	// pre_query hook
-	$args = apply_filters( 'qw_pre_query', $args, $options );
-
-	// set the new query
-	$qw_query = new WP_Query( $args );
-
-	// pre_render hook
-	$options = apply_filters( 'qw_pre_render', $options );
-
-	// get the themed content
-	$themed = qw_template_query( $qw_query, $options );
-
-	// Reset Post Data
-	if ( $reset_post_data ) {
-		wp_reset_postdata();
-	}
-
-	return $themed;
+	return $qw_query->output;
 }
 
-/*
- * Get the Query, and set $options to defaults
+/**
+ * @param $args
+ * @param $options
  *
- * @param int
- *   $query_id - The unique ID of the query
- * @param array
- *   $options_override - An array of values to override in the retrieved set
- * @param array
- *   $full_override - force the options_override as all options
- *
- * @return array
- *   Query options
+ * @return mixed
  */
-function qw_generate_query_options(
-	$query_id,
-	$options_override = array(),
-	$full_override = FALSE
-) {
-	global $wpdb;
-	$table_name = $wpdb->prefix . "query_wrangler";
-	$sql        = "SELECT id,name,type,slug,data FROM " . $table_name . " WHERE id = %d";
-
-	$rows = $wpdb->get_results( $wpdb->prepare( $sql, $query_id ) );
-
-	if ( empty( $rows ) ) {
-		return array();
-	}
-
-	// unserialize the stored data
-	$options = qw_unserialize( $rows[0]->data );
-
-	// override options
-	if ( $full_override ) {
-		// force a full override
-		$options = $options_override;
-	} else {
-		// combine options
-		$options = array_merge_recursive( (array) $options, $options_override );
-	}
-
-	// build query_details
-	$options['meta']               = array();
-	$options['meta']['id']         = $rows[0]->id;
-	$options['meta']['slug']       = $rows[0]->slug;
-	$options['meta']['name']       = $rows[0]->name;
-	$options['meta']['type']       = $rows[0]->type;
-	$options['meta']['pagination'] = ( isset( $options['display']['page']['pager']['active'] ) ) ? 1 : 0;
-	$options['meta']['header']     = $options['display']['header'];
-	$options['meta']['footer']     = $options['display']['footer'];
-	$options['meta']['empty']      = $options['display']['empty'];
-
-	return $options;
-}
-
-/*
- * Generate the WP query itself
- *
- * @param array $options Query data
- * @return array Query Arguments
- */
-function qw_generate_query_args( $options = array() ) {
-	// @todo - remove
-	$handlers = qw_get_query_handlers( $options );
-
+function qw_generate_pager_query_args( $args, $options ){
 	$paged = NULL;
+
 	// if pager_key is enabled, trick qw_get_page_number
 	if ( isset( $options['display']['page']['pager']['use_pager_key'] ) &&
 	     isset( $options['display']['page']['pager']['pager_key'] ) &&
@@ -114,52 +42,36 @@ function qw_generate_query_args( $options = array() ) {
 
 	// standard arguments
 	$args['paged']               = ( $paged ) ? $paged : qw_get_page_number();
-	//$args['posts_per_page']      = ( $options['args']['posts_per_page'] ) ? $options['args']['posts_per_page'] : 5;
-	//$args['offset']              = ( $options['args']['offset'] ) ? $options['args']['offset'] : 0;
-	//$args['post_status']         = $options['args']['post_status'];
-	//$args['ignore_sticky_posts'] = isset( $options['args']['ignore_sticky_posts'] ) ? $options['args']['ignore_sticky_posts'] : 0;
 
 	// having any offset will break pagination
 	if ( $args['paged'] > 1 ){
 		unset( $args['offset'] );
 	}
 
-	$submitted_data = qw_exposed_submitted_data();
+	return $args;
+}
+
+/**
+ * Filters require a callback for setting their values in the $args array.
+ * This processes those callbacks.
+ *
+ * @param $args
+ * @param $options
+ *
+ * @return mixed
+ */
+function qw_generate_filter_callback_args( $args, $options ){
+
+	$handlers = qw_get_query_handlers( $options );
 
 	foreach ( $handlers as $handler_type => $handler ) {
 		if ( is_array( $handler['items'] ) ) {
 			foreach ( $handler['items'] as $name => $item ) {
-				// Exposed items
-				if ( isset( $item['exposed_form'] ) ) {
-					if ( ! empty( $item['values']['exposed_key'] ) ) {
-						// override exposed key
-						$item['exposed_key'] = $item['values']['exposed_key'];
-					} else {
-						// default exposed key
-						$item['exposed_key'] = 'exposed_' . $item['values']['name'];
-					}
-				}
-				// */
-
 				// Alter the query args
 				// look for callback, and run it
 				if ( isset( $item['query_args_callback'] ) && is_callable( $item['query_args_callback'] ) ) {
 					call_user_func_array( $item['query_args_callback'], array( &$args, $item ) );
 				}
-				else if ( isset( $item['orderby_key'] ) && isset( $item['order_key'] ) ) {
-					// else, default to type as WP_Query argument key
-					// arguments passed to query
-					$args[ $item['orderby_key'] ] = $item['type'];
-					$args[ $item['order_key'] ]   = isset( $item['values']['order_value'] ) ? $item['values']['order_value'] : 'ASC';
-				}
-
-				// Process submitted exposed values
-				// exposed items
-				if ( isset( $item['values']['is_exposed'], $submitted_data[ $item['exposed_key'] ] ) && is_callable( $item['exposed_process'] ) ) {
-					$value = $submitted_data[ $item['exposed_key'] ];
-					call_user_func( $item['exposed_process'], $args, $item, $value );
-				}
-				//*/
 			}
 		}
 	}
@@ -167,6 +79,45 @@ function qw_generate_query_args( $options = array() ) {
 	return $args;
 }
 
+/**
+ * @param $args
+ * @param $options
+ *
+ * @return mixed
+ */
+function qw_generate_exposed_filter_callback_args( $args, $options ){
+
+	$handlers = qw_get_query_handlers( $options );
+	$submitted_data = qw_exposed_submitted_data();
+
+	foreach ( $handlers as $handler_type => $handler ) {
+		if ( is_array( $handler['items'] ) ) {
+			foreach ( $handler['items'] as $name => $item ) {
+
+				// Only work items that are exposed
+				if ( !empty( $item['values']['is_exposed'] ) ) {
+
+					if ( ! empty( $item['values']['exposed_key'] ) ) {
+						// override exposed key
+						$item['exposed_key'] = $item['values']['exposed_key'];
+					}
+					else {
+						// default exposed key
+						$item['exposed_key'] = 'exposed_' . $item['values']['name'];
+					}
+
+					// Process submitted exposed values
+					if ( isset( $submitted_data[ $item['exposed_key'] ] ) && is_callable( $item['exposed_process'] ) ) {
+						$value = $submitted_data[ $item['exposed_key'] ];
+						call_user_func( $item['exposed_process'], $args, $item, $value );
+					}
+				}
+			}
+		}
+	}
+
+	return $args;
+}
 /**
  * Get a query's id by using its slug
  */

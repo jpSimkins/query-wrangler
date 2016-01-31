@@ -19,6 +19,8 @@ class QW_Query {
 	// if TRUE, query id was not found in the db
 	public $is_new = FALSE;
 
+	public $is_preview = FALSE;
+
 	// generated WP_Query, not the global wp_query
 	public $wp_query;
 
@@ -65,13 +67,18 @@ class QW_Query {
 	/**
 	 * Execute the entire query process
 	 *
+	 * @param bool $reset_post_data
 	 * @return mixed|string|void
 	 */
-	function execute() {
+	function execute( $reset_post_data = false ) {
 		$this
 			->process_options()
 			->execute_query()
 			->theme_query();
+
+		if ( $reset_post_data ){
+			$this->reset_postdata();
+		}
 
 		return $this;
 	}
@@ -119,9 +126,14 @@ class QW_Query {
 			);
 		}
 
+		// allow preview to alter options in own way
+		if ( $this->is_preview ){
+			$this->options = apply_filters( 'qw_pre_preview', $this->options );
+		}
+
 		// get formatted query arguments
 		if ( ! $this->args ) {
-			$this->args = qw_generate_query_args( $this->options );
+			$this->args = apply_filters('qw_generate_query_args', array(), $this->options );
 		}
 
 		return $this;

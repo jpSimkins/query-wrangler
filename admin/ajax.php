@@ -165,39 +165,27 @@ function qw_get_edit_preview_data(){
 
 	ob_start();
 
-		global $wp_query;
-		$temp     = $wp_query;
-		$wp_query = NULL;
-
-		ob_start();
-			// get the query options, force override
-			$options = qw_generate_query_options( $query_id, $options, TRUE );
-			$options = apply_filters( 'qw_pre_preview', $options );
-
-			// get formatted query arguments
-			$args = qw_generate_query_args( $options );
-			// set the new query
-			$wp_query = new WP_Query( $args );
-
-			// get the themed content
-			print qw_template_query( $wp_query, $options );
-		$preview = ob_get_clean();
+		$qw_query = qw_get_query( $query_id );
+		$qw_query->override_options( $options, true );
+		$qw_query->is_preview = true;
+		$qw_query->execute();
+		$preview = $qw_query->output;
 
 		$templates = "These template files will be searched for relative to your theme folder.<br />
 		              To override a query's template, copy the corresponding template from the <span style='font-family: monospace;'>query-wrangler/templates</span> folder to your theme folder (or THEME/templates) and rename it.
-		              <pre>" . print_r( qw_template_scan( $options ), 1 ) . "</pre>";
+		              <pre>" . print_r( qw_template_scan( $qw_query->options ), 1 ) . "</pre>";
 
 		// php wp_query
-		$php_wpquery = '<pre>$query = ' . var_export( $args, 1 ) . ';</pre>';
+		$php_wpquery = '<pre>$query = ' . var_export( $qw_query->args, 1 ) . ';</pre>';
 
 		// args
-		$args = "<pre>" . print_r( $args, TRUE ) . "</pre>";
+		$args = "<pre>" . print_r( $qw_query->args, TRUE ) . "</pre>";
 
 		// display
-		$display = "<pre>" . htmlentities( print_r( $options['display'],TRUE ) ) . "</pre>";
+		$display = "<pre>" . htmlentities( print_r( $qw_query->options['display'],TRUE ) ) . "</pre>";
 
-		$new_query = "<pre>" . htmlentities( print_r( $wp_query, TRUE ) ) . "</pre>";
-		$all_options = "<pre>" . htmlentities( print_r( $options, TRUE ) ) . "</pre>";
+		$new_query = "<pre>" . htmlentities( print_r( $qw_query->wp_query, TRUE ) ) . "</pre>";
+		$all_options = "<pre>" . htmlentities( print_r( $qw_query->options, TRUE ) ) . "</pre>";
 
 		// return
 		$data = array(
