@@ -67,7 +67,7 @@ $form = new QW_Form_Fields( array(
 							'name' => 'is_exposed',
 							'title' => __( 'Expose Filter' ),
 							'help' => __( 'Exposing a filter allows a site guest to alter the query results with a form. If you expose this filter, the values above will act as the default values of the filter.' ),
-							'values' => (int) !empty( $filter['values']['is_exposed'] ),
+							'value' => (int) !empty( $filter['values']['is_exposed'] ),
 					) );
 					?>
 				</div>
@@ -81,7 +81,7 @@ $form = new QW_Form_Fields( array(
 						'name' => 'exposed_limit_values',
 						'title' => __( 'Limit Values' ),
 						'help' => __( 'If checked, only the values above will be available to the exposed filter.' ),
-						'values' => (int) !empty( $filter['values']['exposed_limit_values'] ),
+						'value' => (int) !empty( $filter['values']['exposed_limit_values'] ),
 				) );
 
 				print $form->render_field( array(
@@ -89,7 +89,7 @@ $form = new QW_Form_Fields( array(
 						'name' => 'exposed_default_values',
 						'title' => __( 'Default Values' ),
 						'help' => __( 'If checked, the values above will be the default values of the exposed filter.' ),
-						'values' => (int) !empty( $filter['values']['exposed_default_values'] ),
+						'value' => (int) !empty( $filter['values']['exposed_default_values'] ),
 				) );
 
 				print $form->render_field( array(
@@ -97,7 +97,7 @@ $form = new QW_Form_Fields( array(
 						'name' => 'exposed_label',
 						'title' => __( 'Exposed Label' ),
 						'help' => __( 'Label for the exposed form item.' ),
-						'values' => (int) !empty( $filter['values']['exposed_label'] ),
+						'value' => (int) !empty( $filter['values']['exposed_label'] ),
 				) );
 
 				print $form->render_field( array(
@@ -105,7 +105,7 @@ $form = new QW_Form_Fields( array(
 						'name' => 'exposed_desc',
 						'title' => __( 'Exposed Description' ),
 						'help' => __( 'Useful for providing help text to a user.' ),
-						'values' => isset( $filter['values']['exposed_desc'] ) ? $filter['values']['exposed_desc'] : '',
+						'value' => isset( $filter['values']['exposed_desc'] ) ? $filter['values']['exposed_desc'] : '',
 				) );
 
 				print $form->render_field( array(
@@ -113,7 +113,7 @@ $form = new QW_Form_Fields( array(
 						'name' => 'exposed_key',
 						'title' => __( 'Exposed Key' ),
 						'help' => __( 'URL ($_GET) key for the filter. Useful for multiple forms on a single page.' ),
-						'values' => isset( $filter['values']['exposed_key'] ) ? $filter['values']['exposed_key'] : '',
+						'value' => isset( $filter['values']['exposed_key'] ) ? $filter['values']['exposed_key'] : '',
 				) );
 
 				if ( isset( $filter['exposed_settings_form'] ) && is_callable( $filter['exposed_settings_form'] ) )

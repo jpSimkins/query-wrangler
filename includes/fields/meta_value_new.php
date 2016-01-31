@@ -31,7 +31,7 @@ function qw_field_meta_value_new( $fields ) {
  */
 function qw_meta_value_new_form_callback( $field ) {
 	$handlers = array();
-	$display_handlers = apply_filters( 'qw_meta_value_display_handlers', array() );
+	$display_handlers = qw_get_meta_value_display_handlers();
 
 	foreach ($display_handlers as $handler => $details ){
 		$handlers[ $handler ] = $details['title'];
@@ -134,7 +134,7 @@ function qw_display_post_meta_value_new( $post, $field ) {
 		$field['meta_key'] = substr( $field['type'], 5 );
 	}
 
-	$display_handlers    = apply_filters( 'qw_meta_value_display_handlers', array() );
+	$display_handlers    = qw_get_meta_value_display_handlers();
 	$display_handler_key = isset( $field['display_handler'] ) ? $field['display_handler'] : 'none';
 	$handler             = isset( $display_handlers[ $display_handler_key ] ) ? $display_handlers[ $display_handler_key ] : $display_handlers['none'];
 

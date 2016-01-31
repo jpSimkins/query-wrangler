@@ -314,9 +314,13 @@ function qw_default_template_file() {
 /**
  * default custom_field (meta_value_new) field display handlers
  */
+
+function qw_get_meta_value_display_handlers(){
+	return apply_filters( 'qw_meta_value_display_handlers', array() );
+}
+
 // add default meta value handlers
-add_filter( 'qw_meta_value_display_handlers',
-	'qw_meta_value_display_handlers_default' );
+add_filter( 'qw_meta_value_display_handlers', 'qw_meta_value_display_handlers_default' );
 
 /*
  * Default meta value handlers

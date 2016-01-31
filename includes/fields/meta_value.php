@@ -43,7 +43,7 @@ function qw_field_meta_value( $fields ) {
  */
 function qw_meta_value_form_callback( $field ) {
 	$handlers = array();
-	$display_handlers = apply_filters( 'qw_meta_value_display_handlers', array() );
+	$display_handlers = qw_get_meta_value_display_handlers();
 
 	foreach ($display_handlers as $handler => $details ){
 		$handlers[ $handler ] = $details['title'];
@@ -125,7 +125,7 @@ function qw_meta_value_form_callback( $field ) {
  * Display the post meta field based on field settings
  */
 function qw_display_post_meta_value( $post, $field ) {
-	$display_handlers    = apply_filters( 'qw_meta_value_display_handlers', array() );
+	$display_handlers    = qw_get_meta_value_display_handlers();
 	$display_handler_key = ( isset( $field['display_handler'] ) ) ? $field['display_handler'] : 'none';
 	$handler             = ( isset( $display_handlers[ $display_handler_key ] ) ) ? $display_handlers[ $display_handler_key ] : $display_handlers['none'];
 
