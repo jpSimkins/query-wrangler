@@ -114,23 +114,6 @@ function qw_all_sort_options() {
 		if ( ! isset( $option['type'] ) ) {
 			$sort_options[ $type ]['type'] = $type;
 		}
-		if ( ! isset( $option['orderby_key'] ) ) {
-			$sort_options[ $type ]['orderby_key'] = 'orderby';
-		}
-		if ( ! isset( $option['order_key'] ) ) {
-			$sort_options[ $type ]['order_key'] = 'order';
-		}
-		if ( ! isset( $option['order_options'] ) ) {
-			$sort_options[ $type ]['order_options'] = array(
-				'ASC'  => 'Ascending',
-				'DESC' => 'Descending',
-			);
-		}
-
-		// default form_callback
-		if ( ! isset( $option['form_callback'] ) ) {
-			$sort_options[ $type ]['form_callback'] = 'qw_form_default_sort_order_options';
-		}
 
 		// maintain hook's key
 		$sort_options[ $type ]['hook_key'] = $type;
