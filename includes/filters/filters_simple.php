@@ -146,7 +146,7 @@ function qw_simple_filters( $filters ){
 			'post_status' => array(
 				'type' => 'checkboxes',
 				'name' => 'post_status',
-				'default_value' => array( 'publish' => 'publish' ),
+				'default_value' => array(),
 				'options' => qw_all_post_statuses(),
 				'class' => array( 'qw-js-title' ),
 			)
@@ -166,7 +166,7 @@ function qw_simple_filters( $filters ){
 			'posts_per_page' => array(
 				'type' => 'text',
 				'name' => 'posts_per_page',
-				'default_value' => 5,
+				'default_value' => 0,
 				'class' => array( 'qw-js-title' ),
 			)
 		)

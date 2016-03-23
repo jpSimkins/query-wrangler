@@ -41,7 +41,7 @@ function qw_generate_pager_query_args( $args, $options ){
 	}
 
 	// standard arguments
-	$args['paged']               = ( $paged ) ? $paged : qw_get_page_number();
+	$args['paged'] = ( $paged ) ? $paged : qw_get_page_number();
 
 	// having any offset will break pagination
 	if ( $args['paged'] > 1 ){

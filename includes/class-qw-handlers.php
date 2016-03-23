@@ -226,8 +226,8 @@ class QW_Handlers {
 		$output = '';
 
 		foreach( $item['form_fields'] as $key => $form_field ){
-			$default_value = !empty( $form_field['default_value'] ) ? $form_field['default_value'] : '';
-			$form_field['value'] = !empty( $item['values'][ $form_field['name'] ] ) ? $item['values'][ $form_field['name'] ] : $default_value;
+			$default_value = isset( $form_field['default_value'] ) ? $form_field['default_value'] : '';
+			$form_field['value'] = isset( $item['values'][ $form_field['name'] ] ) ? $item['values'][ $form_field['name'] ] : $default_value;
 			$output.= $form->render_field( $form_field );
 		}
 
