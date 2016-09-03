@@ -367,7 +367,7 @@ class QW_Admin_Pages {
 		$row = ( array ) $query->row;
 		unset( $row['id'] );
 
-		return "\$query = " . var_export( $row, 1 ) . ";";
+		return json_encode( $row );
 	}
 
 	/**
@@ -396,7 +396,7 @@ class QW_Admin_Pages {
 		$query = null;
 
 		if ( !empty( $import['query'] ) ){
-			eval( stripslashes( $import['query'] ) );
+			$query = json_decode( stripslashes( $import['query'] ), true );
 		}
 
 		if ( !empty( $query ) ) {

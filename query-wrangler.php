@@ -51,6 +51,7 @@ class Query_Wrangler {
 			include_once QW_PLUGIN_DIR . '/template-wrangler.php';
 		}
 		include_once QW_PLUGIN_DIR . '/includes/functions.php';
+		include_once QW_PLUGIN_DIR . '/includes/php-polyfill.php';
 		include_once QW_PLUGIN_DIR . '/includes/hooks.php';
 		include_once QW_PLUGIN_DIR . '/includes/pages.php';
 		include_once QW_PLUGIN_DIR . '/includes/query.php';
