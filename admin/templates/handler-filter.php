@@ -93,7 +93,7 @@ $form = new QW_Form_Fields( array(
 				) );
 
 				print $form->render_field( array(
-						'type' => 'checkbox',
+						'type' => 'text',
 						'name' => 'exposed_label',
 						'title' => __( 'Exposed Label' ),
 						'help' => __( 'Label for the exposed form item.' ),
@@ -101,7 +101,7 @@ $form = new QW_Form_Fields( array(
 				) );
 
 				print $form->render_field( array(
-						'type' => 'checkbox',
+						'type' => 'text',
 						'name' => 'exposed_desc',
 						'title' => __( 'Exposed Description' ),
 						'help' => __( 'Useful for providing help text to a user.' ),
@@ -109,7 +109,7 @@ $form = new QW_Form_Fields( array(
 				) );
 
 				print $form->render_field( array(
-						'type' => 'checkbox',
+						'type' => 'text',
 						'name' => 'exposed_key',
 						'title' => __( 'Exposed Key' ),
 						'help' => __( 'URL ($_GET) key for the filter. Useful for multiple forms on a single page.' ),

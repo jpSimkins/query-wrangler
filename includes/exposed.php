@@ -141,7 +141,7 @@ function qw_theme_single_exposed_handler( $item ) {
 			</label>
 		<?php } ?>
 		<!-- exposed-<?php print $item['name']; ?> -->
-		<?php call_user_func( $item['exposed_form'], $item, $values ); ?>
+		<?php call_user_func_array( $item['exposed_form'], array( &$item, &$values) ); ?>
 
 		<?php if ( ! empty( $item['values']['exposed_desc'] ) ) { ?>
 			<div
