@@ -26,6 +26,7 @@
 									'handler_type' => 'basic',
 									'title' => _( 'Basic Settings' ),
 									'items' => $basics,
+									'query_type' => $query_type,
 							));
 					?>
 				</div>
@@ -41,6 +42,7 @@
 										'items' => $overrides,
 										'limit_per_type' => 1,
 										'add_rearrange' => true,
+										'query_type' => $query_type,
 								));
 					}
 
@@ -50,6 +52,7 @@
 									'title' => _( 'Fields' ),
 									'items' => $fields,
 									'add_rearrange' => true,
+									'query_type' => $query_type,
 							));
 					?>
 				</div>
@@ -63,6 +66,7 @@
 									'title' => _( 'Order By' ),
 									'items' => $sorts,
 									'add_rearrange' => true,
+									'query_type' => $query_type,
 							));
 
 					print qw_admin_template( 'form-editor-items-list',
@@ -71,6 +75,7 @@
 									'title' => _( 'Filters' ),
 									'items' => $filters,
 									'add_rearrange' => true,
+									'query_type' => $query_type,
 							));
 					?>
 				</div>
@@ -84,6 +89,7 @@
 								'handler_type' => 'sort',
 								'description' => __( 'Select options for sorting the query results.' ),
 								'all_item_types' => $all_sorts,
+								'query_type' => $query_type,
 						));
 
 				print qw_admin_template( 'form-editor-items-add-list',
@@ -91,6 +97,7 @@
 								'handler_type' => 'field',
 								'description' => __( 'Select Fields to add to this query\'s output.' ),
 								'all_item_types' => $all_fields,
+								'query_type' => $query_type,
 						));
 
 				print qw_admin_template( 'form-editor-items-add-list',
@@ -98,6 +105,7 @@
 								'handler_type' => 'filter',
 								'description' => __( 'Select filters to affect the query\'s results.' ),
 								'all_item_types' => $all_filters,
+								'query_type' => $query_type,
 						));
 
 				print qw_admin_template( 'form-editor-items-add-list',
@@ -105,6 +113,7 @@
 								'handler_type' => 'override',
 								'description' => __( 'Select overrides to add to this query. Limit 1 per type.' ),
 								'all_item_types' => $all_overrides,
+								'query_type' => $query_type,
 						));
 				?>
 			</div><!-- / "add new items" forms -->
