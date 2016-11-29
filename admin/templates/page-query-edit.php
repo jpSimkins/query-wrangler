@@ -24,7 +24,7 @@
 					print qw_admin_template( 'form-editor-items-list',
 							array(
 									'handler_type' => 'basic',
-									'title' => _( 'Basic Settings' ),
+									'title' => __( 'Basic Settings' ),
 									'items' => $basics,
 									'query_type' => $query_type,
 							));
@@ -38,7 +38,7 @@
 						print qw_admin_template( 'form-editor-items-list',
 								array(
 										'handler_type' => 'override',
-										'title' => _( 'Overrides' ),
+										'title' => __( 'Overrides' ),
 										'items' => $overrides,
 										'limit_per_type' => 1,
 										'add_rearrange' => true,
@@ -49,7 +49,7 @@
 					print qw_admin_template( 'form-editor-items-list',
 							array(
 									'handler_type' => 'field',
-									'title' => _( 'Fields' ),
+									'title' => __( 'Fields' ),
 									'items' => $fields,
 									'add_rearrange' => true,
 									'query_type' => $query_type,
@@ -63,7 +63,7 @@
 					print qw_admin_template( 'form-editor-items-list',
 							array(
 									'handler_type' => 'sort',
-									'title' => _( 'Order By' ),
+									'title' => __( 'Order By' ),
 									'items' => $sorts,
 									'add_rearrange' => true,
 									'query_type' => $query_type,
@@ -72,7 +72,7 @@
 					print qw_admin_template( 'form-editor-items-list',
 							array(
 									'handler_type' => 'filter',
-									'title' => _( 'Filters' ),
+									'title' => __( 'Filters' ),
 									'items' => $filters,
 									'add_rearrange' => true,
 									'query_type' => $query_type,

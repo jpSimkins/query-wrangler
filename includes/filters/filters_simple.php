@@ -8,7 +8,7 @@ function qw_simple_filters( $filters ){
 	 * Ignore sticky posts
 	 */
 	$filters['ignore_sticky_posts'] = array(
-		'title'         => _( 'Ignore Sticky Posts' ),
+		'title'         => __( 'Ignore Sticky Posts' ),
 		'description'   => __( 'Do not enforce stickiness in the resulting query.' ),
 		'query_args_callback' => 'qw_simple_filter_args_callback',
 		'query_display_types' => array( 'page', 'widget', 'override' ),
