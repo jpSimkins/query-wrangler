@@ -367,7 +367,12 @@ class QW_Admin_Pages {
 		$row = ( array ) $query->row;
 		unset( $row['id'] );
 
-		return json_encode( $row );
+		// unserialize the stored data
+		$row['data'] = unserialize( $row['data'] );
+		$row['data'] = qw_query_escape_export( $row['data'] );
+		$export = wp_json_encode( $row, JSON_PRETTY_PRINT );
+
+		return $export;
 	}
 
 	/**
@@ -396,7 +401,10 @@ class QW_Admin_Pages {
 		$query = null;
 
 		if ( !empty( $import['query'] ) ){
-			$query = json_decode( stripslashes( $import['query'] ), true );
+			$import['query'] = stripslashes( $import['query'] );
+			$query = json_decode( $import['query'], TRUE );
+			$query['data'] = qw_query_decode_import( $query['data'] );
+
 		}
 
 		if ( !empty( $query ) ) {

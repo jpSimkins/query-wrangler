@@ -36,7 +36,7 @@ function qw_execute_the_callback( $post, $field, $tokens ) {
 
 	ob_start();
 	if ( isset( $field['custom_output_callback'] ) && is_callable( $field['custom_output_callback'] ) ) {
-		if ( isset( $field['include_output_arguments'] ) ) {
+		if ( !empty( $field['include_output_arguments'] ) ) {
 			$returned = call_user_func( $field['custom_output_callback'], $post, $field, $tokens );
 		}
 		else if ( isset( $field['include_text_arguments'] ) ) {
@@ -47,6 +47,10 @@ function qw_execute_the_callback( $post, $field, $tokens ) {
 				if ( empty( $v ) ) {
 					unset( $callback_params[ $k ] );
 				}
+				else {
+					$callback_params[ $k ] = qw_contextual_tokens_replace( $v );
+				}
+
 			}
 
 			$returned = call_user_func_array( $field['custom_output_callback'], $callback_params );
@@ -74,9 +78,15 @@ function qw_execute_the_callback( $post, $field, $tokens ) {
  * @param $field
  */
 function qw_callback_field_form( $field ) {
+	$defaults = array( '', '', '', '', '' );
+
 	if ( ! isset( $field['values']['parameters'] ) ) {
-		$field['values']['parameters'] = array( '', '', '' );
+		$field['values']['parameters'] = $defaults;
 	}
+	else {
+		$field['values']['parameters'] = array_replace( $defaults, $field['values']['parameters'] );
+	}
+
 
 	$form = new QW_Form_Fields( array(
 		'form_field_prefix' => $field['form_prefix'],
@@ -138,6 +148,24 @@ function qw_callback_field_form( $field ) {
 		'name' => '2',
 		'title' => __( 'Parameter 2' ),
 		'value' => $field['values']['parameters'][2],
+		'class' => array( 'qw-js-title' ),
+	) );
+
+	print $form->render_field( array(
+		'type' => 'text',
+		'name_prefix' => '[parameters]',
+		'name' => '3',
+		'title' => __( 'Parameter 3' ),
+		'value' => $field['values']['parameters'][3],
+		'class' => array( 'qw-js-title' ),
+	) );
+
+	print $form->render_field( array(
+		'type' => 'text',
+		'name_prefix' => '[parameters]',
+		'name' => '4',
+		'title' => __( 'Parameter 4' ),
+		'value' => $field['values']['parameters'][4],
 		'class' => array( 'qw-js-title' ),
 	) );
 }
