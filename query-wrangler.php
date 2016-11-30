@@ -115,6 +115,7 @@ class Query_Wrangler {
 		include_once QW_PLUGIN_DIR . '/includes/fields/image_attachment.php';
 		include_once QW_PLUGIN_DIR . '/includes/fields/featured_image.php';
 		include_once QW_PLUGIN_DIR . '/includes/fields/callback_field.php';
+		include_once QW_PLUGIN_DIR . '/includes/fields/taxonomy_terms.php';
 		// meta field below
 
 		// filters
