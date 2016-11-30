@@ -14,6 +14,7 @@ function qw_simple_basic_settings( $basics ) {
 		'description'   => __( 'The title above the query page or widget' ),
 		'option_type'   => 'display',
 		'weight'        => 0,
+		'required'      => true,
 		'form_fields' => array(
 			'display_title' => array(
 				'type' => 'text',
@@ -27,6 +28,7 @@ function qw_simple_basic_settings( $basics ) {
 		'description'   => __( 'The content placed here will appear if the query has no results.' ),
 		'option_type'   => 'display',
 		'weight'        => 0,
+		'required'      => true,
 		'form_fields' => array(
 			'empty' => array(
 				'type' => 'textarea',
@@ -40,6 +42,7 @@ function qw_simple_basic_settings( $basics ) {
 		'description'   => __( 'The content placed here will appear below the resulting query.' ),
 		'option_type'   => 'display',
 		'weight'        => 0,
+		'required'      => true,
 		'form_fields' => array(
 			'footer' => array(
 				'type' => 'textarea',
@@ -53,6 +56,7 @@ function qw_simple_basic_settings( $basics ) {
 		'description'   => __( 'The content placed here will appear above the resulting query.' ),
 		'option_type'   => 'display',
 		'weight'        => 0,
+		'required'      => true,
 		'form_fields' => array(
 			array(
 				'type' => 'textarea',
@@ -66,6 +70,7 @@ function qw_simple_basic_settings( $basics ) {
 		'description'   => __( 'The CSS class names will be added to the query. This enables you to use specific CSS code for each query. You may define multiples classes separated by spaces.' ),
 		'option_type'   => 'display',
 		'weight'        => 0,
+		'required'      => true,
 		'form_fields' => array(
 			'wrapper_classes' => array(
 				'type' => 'text',
@@ -80,6 +85,7 @@ function qw_simple_basic_settings( $basics ) {
 		'option_type'         => 'display',
 		'query_display_types' => array( 'page', ),
 		'weight'              => 0,
+		'required'      => true,
 		'form_fields' => array(
 			'page_path' => array(
 				'type' => 'text',
@@ -103,6 +109,7 @@ function qw_simple_basic_settings( $basics ) {
 		'form_callback'       => 'qw_basic_page_template_form',
 		'query_display_types' => array( 'page', 'override' ),
 		'weight'              => 0,
+		'required'      => true,
 		'form_fields' => array(
 			'page_template' => array(
 				'type' => 'select',
@@ -124,6 +131,7 @@ function qw_simple_basic_settings( $basics ) {
 		'description'   => __( 'Select which type of pager to use.' ),
 		'option_type'   => 'display',
 		'weight'        => 0,
+		'required'      => true,
 		'form_fields' => array(
 			'use_pager' => array(
 				'type' => 'checkbox',

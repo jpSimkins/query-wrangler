@@ -297,8 +297,21 @@ var QueryWrangler = {};
 
       /**
        * Option Group methods
-       *  - option groups are extra settings for handler item that require enabling to work.
+       *  - option groups are checkboxes that reveal extra settings for handler
+       *  item that require enabling to work.
        *  - eg, rewrite output, create label, etc
+       *
+       *  example html:
+       *   <div class="qw-field-wrapper">
+       *
+       *       <div class="qw-options-group-title">
+       *           <label class="qw-field-label">Rewrite empty result text</label>
+       *           <input type="checkbox">
+       *       </div>
+       *
+       *       <div class="qw-options-group-content">
+       *       </div>
+       *   </div>
        */
       QueryWrangler.optionGroups = {
         /**
@@ -341,6 +354,45 @@ var QueryWrangler = {};
         }
       };
       // option groups
+
+      /**
+       * Select Group methods
+       *  - select groups are select html elements that reveal extra settings for handler item.
+       *  - eg, row_style
+       *
+       *  example html:
+       *    <div class="qw-handler-item-form">
+       *        <select class="qw-select-group-toggle">
+       *          <option value="my_custom_value">A thing</option>
+       *        </select>
+       *        <div class="qw-select-group-item qw-select-group-item-my_custom_value">
+       *        </div>
+       *    </div>
+       */
+      QueryWrangler.selectGroups = {
+
+        /**
+         * Init select groups
+         */
+        init: function(){
+          $.each( $('.qw-select-group-toggle'), function(){
+            QueryWrangler.selectGroups.toggle( $(this) );
+          });
+          $('body').on( 'change', '.qw-select-group-toggle', function(){
+            QueryWrangler.selectGroups.toggle( $(this) );
+          } );
+        },
+
+        /**
+         * Toggle sub-settings for a select group
+         */
+        toggle: function($select ){
+          var $wrapper = $select.closest('.qw-handler-item-form');
+          $wrapper.find('.qw-select-group-item').hide();
+          $wrapper.find('.qw-select-group-value-' + $select.val()).show();
+        }
+      };
+      // select groups
 
       /**
        * JS Titles

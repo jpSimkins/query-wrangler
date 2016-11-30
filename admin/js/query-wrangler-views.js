@@ -39,6 +39,7 @@
           QueryWrangler.jsTitles.init( '.qw-handler-item',
               '.qw-handler-item-title' );
           QueryWrangler.optionGroups.init();
+          QueryWrangler.selectGroups.init();
         },
 
         /**
@@ -189,6 +190,7 @@
          *
          * @param dialog_title - title for the dialog box
          * @param element - element to load into the dialog
+         * @param dialog_id
          * @param update_callback - callback to execute after dialog Update button pressed
          */
         openDialog: function (

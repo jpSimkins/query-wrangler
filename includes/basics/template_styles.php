@@ -12,6 +12,7 @@ function qw_basic_settings_style( $basics ) {
 		'option_type'   => 'display',
 		'form_callback' => 'qw_basic_display_style_form',
 		'weight'        => 0,
+		'required'      => true,
 	);
 
 	return $basics;

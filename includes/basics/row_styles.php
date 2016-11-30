@@ -18,6 +18,7 @@ function qw_basic_settings_row_style( $basics ) {
 		'option_type'   => 'display',
 		'form_callback' => 'qw_basic_display_row_style_form',
 		'weight'        => 0,
+		'required'      => true,
 	);
 
 	return $basics;
@@ -87,7 +88,7 @@ function qw_basic_display_row_style_form( $item, $display ) {
 		'description' => $item['description'],
 		'value' => isset( $display['row_style'] ) ? $display['row_style'] : '',
 		'options' => $row_styles,
-		'class' => array( 'qw-js-title' ),
+		'class' => array( 'qw-js-title', 'qw-select-group-toggle' ),
 	) );
 	?>
 
@@ -100,10 +101,10 @@ function qw_basic_display_row_style_form( $item, $display ) {
 				$row_style['values'] = ( isset( $row_style['settings_key'] ) && isset( $display[ $row_style['settings_key'] . '_settings' ] ) ) ? $display[ $row_style['settings_key'] . '_settings' ] : array();
 				?>
 				<div id="tab-row-style-settings-<?php print $row_style['hook_key']; ?>"
-					 class="qw-query-content">
+				     class="qw-query-content qw-select-group-item qw-select-group-value-<?php print $type; ?>">
 					<h3><?php print $row_style['title']; ?> <?php _e( 'Settings' ); ?></h3>
 
-					<div class="qw-setting-group">
+					<div class="qw-setting-group-inner">
 						<?php print call_user_func( $row_style['settings_callback'], $row_style, $display ); ?>
 					</div>
 				</div>
