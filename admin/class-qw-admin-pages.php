@@ -460,7 +460,7 @@ class QW_Admin_Pages {
 			'query_slug'          => $qw_query->slug,
 			'query_name'          => $qw_query->name,
 			'query_type'          => $qw_query->type,
-			'shortcode'           => '[query slug="' . $qw_query->slug . '"]',
+			'shortcode'           => $this->settings->get('shortcode_compat') ? 'qw_query' : 'query',
 			'options'             => $options,
 			'args'                => $options['args'],
 			'display'             => $display,
@@ -484,11 +484,6 @@ class QW_Admin_Pages {
 			'image_sizes'         => get_intermediate_image_sizes(),
 			'file_styles'         => qw_all_file_styles(),
 		);
-
-		// shortcode compatibility
-		if ( $this->settings->get('shortcode_compat') ){
-			$editor_args['shortcode'] = '[qw_query slug="' . $qw_query->slug . '"]';
-		}
 
 		return $editor_args;
 	}

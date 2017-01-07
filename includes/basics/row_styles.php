@@ -165,6 +165,15 @@ function qw_row_style_fields_settings( $row_style, $display ) {
 		'options' => $group_by_options,
 		'class' => array( 'qw-js-title' ),
 	) );
+
+	print $form->render_field( array(
+		'type' => 'checkbox',
+		'name' => 'strip_group_by_field',
+		'title' => __( 'Strip tags in Group by field' ),
+		'value' => isset( $row_style['values']['strip_group_by_field'] ) ? $row_style['values']['strip_group_by_field'] : '',
+		'options' => $group_by_options,
+		'class' => array( 'qw-js-title' ),
+	) );
 }
 
 /**

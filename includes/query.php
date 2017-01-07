@@ -251,19 +251,29 @@ function qw_serialize( $array ) {
  * Custom: Fix unserialize problem with quotation marks
  */
 function qw_unserialize( $serial_str ) {
-	$array = array();
-	// TODO preg_replace \e deprecated - use preg_replace_callback
-//	$serial_str = @preg_replace( '!s:(\d+):"(.*?)";!se',
-//		"'s:'.strlen('$2').':\"$2\";'",
-//		$serial_str );
-	$array      = unserialize( $serial_str );
-	if ( is_array( $array ) ) {
-		// stripslashes twice for science
-		$array = array_map( 'stripslashes_deep', $array );
-		$array = array_map( 'stripslashes_deep', $array );
+	$data = maybe_unserialize( $serial_str );
 
-		return $array;
+	// if the string failed to unserialize, we may have a quotation problem
+	if ( !is_array( $data ) ) {
+		$serial_str = @preg_replace( '!s:(\d+):"(.*?)";!se', "'s:'.strlen('$2').':\"$2\";'", $serial_str );
+		$data = maybe_unserialize( $serial_str );
 	}
+
+	if ( is_array( $data ) ) {
+		// stripslashes twice for science
+		$data = array_map( 'stripslashes_deep', $data );
+		$data = array_map( 'stripslashes_deep', $data );
+
+		return $data;
+	}
+
+	// if we're here the data wasn't unserialized properly.
+	// return a modified version of the default query to prevent major failures.
+	$default = qw_default_query_data();
+	$default['display']['title'] = 'error unserializing query data';
+	$default['args']['filters']['posts_per_page']['posts_per_page'] = 1;
+
+	return $default;
 }
 
 /*

@@ -45,6 +45,11 @@ class Query_Wrangler_List_Table extends WP_List_Table {
 					<?php print esc_html( get_admin_page_title() ); ?>
 					<a class="add-new-h2" href="<?php echo $this->url; ?>.create"><?php _e( 'Add New' ); ?></a>
 				</h2>
+
+				<form id="search-queries-filter" method="get">
+					<input type="hidden" name="page" value="<?php echo esc_attr($_REQUEST['page']); ?>"/>
+					<?php $this->search_box( 'Search', 'post' ); ?>
+				</form>
 				<form id="queries-filter" method="get">
 					<input type="hidden" name="page" value="<?php echo $_REQUEST['page'] ?>"/>
 					<input type="hidden" name="noheader" value="true"/>
@@ -247,14 +252,33 @@ class Query_Wrangler_List_Table extends WP_List_Table {
 
 		// get the table data
 		$this->process_bulk_action();
-		$orderby = ( ! empty( $_REQUEST['orderby'] ) ) ? $_REQUEST['orderby'] : 'name'; //If no sort, default to title
-		$order   = ( ! empty( $_REQUEST['order'] ) ) ? $_REQUEST['order'] : 'asc'; //If no order, default to asc
 
-		$sql  = "SELECT id as ID, type, name, slug, path
-                FROM " . $wpdb->prefix . "query_wrangler
-                ORDER BY %s %s";
+		$sql = "SELECT `id` as `ID`, `type`, `name`, `slug`, `path` FROM {$wpdb->prefix}query_wrangler";
+		$args = array();
 
-		$data = $wpdb->get_results( $wpdb->prepare( $sql, $orderby, $order ) , ARRAY_A );
+		if ( !empty( $_REQUEST['s'] ) ){
+			$sql.= " WHERE `name` LIKE %s";
+			$args[] = '%' . $wpdb->esc_like( trim( $_REQUEST['s'] ) ) . '%';
+		}
+
+		// whitelist orderby
+		$orderby = 'name';
+		if ( ! empty( $_REQUEST['orderby'] ) &&
+		     in_array( $_REQUEST['orderby'], array('name', 'type') ) ){
+			$orderby = $_REQUEST['orderby'];
+		}
+
+		// whitelist order
+		$order = 'ASC';
+		if ( ! empty( $_REQUEST['order'] ) && strtolower( $_REQUEST['order'] ) == 'desc' ){
+			$order = 'DESC';
+		}
+
+		$sql.= " ORDER BY %s {$order}";
+		$args[] = $orderby;
+
+		$sql = $wpdb->prepare( $sql, $args );
+		$data = $wpdb->get_results( $sql, ARRAY_A );
 
 		// handle pagination
 		$current_page = $this->get_pagenum();

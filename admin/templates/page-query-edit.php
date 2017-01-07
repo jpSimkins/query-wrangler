@@ -11,7 +11,11 @@
 					<input type="submit" class="button-primary" value="<?php _e('Save'); ?>"> | <a href="<?php print admin_url( "admin.php?page=query-wrangler.export&query_id=$query_id" ); ?>"><?php _e( 'Export' ); ?></a>
 				</div>
 			</div>
-			<div class="description"><?php echo $shortcode; ?></div>
+			<div class="description">
+				<code>[<?php echo $shortcode; ?> slug="<?php print $query_slug; ?>"]</code>
+				-or-
+				<code>[<?php echo $shortcode; ?> id="<?php print $query_id; ?>"]</code>
+			</div>
 			<div class="update-nag qw-changes">
 				<strong>*</strong> <?php _e( 'Changes have been made that need to be saved.' ); ?>
 			</div>
