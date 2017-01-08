@@ -36,8 +36,7 @@
           // add new handler items
           $( '.qw-add-title' ).click( QWViews.addHandlerItemsDialog );
 
-          QueryWrangler.jsTitles.init( '.qw-handler-item',
-              '.qw-handler-item-title' );
+          QueryWrangler.jsTitles.init( '.qw-handler-item', '.qw-handler-item-title' );
           QueryWrangler.optionGroups.init();
           QueryWrangler.selectGroups.init();
         },

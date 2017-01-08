@@ -1,6 +1,11 @@
 <?php
 
 class QW_Form_Fields {
+	/**
+	 * Necessary argument defaults for a working form
+	 *
+	 * @var array
+	 */
 	public $default_form_args = array(
 		'id' => '',
 		'class' => array(),
@@ -8,15 +13,67 @@ class QW_Form_Fields {
 		'action' => '',
 		'attributes' => array(),
 		'form_style' => 'flat',
-	);
-
-	public $form_args = array(
 		'form_field_prefix' => '',
 	);
 
+	/**
+	 * Form settings (arguments). Combination of arguments provided to the
+	 * constructor and the default arguments
+	 *
+	 * @var array
+	 */
+	public $form_args = array();
+
+	/**
+	 * Form Styles
+	 *
+	 * Array of keyed set of callbacks for determining the wrapping form and
+	 * field styles.
+	 *
+	 * Ex:
+	 * ---------
+	 *  array(
+	 *		'my_form_style' => array(
+	 *          'form_open'     => 'my_form_style_form_open_callback',
+	 *          'form_close'    => 'my_form_style_form_close_callback',
+	 *          'field_wrapper' => 'my_form_style_field_wrapper_callback',
+	 *      )
+	 *  )
+	 *
+	 * @see QW_Form_Fields::form_open_flat()
+	 * @see QW_Form_Fields::form_close_flat()
+	 * @see QW_Form_Fields::field_wrapper_flat()
+	 *
+	 * @var array
+	 */
 	public $form_styles = array();
+
+
+	/**
+	 * Field Types
+	 *
+	 * Array of keyed set of callbacks for creating HTML output for a form field
+	 *
+	 * Ex:
+	 * ---------
+	 *
+	 * array(
+	 *      'my_field_type' => 'my_field_type_callback'
+	 * )
+	 *
+	 * function my_field_type_callback( $field = array() ) {}
+	 *
+	 * @see QW_Form_Fields::template_textarea()
+	 *
+	 * @var array
+	 */
 	public $field_types = array();
 
+	/**
+	 *  Necessary argument defaults for a working field
+	 *
+	 * @var array
+	 */
 	public $default_field_args = array(
 		'title' => '',
 		'description' => '',
@@ -40,20 +97,30 @@ class QW_Form_Fields {
 		#'id' => '',
 	);
 
+	/**
+	 * @var array
+	 */
 	public $fields = array();
 
 
+	/**
+	 * QW_Form_Fields constructor.
+	 *
+	 * @param array $form_args
+	 */
 	function __construct( $form_args = array() ){
 		$this->form_args = array_replace( $this->default_form_args, $form_args );
-		$this->register_default_field_types();
-		$this->register_default_form_styles();
+		$this->form_styles = $this->default_form_styles();
+		$this->field_types = $this->default_field_types();
 	}
 
 	/**
+	 * Core form styles
 	 *
+	 * @return array
 	 */
-	function register_default_form_styles(){
-		$this->form_styles = array(
+	function default_form_styles(){
+		return array(
 			'flat' => array(
 				'form_open' => array( $this, 'form_open_flat' ),
 				'form_close' => array( $this, 'form_close_flat' ),
@@ -68,25 +135,29 @@ class QW_Form_Fields {
 	}
 
 	/**
+	 * Core field types
 	 *
+	 * @return array
 	 */
-	function register_default_field_types(){
-		$this->field_types = array_replace( $this->field_types, array(
+	function default_field_types(){
+		return array(
 			'text' => array( $this, 'template_input' ),
 			'hidden' => array( $this, 'template_input' ),
 			'number' => array( $this, 'template_input' ),
 			'email' => array( $this, 'template_input' ),
-			'checkbox' => array( $this, 'template_checkbox' ),
 			'submit' => array( $this, 'template_input' ),
 			'button' => array( $this, 'template_input' ),
 			'textarea' => array( $this, 'template_textarea' ),
+			'checkbox' => array( $this, 'template_checkbox' ),
 			'checkboxes' => array( $this, 'template_checkboxes' ),
 			'select' => array( $this, 'template_select' ),
 			'item_list' => array( $this, 'template_item_list' ),
-		) );
+		);
 	}
 
 	/**
+	 * Retrieve the current form_style array
+	 *
 	 * @return array
 	 */
 	function get_form_style(){
@@ -414,7 +485,7 @@ class QW_Form_Fields {
 
 
 	/**
-	 * Settings Table
+	 * Settings Table form style field wrapper HTML
 	 *
 	 * @param $field
 	 * @param $field_html
@@ -443,10 +514,20 @@ class QW_Form_Fields {
 		<?php
 	}
 
+	/**
+	 * Settings table form style open HTML
+	 *
+	 * @return string
+	 */
 	function form_open_settings_table(){
 		return '<table class="form-table">';
 	}
 
+	/**
+	 * Settings table form style close HTML
+	 *
+	 * @return string
+	 */
 	function form_close_settings_table(){
 		return '</table>';
 	}
@@ -478,10 +559,20 @@ class QW_Form_Fields {
 		<?php
 	}
 
+	/**
+	 * Flat form style opening HTML
+	 *
+	 * @return string
+	 */
 	function form_open_flat(){
 		return '<div class="qw-form">';
 	}
 
+	/**
+	 * Flat form style closing HTML
+	 *
+	 * @return string
+	 */
 	function form_close_flat(){
 		return '</div>';
 	}

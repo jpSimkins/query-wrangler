@@ -26,12 +26,12 @@
 				<div class="qw-query-admin-column">
 					<?php
 					print qw_admin_template( 'form-editor-items-list',
-							array(
-									'handler_type' => 'basic',
-									'title' => __( 'Basic Settings' ),
-									'items' => $basics,
-									'query_type' => $query_type,
-							));
+						array(
+							'handler_type' => 'basic',
+							'title' => __( 'Basic Settings' ),
+							'items' => $basics,
+							'query_type' => $query_type,
+						));
 					?>
 				</div>
 				<!-- /column -->
@@ -40,24 +40,24 @@
 					<?php
 					if ( $query_type == 'override' ) {
 						print qw_admin_template( 'form-editor-items-list',
-								array(
-										'handler_type' => 'override',
-										'title' => __( 'Overrides' ),
-										'items' => $overrides,
-										'limit_per_type' => 1,
-										'add_rearrange' => true,
-										'query_type' => $query_type,
-								));
+							array(
+								'handler_type' => 'override',
+								'title' => __( 'Overrides' ),
+								'items' => $overrides,
+								'limit_per_type' => 1,
+								'add_rearrange' => true,
+								'query_type' => $query_type,
+							));
 					}
 
 					print qw_admin_template( 'form-editor-items-list',
-							array(
-									'handler_type' => 'field',
-									'title' => __( 'Fields' ),
-									'items' => $fields,
-									'add_rearrange' => true,
-									'query_type' => $query_type,
-							));
+						array(
+							'handler_type' => 'field',
+							'title' => __( 'Fields' ),
+							'items' => $fields,
+							'add_rearrange' => true,
+							'query_type' => $query_type,
+						));
 					?>
 				</div>
 				<!-- /column -->
@@ -65,22 +65,22 @@
 				<div class="qw-query-admin-column">
 					<?php
 					print qw_admin_template( 'form-editor-items-list',
-							array(
-									'handler_type' => 'sort',
-									'title' => __( 'Order By' ),
-									'items' => $sorts,
-									'add_rearrange' => true,
-									'query_type' => $query_type,
-							));
+						array(
+							'handler_type' => 'sort',
+							'title' => __( 'Order By' ),
+							'items' => $sorts,
+							'add_rearrange' => true,
+							'query_type' => $query_type,
+						));
 
 					print qw_admin_template( 'form-editor-items-list',
-							array(
-									'handler_type' => 'filter',
-									'title' => __( 'Filters' ),
-									'items' => $filters,
-									'add_rearrange' => true,
-									'query_type' => $query_type,
-							));
+						array(
+							'handler_type' => 'filter',
+							'title' => __( 'Filters' ),
+							'items' => $filters,
+							'add_rearrange' => true,
+							'query_type' => $query_type,
+						));
 					?>
 				</div>
 				<div class="qw-clear-gone"><!-- ie hack -->&nbsp;</div>
@@ -89,36 +89,36 @@
 			<div id="qw-options-forms">
 				<?php
 				print qw_admin_template( 'form-editor-items-add-list',
-						array(
-								'handler_type' => 'sort',
-								'description' => __( 'Select options for sorting the query results.' ),
-								'all_item_types' => $all_sorts,
-								'query_type' => $query_type,
-						));
+					array(
+						'handler_type' => 'sort',
+						'description' => __( 'Select options for sorting the query results.' ),
+						'all_item_types' => $all_sorts,
+						'query_type' => $query_type,
+					));
 
 				print qw_admin_template( 'form-editor-items-add-list',
-						array(
-								'handler_type' => 'field',
-								'description' => __( 'Select Fields to add to this query\'s output.' ),
-								'all_item_types' => $all_fields,
-								'query_type' => $query_type,
-						));
+					array(
+						'handler_type' => 'field',
+						'description' => __( 'Select Fields to add to this query\'s output.' ),
+						'all_item_types' => $all_fields,
+						'query_type' => $query_type,
+					));
 
 				print qw_admin_template( 'form-editor-items-add-list',
-						array(
-								'handler_type' => 'filter',
-								'description' => __( 'Select filters to affect the query\'s results.' ),
-								'all_item_types' => $all_filters,
-								'query_type' => $query_type,
-						));
+					array(
+						'handler_type' => 'filter',
+						'description' => __( 'Select filters to affect the query\'s results.' ),
+						'all_item_types' => $all_filters,
+						'query_type' => $query_type,
+					));
 
 				print qw_admin_template( 'form-editor-items-add-list',
-						array(
-								'handler_type' => 'override',
-								'description' => __( 'Select overrides to add to this query. Limit 1 per type.' ),
-								'all_item_types' => $all_overrides,
-								'query_type' => $query_type,
-						));
+					array(
+						'handler_type' => 'override',
+						'description' => __( 'Select overrides to add to this query. Limit 1 per type.' ),
+						'all_item_types' => $all_overrides,
+						'query_type' => $query_type,
+					));
 				?>
 			</div><!-- / "add new items" forms -->
 		</form>
