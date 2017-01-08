@@ -218,24 +218,6 @@ function qw_all_row_styles() {
 }
 
 /*
- * Row Style 'Posts' Styles Hook
- */
-function qw_all_row_complete_styles() {
-	$row_complete_styles = apply_filters( 'qw_row_complete_styles', array() );
-
-	return $row_complete_styles;
-}
-
-/*
- * Row Style 'Fields' Styles Hook
- */
-function qw_all_row_fields_styles() {
-	$row_fields_styles = apply_filters( 'qw_row_fields_styles', array() );
-
-	return $row_fields_styles;
-}
-
-/*
  * File Styles Hook
  */
 function qw_all_file_styles() {

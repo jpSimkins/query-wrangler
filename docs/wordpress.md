@@ -32,8 +32,6 @@ includes/hooks.php | `apply_filters( 'qw_post_statuses', $default );` | Modify t
 includes/hooks.php | `apply_filters( 'qw_post_types', array() );` | Modify the allowed list of post types.
 includes/hooks.php | `apply_filters( 'qw_styles', $styles );` | Register a new template style.
 includes/hooks.php | `apply_filters( 'qw_row_styles', array() );` | Register a new row style.
-includes/hooks.php | `apply_filters( 'qw_row_complete_styles', array() );` | Register a new "posts" row style. 
-includes/hooks.php | `apply_filters( 'qw_row_fields_styles', array() );` | Register a new "fields" row style.
 includes/hooks.php | `apply_filters( 'qw_file_styles', $default );` | Register a new file output style.
 includes/hooks.php | `apply_filters( 'qw_pager_types', $pagers );` | Register a new pager style.
 includes/hooks.php | `return apply_filters( 'qw_default_template_file', 'index.php' );` | Set the default template style name.

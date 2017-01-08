@@ -2,9 +2,6 @@
 // hook into qw_basics
 add_filter( 'qw_basics', 'qw_basic_settings_row_style' );
 
-// add row complete (post rows) styles
-add_filter( 'qw_row_complete_styles', 'qw_default_row_complete_styles', 0 );
-
 /*
  * Basic Settings
  */
@@ -19,23 +16,6 @@ function qw_basic_settings_row_style( $basics ) {
 	);
 
 	return $basics;
-}
-
-/**
- * Default Row 'Posts' Styles
- *
- * @param $row_complete_styles
- * @return array
- */
-function qw_default_row_complete_styles( $row_complete_styles ) {
-	$row_complete_styles['complete'] = array(
-		'title' => __( 'Complete Post' ),
-	);
-	$row_complete_styles['excerpt']  = array(
-		'title' => __( 'Excerpt' ),
-	);
-
-	return $row_complete_styles;
 }
 
 /**
