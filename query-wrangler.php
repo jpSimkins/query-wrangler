@@ -103,8 +103,8 @@ class Query_Wrangler {
 	function load_common(){
 		// basics
 		include_once QW_PLUGIN_DIR . '/includes/basics/basics_simple.php';
-		include_once QW_PLUGIN_DIR . '/includes/basics/template_styles.php';
 		include_once QW_PLUGIN_DIR . '/includes/basics/row_styles.php';
+		include_once QW_PLUGIN_DIR . '/includes/basics/wrapper_styles.php';
 
 		// fields
 		include_once QW_PLUGIN_DIR . '/includes/fields/template_tags.php';

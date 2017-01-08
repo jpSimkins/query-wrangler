@@ -496,7 +496,7 @@ var QueryWrangler = {};
      */
     init: function(){
       // create the message
-      $('#query-field').append( "<blockquote class='fields-not-used-message'>Fields row style is not currently in use.</blockquote>" );
+      $('#query-field').append( "<blockquote class='fields-not-used-message'>Row style is not currently set to use Fields.</blockquote>" );
 
       // track changes to the row style field
       $('#edit--qw-query-optionsdisplayrow_style').change(function(){

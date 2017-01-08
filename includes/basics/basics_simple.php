@@ -23,20 +23,6 @@ function qw_simple_basic_settings( $basics ) {
 			)
 		),
 	);
-	$basics['wrapper_classes'] = array(
-		'title'         => __( 'Wrapper Classes' ),
-		'description'   => __( 'The CSS class names will be added to the query. This enables you to use specific CSS code for each query. You may define multiples classes separated by spaces.' ),
-		'option_type'   => 'display',
-		'weight'        => 4,
-		'required'      => true,
-		'form_fields' => array(
-			'wrapper_classes' => array(
-				'type' => 'text',
-				'name' => 'wrapper-classes',
-				'class' => array( 'qw-text-long', 'qw-js-title' ),
-			)
-		)
-	);
 	$basics['header'] = array(
 		'title'         => __( 'Header' ),
 		'description'   => __( 'The content placed here will appear above the resulting query.' ),
@@ -145,6 +131,7 @@ function qw_simple_basic_settings( $basics ) {
 				'name_prefix' => '[page][pager]',
 				'name' => 'type',
 				'title' => __( 'Pager Type' ),
+				'description' => __( 'Select the type of pager to use.' ),
 				'options' => $pager_types,
 				'class' => array( 'qw-js-title' ),
 			),
@@ -153,7 +140,7 @@ function qw_simple_basic_settings( $basics ) {
 				'name_prefix' => '[page][pager]',
 				'name' => 'previous',
 				'title' => __( 'Previous Page Label' ),
-				'description' => __( 'Use the following options to change the Default Pager labels.' ),
+				'description' => __( 'Modify the text for the "previous" page link.' ),
 				'class' => array( 'qw-js-title' ),
 			),
 			'pager_next' => array(
@@ -161,6 +148,7 @@ function qw_simple_basic_settings( $basics ) {
 				'name_prefix' => '[page][pager]',
 				'name' => 'next',
 				'title' => __( 'Next Page Label' ),
+				'description' => __( 'Modify the text for the "next" page link.' ),
 				'class' => array( 'qw-js-title' ),
 			),
 			/*
