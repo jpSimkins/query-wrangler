@@ -141,6 +141,11 @@ class Query_Wrangler {
 		include_once QW_PLUGIN_DIR . '/includes/overrides/tags.php';
 		include_once QW_PLUGIN_DIR . '/includes/overrides/taxonomies.php';
 
+		// row styles
+		include_once QW_PLUGIN_DIR . '/includes/row_styles/posts.php';
+		include_once QW_PLUGIN_DIR . '/includes/row_styles/fields.php';
+		include_once QW_PLUGIN_DIR . '/includes/row_styles/template_part.php';
+
 
 		$this->settings = QW_Settings::get_instance();
 
