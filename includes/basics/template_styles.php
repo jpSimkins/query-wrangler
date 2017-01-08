@@ -11,7 +11,7 @@ function qw_basic_settings_style( $basics ) {
 		'description'   => __( 'How this query should be styled' ),
 		'option_type'   => 'display',
 		'form_callback' => 'qw_basic_display_style_form',
-		'weight'        => 0,
+		'weight'        => 2,
 		'required'      => true,
 	);
 

@@ -17,7 +17,7 @@ function qw_basic_settings_row_style( $basics ) {
 		'description'   => __( 'How should each post in this query be presented?' ),
 		'option_type'   => 'display',
 		'form_callback' => 'qw_basic_display_row_style_form',
-		'weight'        => 0,
+		'weight'        => 3,
 		'required'      => true,
 	);
 

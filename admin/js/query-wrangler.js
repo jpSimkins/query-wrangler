@@ -40,6 +40,7 @@ var QueryWrangler = {};
       // get our core hook data
       QueryWrangler.ajax.getQwData();
       QueryWrangler.generateFieldTokens();
+      QueryWrangler.rowStyleFieldsToggle.init();
     },
 
     /**
@@ -485,6 +486,41 @@ var QueryWrangler = {};
         // set new title
         $title_target.text( new_title );
       } );
+    }
+  };
+
+  QueryWrangler.rowStyleFieldsToggle = {
+
+    /**
+     * Create the message and start tracking changes on the field
+     */
+    init: function(){
+      // create the message
+      $('#query-field').append( "<blockquote class='fields-not-used-message'>Fields row style is not currently in use.</blockquote>" );
+
+      // track changes to the row style field
+      $('#edit--qw-query-optionsdisplayrow_style').change(function(){
+        QueryWrangler.rowStyleFieldsToggle.refresh();
+      });
+
+      // first load status check
+      QueryWrangler.rowStyleFieldsToggle.refresh();
+    },
+
+    /**
+     * Check the status of the row style setting, and adjust message accordingly
+     */
+    refresh: function() {
+      // show fields, hide message
+      if ( $('#edit--qw-query-optionsdisplayrow_style').val() == 'fields' ) {
+        $('#query-field').find('.qw-handler-item').show();
+        $('.fields-not-used-message').hide();
+      }
+      // hide fields, show message
+      else {
+        $('#query-field').find('.qw-handler-item').hide();
+        $('.fields-not-used-message').show();
+      }
     }
   };
 })( jQuery );

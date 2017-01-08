@@ -26,6 +26,8 @@ function qw_all_basic_settings() {
 		$basics[ $hook_key ]['hook_key']    = $hook_key;
 	}
 
+	uasort( $basics, 'qw_cmp' );
+
 	return $basics;
 }
 
