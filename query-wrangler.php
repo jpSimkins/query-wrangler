@@ -101,64 +101,85 @@ class Query_Wrangler {
 	 * Load files common to both the frontend and admin pages
 	 */
 	function load_common(){
-		// basics
-		include_once QW_PLUGIN_DIR . '/includes/basics/basics_simple.php';
-		include_once QW_PLUGIN_DIR . '/includes/basics/row_styles.php';
-		include_once QW_PLUGIN_DIR . '/includes/basics/wrapper_styles.php';
+		$includes = array(
+			'includes/handlers/basics' => array(
+				'basics_simple',
+				'row_styles',
+				'wrapper_styles',
+			),
+			'includes/handlers/fields' => array(
+				'template_tags',
+				'post_properties',
+				'post_author',
+				'post_author_avatar',
+				'file_attachment',
+				'image_attachment',
+				'featured_image',
+				'callback_field',
+				'taxonomy_terms',
 
-		// fields
-		include_once QW_PLUGIN_DIR . '/includes/fields/template_tags.php';
-		include_once QW_PLUGIN_DIR . '/includes/fields/post_properties.php';
-		include_once QW_PLUGIN_DIR . '/includes/fields/post_author.php';
-		include_once QW_PLUGIN_DIR . '/includes/fields/post_author_avatar.php';
-		include_once QW_PLUGIN_DIR . '/includes/fields/file_attachment.php';
-		include_once QW_PLUGIN_DIR . '/includes/fields/image_attachment.php';
-		include_once QW_PLUGIN_DIR . '/includes/fields/featured_image.php';
-		include_once QW_PLUGIN_DIR . '/includes/fields/callback_field.php';
-		include_once QW_PLUGIN_DIR . '/includes/fields/taxonomy_terms.php';
-		// meta field below
+			),
+			'includes/handlers/filters' => array(
+				'filters_simple',
+				'author',
+				'callback',
+				'post_types',
+				'post_id',
+				'meta_query',
+				'tags',
+				'categories',
+				'post_parent',
+				'taxonomies',
+				'taxonomy_relation',
+				'search',
+			),
+			'includes/handlers/sorts' => array(
+				'default_sorts'
+			),
+			'includes/handlers/overrides' => array(
+				'categories',
+				'post_type_archive',
+				'tags',
+				'taxonomies',
+			),
+			'includes/row_styles' => array(
+				'row_style_posts',
+				'row_style_fields',
+				'row_style_template_part',
+			),
+			'includes/pager_types' => array(
+				'pager_default',
+				'pager_numbers',
+				'pager_pagenavi',
+			),
+			'includes/styles' => array(
+				'style_unformatted',
+				'style_table',
+				'style_ordered_list',
+				'style_unordered_list',
+			),
+		);
 
-		// filters
-		include_once QW_PLUGIN_DIR . '/includes/filters/filters_simple.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/author.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/callback.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/post_types.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/post_id.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/meta_query.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/tags.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/categories.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/post_parent.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/taxonomies.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/taxonomy_relation.php';
-		include_once QW_PLUGIN_DIR . '/includes/filters/search.php';
-
-		// sorts
-		include_once QW_PLUGIN_DIR . '/includes/sorts/default_sorts.php';
-
-		// overrides
-		include_once QW_PLUGIN_DIR . '/includes/overrides/categories.php';
-		include_once QW_PLUGIN_DIR . '/includes/overrides/post_type_archive.php';
-		include_once QW_PLUGIN_DIR . '/includes/overrides/tags.php';
-		include_once QW_PLUGIN_DIR . '/includes/overrides/taxonomies.php';
-
-		// row styles
-		include_once QW_PLUGIN_DIR . '/includes/row_styles/posts.php';
-		include_once QW_PLUGIN_DIR . '/includes/row_styles/fields.php';
-		include_once QW_PLUGIN_DIR . '/includes/row_styles/template_part.php';
-
-
+		/*
+		 * Meta value field changes depending on a setting
+		 */
 		$this->settings = QW_Settings::get_instance();
+
+		if ( $this->settings->get( 'meta_value_field_handler', 0 ) ) {
+			$includes['/includes/handlers/fields'][] = 'meta_value_new';
+		}
+		else {
+			$includes['/includes/handlers/fields'][] = 'meta_value';
+		}
+
+		foreach( $includes as $folder => $files ){
+			foreach( $files as $file ){
+				include_once QW_PLUGIN_DIR . "/{$folder}/{$file}.php";
+			}
+		}
 
 		QW_Override::register();
 		QW_Shortcodes::register( $this->settings );
-
-		// meta value field as a setting
-		if ( $this->settings->get( 'meta_value_field_handler', 0 ) ) {
-			include_once QW_PLUGIN_DIR . '/includes/fields/meta_value_new.php';
-		}
-		else {
-			include_once QW_PLUGIN_DIR . '/includes/fields/meta_value.php';
-		}
 
 		$this->handlers = QW_Handlers::get_instance();
 	}
