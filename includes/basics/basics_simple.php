@@ -10,9 +10,8 @@ add_filter( 'qw_basics', 'qw_simple_basic_settings' );
  */
 function qw_simple_basic_settings( $basics ) {
 	$basics['display_title'] = array(
-		'title'         => __( 'Display Title' ),
+		'title'         => __( 'Title' ),
 		'description'   => __( 'The title above the query page or widget' ),
-		'option_type'   => 'display',
 		'weight'        => 1,
 		'required'      => true,
 		'form_fields' => array(
@@ -23,10 +22,22 @@ function qw_simple_basic_settings( $basics ) {
 			)
 		),
 	);
+	$basics['wrapper_classes'] = array(
+		'title'         => __( 'Wrapper Classes' ),
+		'description'   => __( 'The CSS class names will be added to the query. This enables you to use specific CSS code for each query. You may define multiples classes separated by spaces.' ),
+		'weight'        => 4,
+		'required'      => true,
+		'form_fields' => array(
+			'wrapper_classes' => array(
+				'type' => 'text',
+				'name' => 'wrapper-classes',
+				'class' => array( 'qw-text-long', 'qw-js-title' ),
+			)
+		)
+	);
 	$basics['header'] = array(
 		'title'         => __( 'Header' ),
 		'description'   => __( 'The content placed here will appear above the resulting query.' ),
-		'option_type'   => 'display',
 		'weight'        => 5,
 		'required'      => true,
 		'form_fields' => array(
@@ -40,7 +51,6 @@ function qw_simple_basic_settings( $basics ) {
 	$basics['footer'] = array(
 		'title'         => __( 'Footer' ),
 		'description'   => __( 'The content placed here will appear below the resulting query.' ),
-		'option_type'   => 'display',
 		'weight'        => 6,
 		'required'      => true,
 		'form_fields' => array(
@@ -54,7 +64,6 @@ function qw_simple_basic_settings( $basics ) {
 	$basics['empty'] = array(
 		'title'         => __( 'Empty Text' ),
 		'description'   => __( 'The content placed here will appear if the query has no results.' ),
-		'option_type'   => 'display',
 		'weight'        => 7,
 		'required'      => true,
 		'form_fields' => array(
@@ -68,7 +77,6 @@ function qw_simple_basic_settings( $basics ) {
 	$basics['page_path'] = array(
 		'title'               => __( 'Page path' ),
 		'description'         => __( 'The path or permalink you want this page to use. Avoid using spaces and capitalization for best results.' ),
-		'option_type'         => 'display',
 		'query_display_types' => array( 'page', ),
 		'weight'              => 10,
 		'required'      => true,
@@ -91,7 +99,6 @@ function qw_simple_basic_settings( $basics ) {
 	$basics['page_template'] = array(
 		'title'               => __( 'Page Template' ),
 		'description'         => __( 'Select which page template should wrap this query page.' ),
-		'option_type'         => 'display',
 		'form_callback'       => 'qw_basic_page_template_form',
 		'query_display_types' => array( 'page', 'override' ),
 		'weight'              => 11,
@@ -115,7 +122,6 @@ function qw_simple_basic_settings( $basics ) {
 	$basics['pager'] = array(
 		'title'         => __( 'Pager' ),
 		'description'   => __( 'Select which type of pager to use.' ),
-		'option_type'   => 'display',
 		'weight'        => 12,
 		'required'      => true,
 		'form_fields' => array(
@@ -148,7 +154,7 @@ function qw_simple_basic_settings( $basics ) {
 				'name_prefix' => '[page][pager]',
 				'name' => 'next',
 				'title' => __( 'Next Page Label' ),
-				'description' => __( 'Modify the text for the "next" page link.' ),
+				'description' => __( 'Modify the text for the next page link.' ),
 				'class' => array( 'qw-js-title' ),
 			),
 			/*

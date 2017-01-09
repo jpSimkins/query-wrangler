@@ -1,5 +1,6 @@
 <?php
-/*
+
+/**
  * Template Wrangler templates
  *
  * @param $templates array Passed from the filter hook from WP
@@ -84,18 +85,16 @@ function theme_query_display_style_preprocess( $template ) {
 	return $template;
 }
 
-/*
+/**
  * Template the entire query
  *
- * @param object
- *   $qw_query Wordpress query object
- * @param array
- *   $options the query options
+ * @param object $wp_query WordPress query object
+ * @param array $options the query options
  *
  * @return string HTML for themed/templated query
  */
-function qw_template_query( &$qw_query, $options ) {
-	$results_count                    = count( $qw_query->posts );
+function qw_template_query( &$wp_query, $options ) {
+	$results_count = count( $wp_query->posts );
 	$options['meta']['results_count'] = $results_count;
 
 	// start building theme arguments
@@ -126,13 +125,14 @@ function qw_template_query( &$qw_query, $options ) {
 		$row_style = $row_styles[ $options['display']['row_style'] ];
 
 		if ( is_callable( $row_style['make_rows_callback'] ) ) {
-			$template_args['rows'] = call_user_func( $row_style['make_rows_callback'], $qw_query, $options );
+			$template_args['rows'] = call_user_func( $row_style['make_rows_callback'], $wp_query, $options );
 		}
 
 		// template the query rows
 		$wrapper_args['content'] = theme( 'query_display_rows',
 			$template_args );
-	} // empty results
+	}
+	// empty results
 	else {
 		// no pagination
 		$options['meta']['pagination'] = FALSE;
@@ -140,10 +140,11 @@ function qw_template_query( &$qw_query, $options ) {
 		$wrapper_args['content'] = '<div class="query-empty">' . $options['meta']['empty'] . '</div>';
 	}
 
-	$wrapper_classes                 = array();
-	$wrapper_classes[]               = 'query';
-	$wrapper_classes[]               = 'query-' . $options['meta']['slug'] . '-wrapper';
-	$wrapper_classes[]               = $options['display']['wrapper-classes'];
+	$wrapper_classes   = array();
+	$wrapper_classes[] = 'query';
+	$wrapper_classes[] = 'query-' . $options['meta']['slug'] . '-wrapper';
+	$wrapper_classes[] = $options['display']['wrapper-classes'];
+
 	$wrapper_args['wrapper_classes'] = implode( " ", $wrapper_classes );
 
 	// header
@@ -157,13 +158,13 @@ function qw_template_query( &$qw_query, $options ) {
 
 	// pagination
 	if ( $options['meta']['pagination'] && isset( $options['display']['page']['pager']['active'] ) ) {
-		$pager_classes                 = array();
-		$pager_classes[]               = 'query-pager';
-		$pager_classes[]               = 'pager-' . $options['display']['page']['pager']['type'];
+		$pager_classes   = array();
+		$pager_classes[] = 'query-pager';
+		$pager_classes[] = 'pager-' . $options['display']['page']['pager']['type'];
+
 		$wrapper_args['pager_classes'] = implode( " ", $pager_classes );
 		// pager
-		$wrapper_args['pager'] = qw_make_pager( $options['display']['page']['pager'],
-			$qw_query );
+		$wrapper_args['pager'] = qw_make_pager( $options['display']['page']['pager'], $wp_query );
 	}
 
 	// exposed filters

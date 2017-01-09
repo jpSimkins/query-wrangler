@@ -43,7 +43,7 @@ $form = new QW_Form_Fields( array(
 			'type'  => 'hidden',
 			'name'  => 'name',
 			'value' => $filter['name'],
-			'class' => array( 'qw-field-name', 'qw-js-title' ),
+			'class' => array( 'qw-field-name' ),
 	) );
 
 	if ( $filter['form'] )

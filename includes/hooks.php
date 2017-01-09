@@ -22,7 +22,7 @@ function qw_all_basic_settings() {
 	$basics = apply_filters( 'qw_basics', array() );
 
 	foreach ( $basics as $hook_key => $basic ) {
-		$basics[ $hook_key ]['form_prefix'] = QW_FORM_PREFIX . '[' . $basic['option_type'] . ']';
+		$basics[ $hook_key ]['form_prefix'] = QW_FORM_PREFIX . '[display]';
 		$basics[ $hook_key ]['hook_key']    = $hook_key;
 	}
 

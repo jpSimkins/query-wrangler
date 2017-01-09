@@ -2,11 +2,19 @@
 
 add_filter( 'qw_row_styles', 'qw_row_style_posts', 0 );
 
-function qw_row_style_posts( $row_styles ){
+/**
+ * Very simple Row style post title and content
+ *
+ * @param $row_styles
+ *
+ * @return mixed
+ */
+function qw_row_style_posts( $row_styles )
+{
 	$row_styles['posts']  = array(
 		'title'             => __( 'Posts' ),
 		'settings_callback' => 'qw_row_style_posts_settings',
-		'settings_key'      => 'post',
+		'settings_key'      => 'post_settings',
 		'make_rows_callback'=> 'qw_row_style_posts_make_rows',
 	);
 
@@ -14,12 +22,15 @@ function qw_row_style_posts( $row_styles ){
 }
 
 /**
+ * Settings fields for the Posts row style
+ *
  * @param $row_style
  * @param $display
  */
-function qw_row_style_posts_settings( $row_style, $display ) {
+function qw_row_style_posts_settings( $row_style, $display )
+{
 	$form = new QW_Form_Fields( array(
-		'form_field_prefix' => QW_FORM_PREFIX . '[display][post_settings]',
+		'form_field_prefix' => QW_FORM_PREFIX . "[display][{$row_style['settings_key']}]",
 	) );
 
 	print $form->render_field( array(
@@ -36,12 +47,15 @@ function qw_row_style_posts_settings( $row_style, $display ) {
 }
 
 /**
+ * Render the rows of this row_style as an array of HTML
+ *
  * @param $qw_query
  * @param $options
  *
  * @return array
  */
-function qw_row_style_posts_make_rows( &$qw_query, $options ) {
+function qw_row_style_posts_make_rows( &$qw_query, $options )
+{
 	$groups          = array();
 	$i               = 0;
 	$current_post_id = get_the_ID();
@@ -55,7 +69,7 @@ function qw_row_style_posts_make_rows( &$qw_query, $options ) {
 			'style'    => $options['display']['post_settings']['size'],
 		);
 
-		$row           = array(
+		$row = array(
 			'row_classes' => qw_row_classes( $i, $last_row ),
 		);
 		$field_classes = array( 'query-post-wrapper' );
@@ -66,8 +80,7 @@ function qw_row_style_posts_make_rows( &$qw_query, $options ) {
 		}
 
 		$row['fields'][ $i ]['classes'] = implode( " ", $field_classes );
-		$row['fields'][ $i ]['output']  = theme( 'query_display_rows',
-			$template_args );
+		$row['fields'][ $i ]['output']  = theme( 'query_display_rows', $template_args );
 		$row['fields'][ $i ]['content'] = $row['fields'][ $i ]['output'];
 
 		// can't really group posts row style

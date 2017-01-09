@@ -2,11 +2,20 @@
 
 add_filter( 'qw_row_styles', 'qw_row_style_template_part', 0 );
 
-function qw_row_style_template_part( $row_styles ){
+/**
+ * Row style that leverages WordPress get_template_part() function for rendering
+ * query rows
+ *
+ * @param $row_styles
+ *
+ * @return array
+ */
+function qw_row_style_template_part( $row_styles )
+{
 	$row_styles['template_part'] = array(
 		'title'             => __( 'Template Part' ),
 		'settings_callback' => 'qw_row_style_template_part_settings',
-		'settings_key'      => 'template_part',
+		'settings_key'      => 'template_part_settings',
 		'make_rows_callback'=> 'qw_row_style_template_part_make_rows',
 	);
 
@@ -14,12 +23,15 @@ function qw_row_style_template_part( $row_styles ){
 }
 
 /**
+ * Additional settings for this row_style
+ *
  * @param $row_style
  * @param $display
  */
-function qw_row_style_template_part_settings( $row_style, $display ) {
+function qw_row_style_template_part_settings( $row_style, $display )
+{
 	$form = new QW_Form_Fields( array(
-		'form_field_prefix' => QW_FORM_PREFIX . '[display][template_part_settings]',
+		'form_field_prefix' => QW_FORM_PREFIX . "[display][{$row_style['settings_key']}]",
 	) );
 
 	print $form->render_field( array(
@@ -39,12 +51,15 @@ function qw_row_style_template_part_settings( $row_style, $display ) {
 }
 
 /**
+ * Render the rows for this row_style as an array of HTML
+ *
  * @param $qw_query
  * @param $options
  *
  * @return array
  */
-function qw_row_style_template_part_make_rows( &$qw_query, $options ) {
+function qw_row_style_template_part_make_rows( &$qw_query, $options )
+{
 	$groups          = array();
 	$i               = 0;
 	$current_post_id = get_the_ID();

@@ -2,11 +2,19 @@
 
 add_filter( 'qw_row_styles', 'qw_row_style_fields', 0 );
 
-function qw_row_style_fields( $row_styles ){
+/**
+ * Row style that renders each field attached to a query
+ *
+ * @param $row_styles
+ *
+ * @return array
+ */
+function qw_row_style_fields( $row_styles )
+{
 	$row_styles['fields'] = array(
 		'title'             => __( 'Fields' ),
 		'settings_callback' => 'qw_row_style_fields_settings',
-		'settings_key'      => 'field',
+		'settings_key'      => 'field_settings',
 		'make_rows_callback'=> 'qw_row_style_fields_make_rows',
 	);
 
@@ -14,11 +22,14 @@ function qw_row_style_fields( $row_styles ){
 }
 
 /**
+ * Additional settings for form this row_style
+ *
  * @param $row_style
  * @param $display
  */
-function qw_row_style_fields_settings( $row_style, $display ) {
-	$query_fields = isset( $display['field_settings']['fields'] ) ? $display['field_settings']['fields'] : array();
+function qw_row_style_fields_settings( $row_style, $display )
+{
+	$query_fields = !empty( $display['field_settings']['fields'] ) ? $display['field_settings']['fields'] : array();
 	$all_fields   = qw_all_fields();
 
 	$group_by_options = array(
@@ -29,14 +40,14 @@ function qw_row_style_fields_settings( $row_style, $display ) {
 	}
 
 	$form = new QW_Form_Fields( array(
-		'form_field_prefix' => QW_FORM_PREFIX . '[display][field_settings]',
+		'form_field_prefix' => QW_FORM_PREFIX . "[display][{$row_style['settings_key']}]",
 	) );
 
 	print $form->render_field( array(
 		'type' => 'select',
 		'name' => 'group_by_field',
 		'title' => __( 'Group by field' ),
-		'value' => isset( $row_style['values']['group_by_field'] ) ? $row_style['values']['group_by_field'] : '',
+		'value' => !empty( $row_style['values']['group_by_field'] ) ? $row_style['values']['group_by_field'] : '',
 		'options' => $group_by_options,
 		'class' => array( 'qw-js-title' ),
 	) );
@@ -45,7 +56,7 @@ function qw_row_style_fields_settings( $row_style, $display ) {
 		'type' => 'checkbox',
 		'name' => 'strip_group_by_field',
 		'title' => __( 'Strip tags in Group by field' ),
-		'value' => isset( $row_style['values']['strip_group_by_field'] ) ? $row_style['values']['strip_group_by_field'] : '',
+		'value' => !empty( $row_style['values']['strip_group_by_field'] ) ? $row_style['values']['strip_group_by_field'] : '',
 		'options' => $group_by_options,
 		'class' => array( 'qw-js-title' ),
 	) );
@@ -60,7 +71,8 @@ function qw_row_style_fields_settings( $row_style, $display ) {
  *
  * @return array Executed query rows
  */
-function qw_row_style_fields_make_rows( &$qw_query, $options ) {
+function qw_row_style_fields_make_rows( &$qw_query, $options )
+{
 	$display         = $options['display'];
 	$all_fields      = qw_all_fields();
 	$groups          = array();

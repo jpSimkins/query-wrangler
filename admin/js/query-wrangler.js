@@ -440,19 +440,19 @@ var QueryWrangler = {};
 
         // loop through all js-title elements and make a new tile
         $handler_item.find( '.qw-js-title' ).each( function ( i, element ) {
-          $element = $( element );
+          var $element = $( element );
           var element_value = $element.val();
 
-          switch ( $element.prop( 'tagName' ) ) {
+          switch ( $element.prop( 'tagName' ) )
+          {
             case 'INPUT':
               var tag_type = $element.attr( 'type' );
               // checkboxes are special!
               if ( tag_type == 'checkbox' ) {
                 var is_checked = $element.prop( 'checked' );
-                if ( ! element_value ) {
-                  element_value = (
-                      is_checked
-                  ) ? "on" : "off";
+
+                if ( is_checked && ! element_value ) {
+                  element_value = "on";
                 }
                 else if ( ! is_checked ) {
                   element_value = '';
@@ -468,10 +468,15 @@ var QueryWrangler = {};
               if ( element_value ) {
                 new_title.push( 'In Use' );
               }
+              else {
+                new_title.push( 'None' );
+              }
               break;
 
             case 'SELECT':
-              new_title.push( element_value );
+              if ( element_value != '__none__' ) {
+                new_title.push( element_value );
+              }
               break;
           }
         } );

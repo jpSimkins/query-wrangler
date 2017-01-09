@@ -594,7 +594,7 @@ class QW_Admin_Pages {
 
 			}
 			else if ( isset( $basic['form_callback'] ) && is_callable( $basic['form_callback'] ) ) {
-				call_user_func( $basic['form_callback'], $basic, $options[ $basic['option_type'] ] );
+				call_user_func( $basic['form_callback'], $basic, $options['display'] );
 			}
 			$basics[ $basic_key ]['wrapper_form'] = ob_get_clean();
 		}

@@ -2,14 +2,18 @@
 // hook into qw_basics
 add_filter( 'qw_basics', 'qw_basic_settings_style' );
 
-/*
- * Styles with settings
+/**
+ * Display Styles
+ *
+ * @param $basics
+ *
+ * @return array
  */
-function qw_basic_settings_style( $basics ) {
+function qw_basic_settings_style( $basics )
+{
 	$basics['style'] = array(
-		'title'         => __( 'Wrapper Style' ),
+		'title'         => __( 'Format' ),
 		'description'   => __( 'How this query should be styled' ),
-		'option_type'   => 'display',
 		'form_callback' => 'qw_basic_display_style_form',
 		'weight'        => 2,
 		'required'      => true,
@@ -19,6 +23,7 @@ function qw_basic_settings_style( $basics ) {
 }
 
 /**
+ *
  * @param $item
  * @param $display
  */
@@ -39,15 +44,6 @@ function qw_basic_display_style_form( $item, $display ) {
 		'value' => isset( $display['style'] ) ? $display['style'] : '',
 		'options' => $styles,
 		'class' => array( 'qw-js-title' ),
-	) );
-
-	print $form->render_field( array(
-		'title' => __( 'Wrapper Classes' ),
-		'description' => __( 'The CSS class names will be added to the query. This enables you to use specific CSS code for each query. You may define multiples classes separated by spaces.' ),
-		'type' => 'text',
-		'name' => 'wrapper-classes',
-		'value' => isset( $display['wrapper-classes'] ) ? $display['wrapper-classes'] : '',
-		'class' => array( 'qw-text-long', 'qw-js-title' ),
 	) );
 	?>
 
