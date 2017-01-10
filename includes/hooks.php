@@ -1,46 +1,70 @@
 <?php
-/*
+
+/**
+ * Simple helper functions for very common task of recording an item's original
+ * unique index.
+ *
+ * @param $items
+ *
+ * @return mixed
+ */
+function qw_set_hook_keys( $items )
+{
+	foreach( $items as $hook_key => $item ){
+		$items[ $hook_key ]['hook_key'] = $hook_key;
+	}
+	return $items;
+}
+
+/**
  * All Handlers
  *
  * Handlers are groups of items that can be added and removed from a query
  * eg: filters, sorts, fields
+ *
+ * @return array
  */
-function qw_all_handlers() {
+function qw_all_handlers()
+{
 	$handlers = apply_filters( 'qw_handlers', array() );
+	$handlers = qw_set_hook_keys( $handlers );
+
 	foreach ( $handlers as $hook_key => $handler ) {
-		$handlers[ $hook_key ]['hook_key']  = $hook_key;
 		$handlers[ $hook_key ]['all_items'] = call_user_func( $handler['all_callback'] );
 	}
 
 	return $handlers;
 }
 
-/*
- * Basic Settings
+/**
+ * Get all "Basic" types registered w/ QW
+ *
+ * @return array
  */
-function qw_all_basic_settings() {
+function qw_all_basic_settings()
+{
 	$basics = apply_filters( 'qw_basics', array() );
-
-	foreach ( $basics as $hook_key => $basic ) {
-		$basics[ $hook_key ]['hook_key']    = $hook_key;
-	}
+	$basics = qw_set_hook_keys( $basics );
 
 	uasort( $basics, 'qw_cmp' );
 
 	return $basics;
 }
 
-/*
- * Fields Hook
+/**
+ * Get all "Field" handler item types
+ *
+ * @return array
  */
-function qw_all_fields() {
+function qw_all_fields()
+{
 	$fields = apply_filters( 'qw_fields', array() );
+	$fields = qw_set_hook_keys( $fields );
+
 	foreach ( $fields as $type => $field ) {
 		if ( ! isset( $field['type'] ) ) {
 			$fields[ $type ]['type'] = $type;
 		}
-		// maintain the hook's key
-		$fields[ $type ]['hook_key'] = $type;
 	}
 
 	// sort them by title
@@ -53,19 +77,21 @@ function qw_all_fields() {
 	return $fields;
 }
 
-/*
- * filters Hook
+/**
+ * Get all "Filter" handler item types
+ *
+ * @return array
  */
-function qw_all_filters() {
+function qw_all_filters()
+{
 	$filters = apply_filters( 'qw_filters', array() );
+	$filters = qw_set_hook_keys( $filters );
 
 	foreach ( $filters as $type => $filter ) {
 		// set filter's type as a value if not provided by filter
 		if ( ! isset( $filter['type'] ) ) {
 			$filters[ $type ]['type'] = $type;
 		}
-		// maintain the hook's key
-		$filters[ $type ]['hook_key'] = $type;
 	}
 
 	// sort them by title
@@ -78,20 +104,21 @@ function qw_all_filters() {
 	return $filters;
 }
 
-/*
- * overrides Hook
+/**
+ * Get all "Override" handler item types
+ *
+ * @return array
  */
-function qw_all_overrides() {
+function qw_all_overrides()
+{
 	$overrides = apply_filters( 'qw_overrides', array() );
+	$overrides = qw_set_hook_keys( $overrides );
 
 	foreach ( $overrides as $type => $override ) {
 		// set override's type as a value if not provided by override
 		if ( empty( $override['type'] ) ) {
 			$overrides[ $type ]['type'] = $type;
 		}
-
-		// maintain the hook's key
-		$overrides[ $type ]['hook_key'] = $type;
 	}
 
 	// sort them by title
@@ -104,20 +131,21 @@ function qw_all_overrides() {
 	return $overrides;
 }
 
-/*
- * Sort Options Hook
+/**
+ * Get all "Sort" (Order) handler item types
+ *
+ * @return array
  */
-function qw_all_sort_options() {
+function qw_all_sort_options()
+{
 	$sort_options = apply_filters( 'qw_sort_options', array() );
+	$sort_options = qw_set_hook_keys( $sort_options );
 
 	// set some defaults for very simple hooks
 	foreach ( $sort_options as $type => $option ) {
 		if ( ! isset( $option['type'] ) ) {
 			$sort_options[ $type ]['type'] = $type;
 		}
-
-		// maintain hook's key
-		$sort_options[ $type ]['hook_key'] = $type;
 	}
 
 	// sort them by title
@@ -130,87 +158,47 @@ function qw_all_sort_options() {
 	return $sort_options;
 }
 
-/*
- * Post Statuses
- */
-function qw_all_post_statuses() {
-	$default = array(
-		'publish' => array(
-			'title' => __( 'Published' ),
-		) ,
-		'pending' => array(
-			'title' => __( 'Pending' ),
-		) ,
-		'draft' => array(
-			'title' => __( 'Draft' ),
-		) ,
-		'future' => array(
-			'title' => __( 'Future (Scheduled)' ),
-		) ,
-		'trash' => array(
-			'title' => __( 'Trashed' ),
-		) ,
-		'private' => array(
-			'title' => __( 'Private' ),
-		) ,
-		'any' => array(
-			'title' => __( 'Any' ),
-		) ,
-	);
-
-	$post_statuses = apply_filters( 'qw_post_statuses', $default );
-
-	return $post_statuses;
-}
-
 /**
- * Styles Hook
+ * Get all Template Style options for the Basic "Style" handler item type
  *
  * return array
  */
-function qw_all_styles() {
+function qw_all_styles()
+{
 	$styles = apply_filters( 'qw_styles', array() );
+	$styles = qw_set_hook_keys( $styles );
 
-	foreach ( $styles as $hook_key => $style ) {
-		$styles[ $hook_key ]['hook_key']    = $hook_key;
-		//$styles[ $hook_key ]['form_prefix'] = QW_FORM_PREFIX . "[display][style_settings][{$hook_key}]";
-
-//		if ( ! isset( $style['settings_key'] ) ) {
-//			$styles[ $hook_key ]['settings_key'] = $hook_key . '_settings';
-//		}
-	}
+//	foreach ( $styles as $hook_key => $style ) {
+//		$styles[ $hook_key ]['form_prefix'] = QW_FORM_PREFIX . "[display][style_settings][{$style['settings_key']}]";
+//	}
 
 	return $styles;
 }
 
 /**
- * Row Styles Hook
+ * Get all Row Style options for the Basic "Row Styles" handler item type
  *
  * @return array
  */
 function qw_all_row_styles()
 {
 	$row_styles = apply_filters( 'qw_row_styles', array() );
-
-	foreach ( $row_styles as $hook_key => $row_style ) {
-		$row_styles[ $hook_key ]['hook_key'] = $hook_key;
-	}
+	$row_styles = qw_set_hook_keys( $row_styles );
 
 	return $row_styles;
 }
 
 /**
- * Pager types
+ * Get all Pager options for the Basic "Pager" handler item type
  *
  * @return array
  */
 function qw_all_pager_types()
 {
 	$pagers = apply_filters( 'qw_pager_types', array() );
+	$pagers = qw_set_hook_keys( $pagers );
 
 	foreach( $pagers as $hook_key => $pager ){
-		$pagers[ $hook_key ]['hook_key'] = $hook_key;
-
 		if ( !empty( $pager['settings_key'] ) ){
 			$pagers[ $hook_key ]['form_prefix'] = QW_FORM_PREFIX . "[display][pager][{$pager['settings_key']}]";
 		}
@@ -219,11 +207,76 @@ function qw_all_pager_types()
 	return $pagers;
 }
 
-/*
- * File Styles Hook
+/**
+ * Meta value field display handlers
+ *
+ * @return array
  */
-function qw_all_file_styles() {
+function qw_get_meta_value_display_handlers()
+{
+	$displays = apply_filters( 'qw_meta_value_display_handlers', array() );
+	$displays = qw_set_hook_keys( $displays );
 
+	return $displays;
+}
+
+/**
+ * List of all public Post Types registered in WordPress
+ *
+ * @return array
+ */
+function qw_all_post_types()
+{
+	// Get all verified post types
+	$post_types = get_post_types( array(
+		'public'   => TRUE,
+		'_builtin' => FALSE
+	),
+	'names',
+	'and' );
+
+	// Add standard types
+	$post_types['post'] = 'post';
+	$post_types['page'] = 'page';
+
+	$post_types = apply_filters( 'qw_post_types', $post_types );
+
+	// sort types
+	ksort( $post_types );
+
+	return $post_types;
+}
+
+/**
+ * Get a simple list of WP post_status values and titles
+ *
+ * @return array
+ */
+function qw_all_post_statuses() {
+
+	$post_stati = array(
+		'any' => array(
+			'title' => __( 'Any' ),
+		)
+	);
+
+	foreach( get_post_stati( array(), 'objects' ) as $post_status )
+	{
+		$post_stati[ $post_status->name ]['title'] = $post_status->label;
+	}
+
+	$post_stati = apply_filters( 'qw_post_statuses', $post_stati );
+
+	return $post_stati;
+}
+
+/**
+ * Simple list of all File Styles used by certain "Field" handler item types
+ *
+ * @return array
+ */
+function qw_all_file_styles()
+{
 	$default = array(
 		'link' => array(
 			'title' => __( 'Filename Link to File' ),
@@ -241,105 +294,13 @@ function qw_all_file_styles() {
 	return $styles;
 }
 
-/*
- * Post types
- */
-function qw_all_post_types() {
-	$post_types = apply_filters( 'qw_post_types', array() );
-
-	// Get all verified post types
-	$post_types += get_post_types( array(
-		'public'   => TRUE,
-		'_builtin' => FALSE
-	),
-		'names',
-		'and' );
-	// Add standard types
-	$post_types['post'] = 'post';
-	$post_types['page'] = 'page';
-	// sort types
-	ksort( $post_types );
-
-	return $post_types;
-}
-
-/*
+/**
  * Return Default Template File
+ *
+ * @return string
  */
 function qw_default_template_file() {
 	return apply_filters( 'qw_default_template_file', 'index.php' );
 }
 
 
-/**
- * default custom_field (meta_value_new) field display handlers
- */
-
-function qw_get_meta_value_display_handlers(){
-	return apply_filters( 'qw_meta_value_display_handlers', array() );
-}
-
-// add default meta value handlers
-add_filter( 'qw_meta_value_display_handlers', 'qw_meta_value_display_handlers_default' );
-
-/*
- * Default meta value handlers
- */
-function qw_meta_value_display_handlers_default( $handlers ) {
-	$handlers['none'] = array(
-		'title'    => '-none-',
-		'callback' => 'qw_get_post_meta',
-	);
-	// advanced custom fields: http://wordpress.org/plugins/advanced-custom-fields/
-	if ( function_exists( 'get_field' ) ) {
-		$handlers['acf_default'] = array(
-			'title'    => 'Advanced Custom Fields: get_field',
-			'callback' => 'qw_get_acf_field',
-		);
-	}
-	// cctm: https://wordpress.org/plugins/custom-content-type-manager/
-	if ( function_exists( 'get_custom_field' ) ) {
-		$handlers['cctm_default'] = array(
-			'title'    => 'CCTM: get_custom_field',
-			'callback' => 'qw_get_cctm_field',
-		);
-	}
-
-	return $handlers;
-}
-
-/*
- * return simple get_post_meta array
- */
-function qw_get_post_meta( $post, $field ) {
-	return get_post_meta( $post->ID, $field['meta_key'] );
-}
-
-/*
- * Advanced custom field generic handler
- */
-function qw_get_acf_field( $post, $field ) {
-	$output = '';
-	if ( function_exists( 'get_field' ) ) {
-		$output = get_field( $field['meta_key'], $post->ID );
-	}
-
-	return $output;
-}
-
-/*
- * Custom Content Type Manager generic field handler
- */
-function qw_get_cctm_field( $post, $field ) {
-	$output = '';
-	if ( function_exists( 'get_custom_field' ) ) {
-		$field_name = $field['meta_key'];
-		if ( isset( $field['cctm_chaining'] ) && ! empty( $field['cctm_chaining'] ) ) {
-			$field_name = $field_name . $field['cctm_chaining'];
-		}
-
-		$output = get_custom_field( $field_name );
-	}
-
-	return $output;
-}

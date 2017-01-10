@@ -35,14 +35,6 @@ function qw_filter_search( $filters ) {
 	return $filters;
 }
 
-///**
-// * @param $args
-// * @param $filter
-// */
-//function qw_generate_query_args_search( &$args, $filter ) {
-//	$args['s'] = $filter['values']['search'];
-//}
-
 /**
  * Process submitted exposed form values
  *

@@ -108,6 +108,11 @@ function qw_template_query( &$wp_query, $options ) {
 		$all_styles = qw_all_styles();
 
 		$style = $all_styles[ $options['display']['style'] ];
+		$style['settings'] = array();
+
+		if ( isset( $style['settings_key'], $options['display'][ $style['settings_key'] ] ) ) {
+			$style['settings'] = $options['display'][ $style['settings_key'] ];
+		}
 
 		// setup row template arguments
 		$template_args = array(
@@ -115,11 +120,8 @@ function qw_template_query( &$wp_query, $options ) {
 			'slug'     => $options['meta']['slug'],
 			'style'    => $style['hook_key'],
 			'options'  => $options,
+			'style_settings' => $style['settings'],
 		);
-
-		if ( isset( $options['display'][ $style['settings_key'] ] ) ) {
-			$template_args['style_settings'] = $options['display'][ $style['settings_key'] ];
-		}
 
 		$row_styles = qw_all_row_styles();
 		$row_style = $row_styles[ $options['display']['row_style'] ];

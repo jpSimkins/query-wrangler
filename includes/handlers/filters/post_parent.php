@@ -30,14 +30,6 @@ function qw_filter_post_parent( $filters ) {
 }
 
 /**
- * @param $args
- * @param $filter
- */
-//function qw_generate_query_args_post_parent( &$args, $filter ) {
-//	$args['post_parent'] = $filter['values']['post_parent'];
-//}
-
-/**
  * Process submitted exposed form values
  *
  * @param $args

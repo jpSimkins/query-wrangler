@@ -10,6 +10,7 @@ add_filter( 'qw_generate_query_args', 'qw_generate_exposed_filter_callback_args'
  * @param int $query_id Id for the query
  * @param array $options_override an array for changing or adding query data options
  * @param bool $reset_post_data Reset the $wp_query after execution
+ *
  * @return string Can return a string of html based on parameter $return
  */
 function qw_execute_query( $query_id, $options_override = array(), $reset_post_data = TRUE )
@@ -20,6 +21,114 @@ function qw_execute_query( $query_id, $options_override = array(), $reset_post_d
 		->execute( $reset_post_data );
 
 	return $qw_query->output;
+}
+
+/**
+ * Get an existing query as QW_Query object
+ *
+ * @param $id
+ *
+ * @return null|QW_Query
+ */
+function qw_get_query( $id ) {
+	if ( ! empty( $id ) ) {
+		$query = new QW_Query( $id );
+
+		if ( $query && is_a( $query, 'QW_Query' ) && ! $query->is_new ) {
+			return $query;
+		}
+	}
+
+	return NULL;
+}
+
+/**
+ * Create a new empty QW_Query
+ *
+ * @return QW_Query object
+ */
+function qw_create_query() {
+	return new QW_Query();
+}
+
+
+/**
+ * Default values for  new query
+ *
+ * @return array Default query settings
+ */
+function qw_default_query_data() {
+	return
+		array (
+			'display' => array (
+				'title' => '',
+				'style' => 'unformatted',
+				'row_style' => 'posts',
+				'post_settings' => array (
+					'size' => 'complete',
+				),
+				'field_settings' => array (
+					'group_by_field' => '__none__',
+				),
+				'template_part_settings' => array (
+					'path' => '',
+					'name' => '',
+				),
+				'header' => '',
+				'footer' => '',
+				'empty' => '',
+				'wrapper-classes' => '',
+				'page' => array (
+					'pager' => array (
+						'active' => '0',
+						'type' => 'default',
+					),
+				),
+			),
+			'args' => array (
+				'sorts' => array (
+					'date' => array (
+						'weight' => '0',
+						'type' => 'date',
+						'hook_key' => 'post_date',
+						'name' => 'date',
+						'order_value' => 'DESC',
+					),
+				),
+				'filters' => array (
+					'posts_per_page' => array (
+						'weight' => '0',
+						'type' => 'posts_per_page',
+						'hook_key' => 'posts_per_page',
+						'name' => 'posts_per_page',
+						'posts_per_page' => '5',
+					),
+					'post_status' => array (
+						'weight' => '1',
+						'type' => 'post_status',
+						'hook_key' => 'post_status',
+						'name' => 'post_status',
+						'post_status' => array( 'publish' => 'publish' ),
+					),
+					'post_types' => array (
+						'weight' => '2',
+						'type' => 'post_types',
+						'hook_key' => 'post_types',
+						'name' => 'post_types',
+						'post_types' => array (
+							'post' => 'post',
+						),
+					),
+					'ignore_sticky_posts' => array (
+						'weight' => '3',
+						'type' => 'ignore_sticky_posts',
+						'hook_key' => 'ignore_sticky_posts',
+						'name' => 'ignore_sticky_posts',
+						'ignore_sticky_posts' => 'on',
+					),
+				),
+			),
+		);
 }
 
 /**
@@ -118,92 +227,13 @@ function qw_generate_exposed_filter_callback_args( $args, $options ){
 
 	return $args;
 }
-/**
- * Get a query's id by using its slug
- */
-function qw_get_query_by_slug( $slug ) {
-	global $wpdb;
-
-	return $wpdb->get_var( $wpdb->prepare( "SELECT id FROM " . $wpdb->prefix . "query_wrangler WHERE `slug` = '%s'",
-		$slug ) );
-}
 
 /**
- * Get an unserialized query row from the database, using the query's id
- *
- * @param $id
- *
- * @return bool|mixed
- */
-function qw_get_query_by_id( $id ) {
-	global $wpdb;
-	$table = $wpdb->prefix . 'query_wrangler';
-	$sql   = "SELECT * FROM $table WHERE id = %d LIMIT 1";
-	$query = $wpdb->get_row( $wpdb->prepare( $sql, $id ) );
-
-	if ( $query ) {
-		$query->data = qw_unserialize( $query->data );
-
-		return $query;
-	}
-
-	return FALSE;
-}
-
-/**
- * Get a query's id by that is set to override a specific term_id
- *
- * @param $term_id
- *
- * @return bool
- */
-function qw_get_query_by_override_term( $term_id ) {
-
-	global $wpdb;
-	$qw_table  = $wpdb->prefix . "query_wrangler";
-	$qot_table = $wpdb->prefix . "query_override_terms";
-
-	$sql = "SELECT qw.id FROM " . $qw_table . " as qw
-              LEFT JOIN " . $qot_table . " as ot ON ot.query_id = qw.id
-              WHERE qw.type = 'override' AND ot.term_id = %d
-              LIMIT 1";
-
-	$row = $wpdb->get_row( $wpdb->prepare( $sql, $term_id ) );
-
-	if ( $row ) {
-		return $row->id;
-	}
-
-	return FALSE;
-}
-
-/*
- * Get all queries of the type widget
- *
- * @return array of query widgets with key as query id
- */
-function qw_get_all_widgets() {
-	global $wpdb;
-	$table_name = $wpdb->prefix . "query_wrangler";
-	$sql        = "SELECT id,name FROM " . $table_name . " WHERE type = 'widget'";
-	$rows       = $wpdb->get_results( $sql );
-
-	if ( is_array( $rows ) ) {
-		$widgets = array();
-		foreach ( $rows as $row ) {
-			$widgets[ $row->id ] = $row->name;
-		}
-
-		return $widgets;
-	}
-}
-
-/*
  * Helper function: Get the current page number
+ *
  * @param object $qw_query - the query being displayed
  *
- * @return
- *    int - the currentpage number
+ * @return int - the currentpage number
  */
 function qw_get_page_number( $qw_query = NULL ) {
 	// help figure out the current page
@@ -232,23 +262,33 @@ function qw_get_page_number( $qw_query = NULL ) {
 	return $page;
 }
 
-/*
+/**
  * Trim each item in an array w/ array_walk
  *   eg: array_walk($fruit, 'qw_trim');
+ *
+ * @param mixed
  */
 function qw_trim( &$value ) {
 	$value = trim( $value );
 }
 
-/*
+/**
  * Serialize wrapper functions for future changes.
+ *
+ * @param $array
+ *
+ * @return string
  */
 function qw_serialize( $array ) {
 	return serialize( $array );
 }
 
-/*
+/**
  * Custom: Fix unserialize problem with quotation marks
+ *
+ * @param $serial_str
+ *
+ * @return array
  */
 function qw_unserialize( $serial_str ) {
 	$data = maybe_unserialize( $serial_str );
@@ -276,8 +316,13 @@ function qw_unserialize( $serial_str ) {
 	return $default;
 }
 
-/*
+/**
  * Support function for legacy, pre hook_keys discovery
+ *
+ * @param $all
+ * @param $single
+ *
+ * @return int|string
  */
 function qw_get_hook_key( $all, $single ) {
 	// default to new custom_field (meta_value_new)
@@ -302,27 +347,31 @@ function qw_get_hook_key( $all, $single ) {
 	return $hook_key;
 }
 
-/*
+/**
  * Replace contextual tokens within a string
  *
- * @params string $args - a query argument string
+ * @param string $args - a query argument string
  *
  * @return string - query argument string with tokens replaced with values
  */
 function qw_contextual_tokens_replace( $args ) {
 	$matches = array();
 	preg_match_all( '/{{([^}]*)}}/', $args, $matches );
-	if ( isset( $matches[1] ) ) {
+
+	if ( isset( $matches[1] ) )
+	{
 		global $post;
 
-		foreach ( $matches[1] as $i => $context_token ) {
-			if ( stripos( $context_token, ':' ) !== FALSE ) {
+		foreach ( $matches[1] as $i => $context_token )
+		{
+			if ( stripos( $context_token, ':' ) !== FALSE )
+			{
 				$a = explode( ':', $context_token );
-				if ( $a[0] == 'post' && isset( $post->{$a[1]} ) ) {
-					$args = str_replace( $matches[0][ $i ],
-						$post->{$a[1]},
-						$args );
-				} else if ( $a[0] == 'query_var' && $replace = get_query_var( $a[1] ) ) {
+				if ( $a[0] == 'post' && isset( $post->{$a[1]} ) )
+				{
+					$args = str_replace( $matches[0][ $i ], $post->{$a[1]}, $args );
+				}
+				else if ( $a[0] == 'query_var' && $replace = get_query_var( $a[1] ) ) {
 					$args = str_replace( $matches[0][ $i ], $replace, $args );
 				}
 			}
@@ -332,8 +381,13 @@ function qw_contextual_tokens_replace( $args ) {
 	return $args;
 }
 
-/*
- * usort callback. I likely stole this from somewhere.. like php.net
+/**
+ * usort callback - sort by 'weight' key in array
+ *
+ * @param $a
+ * @param $b
+ *
+ * @return int
  */
 function qw_cmp( $a, $b ) {
 	if ( $a['weight'] == $b['weight'] ) {
@@ -341,155 +395,4 @@ function qw_cmp( $a, $b ) {
 	}
 
 	return ( $a['weight'] < $b['weight'] ) ? - 1 : 1;
-}
-
-/*
- * Default values for  new query
- *
- * @return array Default query settings
- */
-function qw_default_query_data() {
-	return
-	array (
-		'display' => array (
-			'title' => '',
-			'style' => 'unformatted',
-			'row_style' => 'posts',
-			'post_settings' => array (
-				'size' => 'complete',
-			),
-			'field_settings' => array (
-				'group_by_field' => '__none__',
-			),
-			'template_part_settings' => array (
-				'path' => '',
-				'name' => '',
-			),
-			'header' => '',
-			'footer' => '',
-			'empty' => '',
-			'wrapper-classes' => '',
-			'page' => array (
-				'pager' => array (
-					'active' => '0',
-					'type' => 'default',
-					'previous' => '',
-					'next' => '',
-				),
-			),
-		),
-		'args' => array (
-			'sorts' => array (
-				'date' => array (
-					'weight' => '0',
-					'type' => 'date',
-					'hook_key' => 'post_date',
-					'name' => 'date',
-					'order_value' => 'DESC',
-				),
-			),
-			'filters' => array (
-				'posts_per_page' => array (
-					'weight' => '0',
-					'type' => 'posts_per_page',
-					'hook_key' => 'posts_per_page',
-					'name' => 'posts_per_page',
-					'posts_per_page' => '5',
-				),
-				'post_status' => array (
-					'weight' => '1',
-					'type' => 'post_status',
-					'hook_key' => 'post_status',
-					'name' => 'post_status',
-					'post_status' => array( 'publish' => 'publish' ),
-				),
-				'post_types' => array (
-					'weight' => '2',
-					'type' => 'post_types',
-					'hook_key' => 'post_types',
-					'name' => 'post_types',
-					'post_types' => array (
-						'post' => 'post',
-					),
-				),
-				'ignore_sticky_posts' => array (
-					'weight' => '3',
-					'type' => 'ignore_sticky_posts',
-					'hook_key' => 'ignore_sticky_posts',
-					'name' => 'ignore_sticky_posts',
-					'ignore_sticky_posts' => 'on',
-				),
-			),
-		),
-	);
-}
-
-/**
- * Get an existing query as QW_Query object
- *
- * @param $id
- *
- * @return null|QW_Query
- */
-function qw_get_query( $id ) {
-	if ( ! empty( $id ) ) {
-		$query = new QW_Query( $id );
-
-		if ( $query && is_a( $query, 'QW_Query' ) && ! $query->is_new ) {
-			return $query;
-		}
-	}
-
-	return NULL;
-}
-
-/**
- * Create a new empty QW_Query
- */
-function qw_create_query() {
-	return new QW_Query();
-}
-
-
-/**
- * Most simple filters can use the same callback for query argument generation.
- * This looks for a value in the filter who's key in the values array
- * is the filter's hook_key.
- *
- * @param $args
- * @param $filter
- */
-function qw_simple_filter_args_callback( &$args, $filter ){
-	$key = $filter['hook_key'];
-
-	if ( isset( $filter['values'][ $key ] ) ){
-		$args[ $key ] = $filter['values'][ $key ];
-	}
-}
-
-/**
- * A filter query args callback that allows the filter item itself define some
- * dynamic aspects of how the filter values are transposed into args values.
- *
- * @param $args
- * @param $filter
- */
-function qw_dynamic_filter_args_callback( &$args, $filter ){
-	if ( !empty( $filter['query_args_process'] ) ){
-		foreach( $filter['query_args_process'] as $args_key => $process ) {
-			if ( isset( $filter['values'][ $process['values_key'] ] ) ){
-				$value = $filter['values'][ $process['values_key'] ];
-
-				if ( !empty( $process['process_callbacks'] ) ){
-					foreach( $process['process_callbacks'] as $callback ){
-						if ( is_callable( $callback ) ){
-							$value = call_user_func( $callback, $value );
-						}
-					}
-				}
-
-				$args[ $args_key ] = $value;
-			}
-		}
-	}
 }

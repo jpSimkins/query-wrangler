@@ -13,7 +13,7 @@ function qw_filter_callback( $filters ) {
 	$filters['callback'] = array(
 		'title'               => __( 'Callback' ),
 		'description'         => __( 'Provide a callback that can alter the query arguments in any way.' ),
-		'query_args_callback' => 'qw_filter_callback_execute',
+		'query_args_callback' => 'qw_generate_query_args_filter_callback_execute',
 		'query_display_types' => array( 'page', 'widget', 'override' ),
 		'form_fields' => array(
 			'callback' => array(
@@ -36,7 +36,7 @@ function qw_filter_callback( $filters ) {
  * @param $args
  * @param $filter
  */
-function qw_filter_callback_execute( &$args, $filter ) {
+function qw_generate_query_args_filter_callback_execute( &$args, $filter ) {
 	if ( isset( $filter['values']['callback'] ) && is_callable( $filter['values']['callback'] ) ) {
 		$args = call_user_func( $filter['values']['callback'], $args, $filter );
 	}

@@ -174,3 +174,57 @@ function qw_simple_filters( $filters ){
 
 	return $filters;
 }
+
+/**
+ * Most simple filters can use the same callback for query argument generation.
+ * This looks for a value in the filter who's key in the values array
+ * is the filter's hook_key.
+ *
+ * @param $args
+ * @param $filter
+ */
+function qw_simple_filter_args_callback( &$args, $filter ){
+	$key = $filter['hook_key'];
+
+	if ( isset( $filter['values'][ $key ] ) ){
+		$value = $filter['values'][ $key ];
+
+		if ( is_string( $value ) ){
+			$value = qw_contextual_tokens_replace( $value );
+		}
+		else if ( is_array( $value ) ) {
+			foreach( $value as $item_key => $item_value ){
+				$value[ $item_key ] = qw_contextual_tokens_replace( $item_value );
+			}
+		}
+
+		$args[ $key ] = $value;
+	}
+}
+
+/**
+ * A filter query args callback that allows the filter item itself define some
+ * dynamic aspects of how the filter values are transposed into args values.
+ *
+ * @param $args
+ * @param $filter
+ */
+function qw_dynamic_filter_args_callback( &$args, $filter ){
+	if ( !empty( $filter['query_args_process'] ) ){
+		foreach( $filter['query_args_process'] as $args_key => $process ) {
+			if ( isset( $filter['values'][ $process['values_key'] ] ) ){
+				$value = $filter['values'][ $process['values_key'] ];
+
+				if ( !empty( $process['process_callbacks'] ) ){
+					foreach( $process['process_callbacks'] as $callback ){
+						if ( is_callable( $callback ) ){
+							$value = call_user_func( $callback, $value );
+						}
+					}
+				}
+
+				$args[ $args_key ] = $value;
+			}
+		}
+	}
+}

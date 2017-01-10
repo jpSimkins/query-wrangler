@@ -28,15 +28,6 @@ function qw_filter_post_types( $filters ) {
 }
 
 /*
- * Add query args as necessary
- */
-//function qw_filter_post_types_args( &$args, $filter ) {
-//	if ( isset( $filter['values']['post_types'] ) ) {
-//		$args['post_type'] = $filter['values']['post_types'];
-//	}
-//}
-
-/*
  * Exposed settings form
  */
 function qw_filter_post_types_exposed_settings_form( $filter ) {

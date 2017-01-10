@@ -55,6 +55,7 @@ class Query_Wrangler {
 		include_once QW_PLUGIN_DIR . '/includes/hooks.php';
 		include_once QW_PLUGIN_DIR . '/includes/pages.php';
 		include_once QW_PLUGIN_DIR . '/includes/query.php';
+		include_once QW_PLUGIN_DIR . '/includes/query-db.php';
 		include_once QW_PLUGIN_DIR . '/includes/theme.php';
 		include_once QW_PLUGIN_DIR . '/includes/exposed.php';
 
@@ -158,6 +159,11 @@ class Query_Wrangler {
 				'style_table',
 				'style_ordered_list',
 				'style_unordered_list',
+			),
+			'includes/meta_value_displays' => array(
+				'raw',
+				'acf_default',
+				'cctm_default',
 			),
 		);
 
