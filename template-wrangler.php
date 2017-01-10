@@ -167,15 +167,15 @@ function tw_process_template( &$template ) {
 		}
 	}
 
-	// if there is a theme based preprocess function, run it on the arguments
-	if ( function_exists( $theme_folder . '_' . $template['name'] . '_preprocess' ) ) {
-		$preprocess = $theme_folder . '_' . $template['name'] . '_preprocess';
-		$template   = call_user_func( $preprocess, $template );
-	} // else if there is a default preprocess function, run it on the arguments
-	else if ( function_exists( 'theme_' . $template['name'] . '_preprocess' ) ) {
-		$preprocess = 'theme_' . $template['name'] . '_preprocess';
-		$template   = call_user_func( $preprocess, $template );
-	}
+//	// if there is a theme based preprocess function, run it on the arguments
+//	if ( function_exists( $theme_folder . '_' . $template['name'] . '_preprocess' ) ) {
+//		$preprocess = $theme_folder . '_' . $template['name'] . '_preprocess';
+//		$template   = call_user_func( $preprocess, $template );
+//	} // else if there is a default preprocess function, run it on the arguments
+//	else if ( function_exists( 'theme_' . $template['name'] . '_preprocess' ) ) {
+//		$preprocess = 'theme_' . $template['name'] . '_preprocess';
+//		$template   = call_user_func( $preprocess, $template );
+//	}
 
 	// if no templates were given, look for theme functions
 	if ( ! isset( $template['files'] ) ) {

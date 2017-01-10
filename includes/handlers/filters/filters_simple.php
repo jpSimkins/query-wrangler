@@ -36,7 +36,7 @@ function qw_simple_filters( $filters ){
 				'type' => 'text',
 				'name' => 'meta_key',
 				'description' => __( 'The meta_key for filtering results.' ),
-				'class' => array( 'qw-js-title' ),
+				'class' => array( 'qw-js-title', 'qw-meta-value-key-autocomplete' ),
 			)
 		)
 	);
@@ -66,7 +66,7 @@ function qw_simple_filters( $filters ){
 				'type' => 'text',
 				'name' => 'meta_key',
 				'title' => __( 'Meta Key' ),
-				'class' => array( 'qw-js-title' ),
+				'class' => array( 'qw-js-title', 'qw-meta-value-key-autocomplete' ),
 			),
 			'meta_compare' => array(
 				'type' => 'select',

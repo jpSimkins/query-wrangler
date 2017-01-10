@@ -34,7 +34,7 @@ function qw_filter_meta_query_form( $filter ) {
 	    'name' => 'key',
 	    'title' => __( 'Meta Key' ),
 	    'value' => isset( $filter['values']['key'] ) ? $filter['values']['key'] : '',
-	    'class' => array( 'qw-js-title' ),
+	    'class' => array( 'qw-js-title', 'qw-meta-value-key-autocomplete' ),
 	) );
 
 	print $form->render_field( array(

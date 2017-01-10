@@ -33,9 +33,11 @@ var QueryWrangler = {};
       }
 
       // provide meta_value_field key suggestions
-      $( '.qw-meta-value-key-autocomplete' ).autocomplete( {
-        source: QueryWrangler.ajax.metaValueKeySearch
-      } );
+      $('body').on('keydown.autocomplete', '.qw-meta-value-key-autocomplete', {}, function(){
+        $( this ).autocomplete( {
+          source: QueryWrangler.ajax.metaValueKeySearch
+        } );
+      });
 
       // get our core hook data
       QueryWrangler.ajax.getQwData();

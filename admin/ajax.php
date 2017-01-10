@@ -1,5 +1,9 @@
 <?php
 
+add_action( 'wp_ajax_qw_form_ajax', 'qw_form_ajax' );
+add_action( 'wp_ajax_qw_data_ajax', 'qw_data_ajax' );
+add_action( 'wp_ajax_qw_meta_key_autocomplete', 'qw_meta_key_autocomplete' );
+
 /**
  * Ajax for form templates
  */
@@ -40,7 +44,7 @@ function qw_form_ajax() {
 	exit;
 }
 
-/*
+/**
  * Random data grabs
  */
 function qw_data_ajax() {
@@ -56,8 +60,64 @@ function qw_data_ajax() {
 	}
 }
 
-/*
+/**
+ * Edit - JSON data for js
+ *
+ * @param null $query_id
+ * @return mixed|string|void
+ */
+function qw_edit_query_json( $query_id = NULL ) {
+	$data = array(
+		'allFields'      => qw_all_fields(),
+		'allStyles'      => qw_all_styles(),
+		'allRowStyles'   => qw_all_row_styles(),
+		'allPostTypes'   => qw_all_post_types(),
+		'allPagerTypes'  => qw_all_pager_types(),
+		'allImageSizes'  => get_intermediate_image_sizes(),
+		'allFileStyles'  => qw_all_file_styles(),
+		'allFilters'     => qw_all_filters(),
+		'allSortOptions' => qw_all_sort_options(),
+		'allOverrides'   => qw_all_overrides(),
+	);
+
+	// editing a query
+	if ( $query_id && $row = qw_get_query_by_id( $query_id ) ) {
+		$row->options  = $row->data;
+		$data['query'] = $row;
+	}
+
+	return json_encode( $data );
+}
+
+/**
+ * Ajax callback for meta_key autocomplete
+ */
+function qw_meta_key_autocomplete() {
+	if ( isset( $_POST['qw_meta_key_autocomplete'] ) ) {
+		$meta_key = sanitize_text_field( $_POST['qw_meta_key_autocomplete'] );
+
+		global $wpdb;
+		$like = $wpdb->esc_like( $meta_key );
+		$query = $wpdb->prepare(
+			"SELECT DISTINCT(`meta_key`) FROM {$wpdb->postmeta} WHERE `meta_key` LIKE '%s' LIMIT 15",
+			'%' . $like. '%'
+		);
+		$results = $wpdb->get_col( $query );
+
+		wp_send_json( array(
+			'success' => TRUE,
+			'values'  => $results,
+		) );
+	}
+	exit;
+}
+
+/**
  * Scan for all templates used by a single query
+ *
+ * @param $options
+ *
+ * @return array
  */
 function qw_template_scan( $options ) {
 	global $wpdb;
@@ -150,7 +210,9 @@ function qw_template_scan( $options ) {
 }
 
 /**
- * @return array|mixed|void
+ * Get preview developer data into an array of HTML outputs
+ *
+ * @return array
  */
 function qw_get_edit_preview_data(){
 	$decode  = urldecode( $_POST['options'] );
@@ -176,23 +238,18 @@ function qw_get_edit_preview_data(){
 		              <pre>" . print_r( qw_template_scan( $qw_query->options ), 1 ) . "</pre>";
 
 		// php wp_query
-		$php_wpquery = '<pre>$query = ' . var_export( $qw_query->args, 1 ) . ';</pre>';
-
-		// args
-		$args = "<pre>" . print_r( $qw_query->args, TRUE ) . "</pre>";
-
-		// display
-		$display = "<pre>" . htmlentities( print_r( $qw_query->options['display'],TRUE ) ) . "</pre>";
+		$php_wpquery = '<pre>$query = new WP_Query(' . var_export( $qw_query->args, 1 ) . ');</pre>';
 
 		$new_query = "<pre>" . htmlentities( print_r( $qw_query->wp_query, TRUE ) ) . "</pre>";
+
 		$all_options = "<pre>" . htmlentities( print_r( $qw_query->options, TRUE ) ) . "</pre>";
 
 		// return
 		$data = array(
 				'preview'     => $preview,
 				'php_wpquery' => $php_wpquery,
-				'args'        => $args,
-				'display'     => $display,
+				//'args'        => $args,
+				//'display'     => $display,
 				'options'     => $all_options,
 				'wpquery'     => $new_query,
 				'templates'   => $templates,
@@ -205,74 +262,3 @@ function qw_get_edit_preview_data(){
 	return $data;
 }
 
-/**
- * Edit - JSON data for js
- *
- * @param null $query_id
- * @return mixed|string|void
- */
-function qw_edit_query_json( $query_id = NULL ) {
-	$data = array(
-			'allFields'      => qw_all_fields(),
-			'allStyles'      => qw_all_styles(),
-			'allRowStyles'   => qw_all_row_styles(),
-			'allPostTypes'   => qw_all_post_types(),
-			'allPagerTypes'  => qw_all_pager_types(),
-			'allImageSizes'  => get_intermediate_image_sizes(),
-			'allFileStyles'  => qw_all_file_styles(),
-			'allFilters'     => qw_all_filters(),
-			'allSortOptions' => qw_all_sort_options(),
-			'allOverrides'   => qw_all_overrides(),
-	);
-
-	// editing a query
-	if ( $query_id && $row = qw_get_query_by_id( $query_id ) ) {
-		$row->options  = $row->data;
-		$data['query'] = $row;
-	}
-
-	return json_encode( $data );
-}
-
-/**
- * Ajax callback for meta_key autocomplete
- */
-function qw_meta_key_autocomplete() {
-	if ( isset( $_POST['qw_meta_key_autocomplete'] ) ) {
-		$meta_key = sanitize_text_field( $_POST['qw_meta_key_autocomplete'] );
-
-		global $wpdb;
-		$like = $wpdb->esc_like( $meta_key );
-		$query = $wpdb->prepare(
-				"SELECT DISTINCT(`meta_key`) FROM {$wpdb->postmeta} WHERE `meta_key` LIKE '%s' LIMIT 15",
-				'%' . $like. '%'
-		);
-		$results = $wpdb->get_col( $query );
-
-		wp_send_json( array(
-				'success' => TRUE,
-				'values'  => $results,
-		) );
-	}
-	exit;
-}
-
-
-
-/*
- * Generate form prefixes for handlers
- *
- * @param string
- *    $type = sort, field, filter, override
- */
-function qw_make_form_prefix( $type, $name ) {
-	$handlers = qw_all_handlers();
-
-	if ( isset( $handlers[ $type ]['form_prefix'] ) ) {
-		$output = QW_FORM_PREFIX . $handlers[ $type ]['form_prefix'] . '[' . $name . ']';
-	} else {
-		$output = QW_FORM_PREFIX . "[" . $name . "]";
-	}
-
-	return $output;
-}

@@ -203,10 +203,6 @@ class Query_Wrangler {
 
 		QW_Admin_Pages::register( $this->settings, $wpdb );
 
-		add_action( 'wp_ajax_qw_form_ajax', 'qw_form_ajax' );
-		add_action( 'wp_ajax_qw_data_ajax', 'qw_data_ajax' );
-		add_action( 'wp_ajax_qw_meta_key_autocomplete', 'qw_meta_key_autocomplete' );
-
 	}
 
 	// QW_Admin_Pages

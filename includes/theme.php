@@ -3,6 +3,8 @@
 // template wrangler hook
 add_filter( 'tw_templates', 'qw_templates' );
 
+add_filter( 'tw_pre_process_template', 'tw_pre_process_template_display_style', 0 );
+
 /**
  * Template Wrangler templates
  *
@@ -44,40 +46,27 @@ function qw_templates( $templates ) {
 	return $templates;
 }
 
-/*
- * Preprocess query_display_rows to allow field styles to define their own default path
+/**
+ * Filter implements - tw_pre_process_template from template_wrangler
+ *
+ * Process query_display_rows to allow display styles to define their own
+ * default path
+ *
+ * @param $template
+ *
+ * @return array
  */
-function theme_query_display_rows_preprocess( $template ) {
+function tw_pre_process_template_display_style( $template ) {
 	// make sure we know what style to use
-	if ( isset( $template['arguments']['style'] ) ) {
+	if ( !empty( $template['arguments']['style'] ) )
+	{
 		// get the specific style
 		$all_styles = qw_all_styles();
 
 		// set this template's default path to the style's default path
-		if ( isset( $all_styles[ $template['arguments']['style'] ] ) ) {
-			$style                    = $all_styles[ $template['arguments']['style'] ];
-			$template['default_path'] = $style['default_path'];
-		}
-
-		//if(isset($all_styles[$template['preprocess_callback']])){
-		//  $template['preprocess_callback'] = $all_styles[$template['preprocess_callback']];
-		//}
-	}
-
-	return $template;
-}
-
-/*
- * Preprocess query_display_syle to allow field styles to define their own default path
- */
-function theme_query_display_style_preprocess( $template ) {
-	$all_styles = qw_all_styles();
-	// make sure we know what style to use
-	if ( isset( $all_styles[ $template['arguments']['style'] ] ) ) {
-		// get the specific style
-		$style = $all_styles[ $template['arguments']['style'] ];
-		// set this template's default path to the style's default path
-		if ( ! empty( $style['default_path'] ) ) {
+		if ( !empty( $all_styles[ $template['arguments']['style'] ] ) )
+		{
+			$style = $all_styles[ $template['arguments']['style'] ];
 			$template['default_path'] = $style['default_path'];
 		}
 	}
