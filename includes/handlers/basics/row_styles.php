@@ -17,9 +17,33 @@ function qw_basic_settings_row_style( $basics )
 		'form_callback' => 'qw_basic_display_row_style_form',
 		'weight'        => 3,
 		'required'      => true,
+		'form_prefix'   => QW_FORM_PREFIX . '[display]',
 	);
 
 	return $basics;
+}
+
+/**
+ * Get the current settings values saved to this query
+ *
+ * @param $row_styles
+ * @param $display
+ *
+ * @return mixed
+ */
+function qw_row_styles_get_settings_values( $row_styles, $display )
+{
+	foreach ( $row_styles as $hook_key => $style ) {
+		$row_styles[ $hook_key ]['values'] = array();
+
+		if ( !empty( $style['settings_key'] ) &&
+		     !empty( $display[ $style['settings_key'] ] ) )
+		{
+			$row_styles[ $hook_key ]['values'] =  $display[ $style['settings_key'] ];
+		}
+	}
+
+	return $row_styles;
 }
 
 /**
@@ -30,51 +54,30 @@ function qw_basic_settings_row_style( $basics )
  */
 function qw_basic_display_row_style_form( $item, $display )
 {
-	$row_styles = array();
-	foreach ( qw_all_row_styles() as $key => $details ) {
-		$row_styles[ $key ] = $details['title'];
-	}
+	$row_styles = qw_all_row_styles();
+	$row_styles = qw_row_styles_get_settings_values( $row_styles, $display );
 
 	$form = new QW_Form_Fields( array(
 		'form_field_prefix' => $item['form_prefix'],
 	) );
+
+	$row_style_options = array();
+
+	foreach ( $row_styles as $key => $details ) {
+		$row_style_options[ $key ] = $details['title'];
+	}
 
 	print $form->render_field( array(
 		'type' => 'select',
 		'name' => 'row_style',
 		'description' => $item['description'],
 		'value' => isset( $display['row_style'] ) ? $display['row_style'] : '',
-		'options' => $row_styles,
+		'options' => $row_style_options,
 		'class' => array( 'qw-js-title', 'qw-select-group-toggle' ),
 	) );
-	?>
-	<div id="row-style-settings">
-		<?php
-		foreach ( qw_all_row_styles() as $row_style )
-		{
-			if ( isset( $row_style['settings_callback'] ) && is_callable( $row_style['settings_callback'] ) )
-			{
-				// get the current values saved to this query
-				$row_style['values'] = array();
 
-				if ( isset( $row_style['settings_key'] ) &&
-				     isset( $display[ $row_style['settings_key'] ] ) )
-				{
-					$row_style['values'] =  $display[ $row_style['settings_key'] ];
-				}
-				?>
-				<div id="tab-row-style-settings-<?php print $row_style['hook_key']; ?>"
-				     class="qw-query-content qw-select-group-item qw-select-group-value-<?php print $row_style['hook_key']; ?>">
-					<h3><?php print $row_style['title']; ?> <?php _e( 'Settings' ); ?></h3>
-
-					<div class="qw-setting-group-inner">
-						<?php print call_user_func( $row_style['settings_callback'], $row_style, $display ); ?>
-					</div>
-				</div>
-			<?php
-			}
-		}
-		?>
-	</div>
-<?php
+	print qw_admin_template( 'select-settings-group', array(
+		'items' => $row_styles,
+		'display' => $display,
+	) );
 }

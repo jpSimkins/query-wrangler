@@ -13,10 +13,51 @@ function qw_pager_type_default( $pager_types )
 {
 	$pager_types['default'] = array(
 		'title'    => __( 'Default' ),
-		'callback' => 'qw_pager_type_default_callback'
+		'callback' => 'qw_pager_type_default_callback',
+		'settings_callback' => 'qw_pager_type_default_settings_callback',
+		'settings_key' => 'default_settings',
 	);
 
 	return $pager_types;
+}
+
+/**
+ * Additional settings for this pager type
+ *
+ * @param $pager
+ * @param $display
+ */
+function qw_pager_type_default_settings_callback( $pager, $display )
+{
+	// default settings values
+	$values = array(
+		'previous' => '&laquo; Previous Page',
+		'next' => 'Next Page &raquo;',
+	);
+
+	if ( !empty( $pager['values'] ) ) {
+		$values = array_replace( $values, $pager['values'] );
+	}
+
+	$form = new QW_Form_Fields( array(
+		'form_field_prefix' => $pager['form_prefix'],
+	) );
+
+	print $form->render_field( array(
+		'type' => 'text',
+		'name' => 'previous',
+		'title' => __( 'Previous Page Label' ),
+		'value' => $values['previous'],
+		'description' => __( 'Modify the text for the "previous" page link.' ),
+	) );
+
+	print $form->render_field( array(
+		'type' => 'text',
+		'name' => 'next',
+		'title' => __( 'Next Page Label' ),
+		'value' => $values['next'],
+		'description' => __( 'Modify the text for the next page link.' ),
+	) );
 }
 
 /**
@@ -42,8 +83,6 @@ function qw_pager_type_default_callback( $pager, &$wp_query )
 	}
 
 	$pager_themed      = '';
-	$pager['next']     = ( $pager['next'] ) ? $pager['next'] : 'Next Page &raquo;';
-	$pager['previous'] = ( $pager['previous'] ) ? $pager['previous'] : '&laquo; Previous Page';
 
 	if ( $page = qw_get_page_number( $wp_query ) ) {
 		$path = rtrim( $path_array[0], '/' );
@@ -57,7 +96,7 @@ function qw_pager_type_default_callback( $pager, &$wp_query )
 				$url .= '?' . $exposed_path;
 			}
 
-			$pager_themed .= sprintf( $template, 'query-prevpage', $url, $pager['previous'] );
+			$pager_themed .= sprintf( $template, 'query-prevpage', $url, $pager['values']['previous'] );
 		}
 		// previous link with no page number
 		else if ( $page == 2 ) {
@@ -66,7 +105,7 @@ function qw_pager_type_default_callback( $pager, &$wp_query )
 				$url .= '?' . $exposed_path;
 			}
 
-			$pager_themed .= sprintf( $template, 'query-prevpage', $url, $pager['previous'] );
+			$pager_themed .= sprintf( $template, 'query-prevpage', $url, $pager['values']['previous'] );
 		}
 
 		// next link
@@ -76,7 +115,7 @@ function qw_pager_type_default_callback( $pager, &$wp_query )
 				$url .= '?' . $exposed_path;
 			}
 
-			$pager_themed .= sprintf( $template, 'query-nextpage', $url, $pager['next'] );
+			$pager_themed .= sprintf( $template, 'query-nextpage', $url, $pager['values']['next'] );
 		}
 
 		return $pager_themed;

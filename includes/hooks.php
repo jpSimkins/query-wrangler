@@ -22,7 +22,6 @@ function qw_all_basic_settings() {
 	$basics = apply_filters( 'qw_basics', array() );
 
 	foreach ( $basics as $hook_key => $basic ) {
-		$basics[ $hook_key ]['form_prefix'] = QW_FORM_PREFIX . '[display]';
 		$basics[ $hook_key ]['hook_key']    = $hook_key;
 	}
 
@@ -174,11 +173,11 @@ function qw_all_styles() {
 
 	foreach ( $styles as $hook_key => $style ) {
 		$styles[ $hook_key ]['hook_key']    = $hook_key;
-		$styles[ $hook_key ]['form_prefix'] = QW_FORM_PREFIX . "[display][style_settings][{$hook_key}]";
+		//$styles[ $hook_key ]['form_prefix'] = QW_FORM_PREFIX . "[display][style_settings][{$hook_key}]";
 
-		if ( ! isset( $style['settings_key'] ) ) {
-			$styles[ $hook_key ]['settings_key'] = $hook_key . '_settings';
-		}
+//		if ( ! isset( $style['settings_key'] ) ) {
+//			$styles[ $hook_key ]['settings_key'] = $hook_key . '_settings';
+//		}
 	}
 
 	return $styles;
@@ -189,10 +188,12 @@ function qw_all_styles() {
  *
  * @return array
  */
-function qw_all_row_styles() {
+function qw_all_row_styles()
+{
 	$row_styles = apply_filters( 'qw_row_styles', array() );
-	foreach ( $row_styles as $k => $row_style ) {
-		$row_styles[ $k ]['hook_key'] = $k;
+
+	foreach ( $row_styles as $hook_key => $row_style ) {
+		$row_styles[ $hook_key ]['hook_key'] = $hook_key;
 	}
 
 	return $row_styles;
@@ -200,12 +201,19 @@ function qw_all_row_styles() {
 
 /**
  * Pager types
+ *
+ * @return array
  */
-function qw_all_pager_types() {
+function qw_all_pager_types()
+{
 	$pagers = apply_filters( 'qw_pager_types', array() );
 
 	foreach( $pagers as $hook_key => $pager ){
 		$pagers[ $hook_key ]['hook_key'] = $hook_key;
+
+		if ( !empty( $pager['settings_key'] ) ){
+			$pagers[ $hook_key ]['form_prefix'] = QW_FORM_PREFIX . "[display][pager][{$pager['settings_key']}]";
+		}
 	}
 
 	return $pagers;

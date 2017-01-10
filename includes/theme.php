@@ -163,7 +163,7 @@ function qw_template_query( &$wp_query, $options ) {
 
 		$wrapper_args['pager_classes'] = implode( " ", $pager_classes );
 		// pager
-		$wrapper_args['pager'] = qw_make_pager( $options['display']['page']['pager'], $wp_query );
+		$wrapper_args['pager'] = qw_make_pager( $options['display']['page']['pager']['type'], $wp_query, $options['display'] );
 	}
 
 	// exposed filters
@@ -327,28 +327,4 @@ function qw_theme_image( $post, $field ) {
 
 		return $output;
 	}
-}
-
-/*
- * Custom Pager function
- *
- * @param array $pager Query pager details
- * @param object $qw_query Object
- * @return HTML processed pager
- */
-function qw_make_pager( $pager, &$qw_query ) {
-	$pager_themed = '';
-	$pagers       = qw_all_pager_types();
-
-	//set callback if function exists
-	if ( is_callable( $pagers[ $pager['type'] ]['callback'] ) ) {
-		$callback = $pagers[ $pager['type'] ]['callback'];
-	} else {
-		$callback = $pagers['default']['callback'];
-	}
-
-	// execute callback
-	$pager_themed = call_user_func( $callback, $pager, $qw_query );
-
-	return $pager_themed;
 }

@@ -104,8 +104,9 @@ class Query_Wrangler {
 		$includes = array(
 			'includes/handlers/basics' => array(
 				'basics_simple',
+				'pager',
 				'row_styles',
-				'wrapper_styles',
+				'styles',
 			),
 			'includes/handlers/fields' => array(
 				'template_tags',

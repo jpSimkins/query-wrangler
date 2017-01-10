@@ -13,7 +13,7 @@ function qw_pager_type_numbers( $pager_types )
 {
 	$pager_types['numbers'] = array(
 		'title'    => __( 'Page Numbers' ),
-		'callback' => 'qw_pager_type_numbers_callback'
+		'callback' => 'qw_pager_type_numbers_callback',
 	);
 
 	return $pager_types;
