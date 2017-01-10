@@ -1,6 +1,19 @@
 <?php
 
 /**
+ * temp fix
+ *
+ * @param $options
+ *
+ * @return mixed|void
+ */
+function qw_get_query_handlers( $options ){
+	$handlers = QW_Handlers::get_instance();
+
+	return $handlers->get_query_handlers( $options );
+}
+
+/**
  * Trim each item in an array w/ array_walk
  *   eg: array_walk($fruit, 'qw_trim');
  *
@@ -71,6 +84,40 @@ function qw_cmp( $a, $b ) {
 }
 
 /**
+ * Replace contextual tokens within a string
+ *
+ * @param string $args - a query argument string
+ *
+ * @return string - query argument string with tokens replaced with values
+ */
+function qw_contextual_tokens_replace( $args ) {
+	$matches = array();
+	preg_match_all( '/{{([^}]*)}}/', $args, $matches );
+
+	if ( isset( $matches[1] ) )
+	{
+		global $post;
+
+		foreach ( $matches[1] as $i => $context_token )
+		{
+			if ( stripos( $context_token, ':' ) !== FALSE )
+			{
+				$a = explode( ':', $context_token );
+				if ( $a[0] == 'post' && isset( $post->{$a[1]} ) )
+				{
+					$args = str_replace( $matches[0][ $i ], $post->{$a[1]}, $args );
+				}
+				else if ( $a[0] == 'query_var' && $replace = get_query_var( $a[1] ) ) {
+					$args = str_replace( $matches[0][ $i ], $replace, $args );
+				}
+			}
+		}
+	}
+
+	return $args;
+}
+
+/**
  * Simple helper functions for very common task of recording an item's original
  * unique index.
  *
@@ -115,46 +162,6 @@ function qw_get_hook_key( $all, $single ) {
 	}
 
 	return $hook_key;
-}
-
-/**
- * Helper to handle HTMl inside of json export
- *
- * @param $data
- *
- * @return mixed
- */
-function qw_query_escape_export( $data ){
-	if ( isset( $data['display']['field_settings']['fields'] ) ) {
-		$fields = &$data['display']['field_settings']['fields'];
-
-		foreach( $fields as $field_name => $field ) {
-			$fields[ $field_name ]['custom_output'] = htmlspecialchars( $field['custom_output'], ENT_QUOTES, 'UTF-8', false );
-			$fields[ $field_name ]['empty_field_content'] = htmlspecialchars( $field['empty_field_content'], ENT_QUOTES, 'UTF-8', false );
-		}
-	}
-
-	return $data;
-}
-
-/**
- * Helper to handle HTMl inside of json import
- *
- * @param $data
- *
- * @return mixed
- */
-function qw_query_decode_import( $data ){
-	if ( isset( $data['display']['field_settings']['fields'] ) ) {
-		$fields = &$data['display']['field_settings']['fields'];
-
-		foreach( $fields as $field_name => $field ) {
-			$fields[ $field_name ]['custom_output'] = htmlspecialchars_decode( $field['custom_output'] );
-			$fields[ $field_name ]['empty_field_content'] = htmlspecialchars_decode( $field['empty_field_content'] );
-		}
-	}
-
-	return $data;
 }
 
 /**

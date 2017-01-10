@@ -369,10 +369,30 @@ class QW_Admin_Pages {
 
 		// unserialize the stored data
 		$row['data'] = qw_unserialize( $row['data'] );
-		$row['data'] = qw_query_escape_export( $row['data'] );
+		$row['data'] = $this->escape_export( $row['data'] );
 		$export = wp_json_encode( $row, JSON_PRETTY_PRINT );
 
 		return $export;
+	}
+
+	/**
+	 * Helper to handle HTMl inside of json export
+	 *
+	 * @param $data
+	 *
+	 * @return mixed
+	 */
+	function escape_export( $data ){
+		if ( isset( $data['display']['field_settings']['fields'] ) ) {
+			$fields = &$data['display']['field_settings']['fields'];
+
+			foreach( $fields as $field_name => $field ) {
+				$fields[ $field_name ]['custom_output'] = htmlspecialchars( $field['custom_output'], ENT_QUOTES, 'UTF-8', false );
+				$fields[ $field_name ]['empty_field_content'] = htmlspecialchars( $field['empty_field_content'], ENT_QUOTES, 'UTF-8', false );
+			}
+		}
+
+		return $data;
 	}
 
 	/**
@@ -403,7 +423,7 @@ class QW_Admin_Pages {
 		if ( !empty( $import['query'] ) ){
 			$import['query'] = stripslashes( $import['query'] );
 			$query = json_decode( $import['query'], TRUE );
-			$query['data'] = qw_query_decode_import( $query['data'] );
+			$query['data'] = $this->decode_import( $query['data'] );
 
 		}
 
@@ -416,6 +436,26 @@ class QW_Admin_Pages {
 
 			return $this->wpdb->insert_id;
 		}
+	}
+
+	/**
+	 * Helper to handle HTMl inside of json import
+	 *
+	 * @param $data
+	 *
+	 * @return mixed
+	 */
+	function decode_import( $data ){
+		if ( isset( $data['display']['field_settings']['fields'] ) ) {
+			$fields = &$data['display']['field_settings']['fields'];
+
+			foreach( $fields as $field_name => $field ) {
+				$fields[ $field_name ]['custom_output'] = htmlspecialchars_decode( $field['custom_output'] );
+				$fields[ $field_name ]['empty_field_content'] = htmlspecialchars_decode( $field['empty_field_content'] );
+			}
+		}
+
+		return $data;
 	}
 
 	/**

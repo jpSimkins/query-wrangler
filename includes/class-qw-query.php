@@ -188,8 +188,7 @@ class QW_Query {
 			// get existing items on the query
 			$existing_items = array();
 			if ( is_callable( $handler['data_callback'] ) ) {
-				$existing_items = call_user_func( $handler['data_callback'],
-					$this->data );
+				$existing_items = call_user_func( $handler['data_callback'], $this->data );
 			}
 
 			// determine the weight and name of the new item based on
@@ -215,38 +214,10 @@ class QW_Query {
 			// merge in values
 			$new_item = array_replace_recursive( $new_item, $values );
 
-			$this->set_handler_item( $handler_type, $new_item['name'], $new_item );
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Set the value of a specific handler item
-	 *
-	 * @param $handler_type
-	 * @param $key
-	 * @param $value
-	 *
-	 * @return $this
-	 */
-	function set_handler_item( $handler_type, $key, $value ) {
-		switch ( $handler_type ) {
-			case 'filter':
-				$this->data['args']['filters'][ $key ] = $value;
-				break;
-
-			case 'field':
-				$this->data['display']['field_settings']['fields'][ $key ] = $value;
-				break;
-
-			case 'sort':
-				$this->data['args']['sorts'][ $key ] = $value;
-				break;
-
-			case 'override':
-				$this->data['override'][ $key ] = $value;
-				break;
+			// set new item in the query args
+			if ( is_callable( $handler['set_data_callback'] ) ){
+				$this->data = call_user_func( $handler['set_data_callback'], $this->data, $new_item['name'], $new_item );
+			}
 		}
 
 		return $this;

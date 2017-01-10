@@ -1,7 +1,5 @@
 <?php
 
-add_filter( 'qw_generate_query_args', 'qw_generate_filter_callback_args', 0, 2 );
-
 /**
  * Primary function for building and displaying a query
  *
@@ -127,66 +125,4 @@ function qw_default_query_data() {
 				),
 			),
 		);
-}
-
-/**
- * Filters require a callback for setting their values in the $args array.
- * This processes those callbacks.
- *
- * @param $args
- * @param $options
- *
- * @return mixed
- */
-function qw_generate_filter_callback_args( $args, $options ){
-
-	$handlers = qw_get_query_handlers( $options );
-
-	foreach ( $handlers as $handler_type => $handler ) {
-		if ( is_array( $handler['items'] ) ) {
-			foreach ( $handler['items'] as $name => $item ) {
-				// Alter the query args
-				// look for callback, and run it
-				if ( isset( $item['query_args_callback'] ) && is_callable( $item['query_args_callback'] ) ) {
-					call_user_func_array( $item['query_args_callback'], array( &$args, $item ) );
-				}
-			}
-		}
-	}
-
-	return $args;
-}
-
-/**
- * Replace contextual tokens within a string
- *
- * @param string $args - a query argument string
- *
- * @return string - query argument string with tokens replaced with values
- */
-function qw_contextual_tokens_replace( $args ) {
-	$matches = array();
-	preg_match_all( '/{{([^}]*)}}/', $args, $matches );
-
-	if ( isset( $matches[1] ) )
-	{
-		global $post;
-
-		foreach ( $matches[1] as $i => $context_token )
-		{
-			if ( stripos( $context_token, ':' ) !== FALSE )
-			{
-				$a = explode( ':', $context_token );
-				if ( $a[0] == 'post' && isset( $post->{$a[1]} ) )
-				{
-					$args = str_replace( $matches[0][ $i ], $post->{$a[1]}, $args );
-				}
-				else if ( $a[0] == 'query_var' && $replace = get_query_var( $a[1] ) ) {
-					$args = str_replace( $matches[0][ $i ], $replace, $args );
-				}
-			}
-		}
-	}
-
-	return $args;
 }

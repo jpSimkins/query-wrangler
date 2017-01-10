@@ -56,7 +56,7 @@ class Query_Wrangler {
 		include_once QW_PLUGIN_DIR . '/includes/pages.php';
 		include_once QW_PLUGIN_DIR . '/includes/query.php';
 		include_once QW_PLUGIN_DIR . '/includes/query-db.php';
-		include_once QW_PLUGIN_DIR . '/includes/theme.php';
+		include_once QW_PLUGIN_DIR . '/includes/template.php';
 		include_once QW_PLUGIN_DIR . '/includes/exposed.php';
 
 		spl_autoload_register( array( $this, 'autoload' ) );
@@ -103,6 +103,12 @@ class Query_Wrangler {
 	 */
 	function load_common(){
 		$includes = array(
+			'includes/handlers' => array(
+				'field',
+				'filter',
+				'override',
+				'sort',
+			),
 			'includes/handlers/basics' => array(
 				'basics_simple',
 				'empty',
@@ -122,7 +128,6 @@ class Query_Wrangler {
 				'featured_image',
 				'callback_field',
 				'taxonomy_terms',
-
 			),
 			'includes/handlers/filters' => array(
 				'filters_simple',

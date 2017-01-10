@@ -23,8 +23,6 @@ class QW_Handlers {
 	 * QW_Handlers constructor.
 	 */
 	private function __construct(){
-		add_filter( 'qw_handlers', array( $this, 'default_handler_types' ) );
-
 		$this->all_handlers = qw_all_handlers();
 	}
 
@@ -40,45 +38,6 @@ class QW_Handlers {
 		}
 
 		return $instance;
-	}
-
-	/**
-	 * Core QW handler types
-	 *
-	 * @param $handlers
-	 * @return mixed
-	 */
-	function default_handler_types( $handlers ) {
-		$handlers['field']    = array(
-				'title'            => __( 'Field' ),
-				'description'      => __( 'Select Fields to add to this query output.' ),
-				'all_callback'     => 'qw_all_fields',
-				'data_callback'    => array( $this, 'get_fields_data' ),
-				'form_prefix'      => '[display][field_settings][fields]',
-		);
-		$handlers['sort']     = array(
-				'title'            => __( 'Sort Option' ),
-				'description'      => __( 'Select options for sorting the query results.' ),
-				'all_callback'     => 'qw_all_sort_options',
-				'data_callback'    =>  array( $this, 'get_sorts_data' ),
-				'form_prefix'      => '[args][sorts]',
-		);
-		$handlers['filter']   = array(
-				'title'            => __( 'Filter' ),
-				'description'      => __( 'Select filters to affect the query results.' ),
-				'all_callback'     => 'qw_all_filters',
-				'data_callback'    => array( $this, 'get_filters_data' ),
-				'form_prefix'      => '[args][filters]',
-		);
-		$handlers['override'] = array(
-				'title'            => __( 'Override' ),
-				'description'      => __( 'Select overrides to affect the query results based on the context of where the query is displayed.' ),
-				'all_callback'     => 'qw_all_overrides',
-				'data_callback'    => array( $this, 'get_overrides_data' ),
-				'form_prefix'      => '[override]',
-		);
-
-		return $handlers;
 	}
 
 	/**
@@ -233,81 +192,4 @@ class QW_Handlers {
 
 		return $output;
 	}
-
-	/**
-	 * Retrieve existing Field data from an array of query options
-	 *
-	 * @param $options
-	 * @return array
-	 */
-	function get_fields_data( $options ) {
-		$data = array();
-
-		if ( !empty( $options['display']['field_settings']['fields'] ) ) {
-			$data = $options['display']['field_settings']['fields'];
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Retrieve existing Sort data from an array of query options
-	 *
-	 * @param $options
-	 * @return array
-	 */
-	function get_sorts_data( $options ) {
-		$data = array();
-
-		if ( !empty( $options['args']['sorts'] ) ) {
-			$data = $options['args']['sorts'];
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Retrieve existing Filter data from an array of query options
-	 *
-	 * @param $options
-	 * @return array
-	 */
-	function get_filters_data( $options ) {
-		$data = array();
-
-		if ( !empty( $options['args']['filters'] ) ) {
-			$data = $options['args']['filters'];
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Retrieve existing Override data from an array of query options
-	 *
-	 * @param $options
-	 * @return array
-	 */
-	function get_overrides_data( $options ) {
-		$data = array();
-
-		if ( !empty( $options['override'] ) ) {
-			$data = $options['override'];
-		}
-
-		return $data;
-	}
-}
-
-/**
- * temp fix
- *
- * @param $options
- *
- * @return mixed|void
- */
-function qw_get_query_handlers( $options ){
-	$handlers = QW_Handlers::get_instance();
-
-	return $handlers->get_query_handlers( $options );
 }
