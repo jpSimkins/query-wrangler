@@ -75,5 +75,6 @@ class QW_Update {
 		// post_status
 		// offset
 
+		// pager settings
 	}
 }

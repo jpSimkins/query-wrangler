@@ -61,10 +61,10 @@ class Query_Wrangler {
 
 		spl_autoload_register( array( $this, 'autoload' ) );
 
-
-
 		$last_db_version = get_option( 'qw_db_version', '2000' );
+
 		$update = new QW_Update( $last_db_version, QW_DB_VERSION );
+
 		if ( $update->needed() ){
 			$update->perform_updates();
 		}
