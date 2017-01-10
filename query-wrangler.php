@@ -105,6 +105,9 @@ class Query_Wrangler {
 		$includes = array(
 			'includes/handlers/basics' => array(
 				'basics_simple',
+				'empty',
+				'footer',
+				'header',
 				'pager',
 				'row_styles',
 				'styles',
@@ -196,7 +199,6 @@ class Query_Wrangler {
 	 */
 	function load_admin(){
 		global $wpdb;
-		include_once QW_PLUGIN_DIR . '/admin/admin-functions.php';
 		include_once QW_PLUGIN_DIR . '/admin/ajax.php';
 
 		QW_Admin_Pages::register( $this->settings, $wpdb );

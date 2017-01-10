@@ -2,6 +2,8 @@
 
 add_filter( 'qw_basics', 'qw_basic_settings_row_style' );
 
+add_filter( 'qw_template_query_template_args', 'qw_template_query_row_style_template_args', 10, 3 );
+
 /**
  * Basic Settings
  *
@@ -80,4 +82,26 @@ function qw_basic_display_row_style_form( $item, $display )
 		'items' => $row_styles,
 		'display' => $display,
 	) );
+}
+
+
+/**
+ * Filter implements - qw_template_query_template_args
+ *
+ * @param $template_args
+ * @param $wp_query
+ * @param $options
+ *
+ * @return array
+ */
+function qw_template_query_row_style_template_args( $template_args, $wp_query, $options )
+{
+	$row_styles = qw_all_row_styles();
+	$row_style = $row_styles[ $options['display']['row_style'] ];
+
+	if ( is_callable( $row_style['make_rows_callback'] ) ) {
+		$template_args['rows'] = call_user_func( $row_style['make_rows_callback'], $wp_query, $options );
+	}
+
+	return $template_args;
 }

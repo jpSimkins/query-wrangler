@@ -66,12 +66,12 @@ function qw_row_style_fields_settings( $row_style, $display )
 /**
  * Build array of fields and rows for templating
  *
- * @param $qw_query
+ * @param $wp_query
  * @param $options
  *
  * @return array Executed query rows
  */
-function qw_row_style_fields_make_rows( &$qw_query, $options )
+function qw_row_style_fields_make_rows( $wp_query, $options )
 {
 	$display         = $options['display'];
 	$all_fields      = qw_all_fields();
@@ -94,12 +94,12 @@ function qw_row_style_fields_make_rows( &$qw_query, $options )
 	}
 
 	// loop through each post
-	$last_row = $qw_query->post_count - 1;
+	$last_row = $wp_query->post_count - 1;
 	$i = 0;
-	while ( $qw_query->have_posts() ) {
-		$qw_query->the_post();
+	while ( $wp_query->have_posts() ) {
+		$wp_query->the_post();
 		//
-		$this_post = $qw_query->post;
+		$this_post = $wp_query->post;
 		$row       = array(
 			'row_classes' => qw_row_classes( $i, $last_row ),
 		);

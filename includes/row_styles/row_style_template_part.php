@@ -53,20 +53,20 @@ function qw_row_style_template_part_settings( $row_style, $display )
 /**
  * Render the rows for this row_style as an array of HTML
  *
- * @param $qw_query
+ * @param $wp_query
  * @param $options
  *
  * @return array
  */
-function qw_row_style_template_part_make_rows( &$qw_query, $options )
+function qw_row_style_template_part_make_rows( $wp_query, $options )
 {
 	$groups          = array();
 	$i               = 0;
 	$current_post_id = get_the_ID();
-	$last_row = $qw_query->post_count - 1;
+	$last_row = $wp_query->post_count - 1;
 
-	while ( $qw_query->have_posts() ) {
-		$qw_query->the_post();
+	while ( $wp_query->have_posts() ) {
+		$wp_query->the_post();
 		$path = $options['display']['template_part_settings']['path'];
 		$name = $options['display']['template_part_settings']['name'];
 

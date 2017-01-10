@@ -1,5 +1,47 @@
 <?php
 
+add_filter( 'qw_generate_query_args', 'qw_generate_exposed_filter_callback_args', 30, 2 );
+
+/**
+ * @param $args
+ * @param $options
+ *
+ * @return mixed
+ */
+function qw_generate_exposed_filter_callback_args( $args, $options ){
+
+	$handlers = qw_get_query_handlers( $options );
+	$submitted_data = qw_exposed_submitted_data();
+
+	foreach ( $handlers as $handler_type => $handler ) {
+		if ( is_array( $handler['items'] ) ) {
+			foreach ( $handler['items'] as $name => $item ) {
+
+				// Only work items that are exposed
+				if ( !empty( $item['values']['is_exposed'] ) ) {
+
+					if ( ! empty( $item['values']['exposed_key'] ) ) {
+						// override exposed key
+						$item['exposed_key'] = $item['values']['exposed_key'];
+					}
+					else {
+						// default exposed key
+						$item['exposed_key'] = 'exposed_' . $item['values']['name'];
+					}
+
+					// Process submitted exposed values
+					if ( isset( $submitted_data[ $item['exposed_key'] ] ) && is_callable( $item['exposed_process'] ) ) {
+						$value = $submitted_data[ $item['exposed_key'] ];
+						call_user_func( $item['exposed_process'], $args, $item, $value );
+					}
+				}
+			}
+		}
+	}
+
+	return $args;
+}
+
 /*
  * Process and theme exposed handlers
  */

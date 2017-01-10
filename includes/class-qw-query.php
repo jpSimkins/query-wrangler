@@ -119,10 +119,6 @@ class QW_Query {
 				'slug'       => $this->slug,
 				'name'       => $this->name,
 				'type'       => $this->type,
-				'pagination' => isset( $this->options['display']['page']['pager']['active'] ) ? 1 : 0,
-				'header'     => $this->options['display']['header'],
-				'footer'     => $this->options['display']['footer'],
-				'empty'      => $this->options['display']['empty'],
 			);
 		}
 

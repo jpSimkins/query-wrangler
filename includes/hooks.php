@@ -1,22 +1,6 @@
 <?php
 
 /**
- * Simple helper functions for very common task of recording an item's original
- * unique index.
- *
- * @param $items
- *
- * @return mixed
- */
-function qw_set_hook_keys( $items )
-{
-	foreach( $items as $hook_key => $item ){
-		$items[ $hook_key ]['hook_key'] = $hook_key;
-	}
-	return $items;
-}
-
-/**
  * All Handlers
  *
  * Handlers are groups of items that can be added and removed from a query

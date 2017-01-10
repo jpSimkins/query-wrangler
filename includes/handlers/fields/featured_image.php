@@ -28,3 +28,24 @@ function qw_field_featured_image( $fields ) {
 
 	return $fields;
 }
+
+/**
+ * Turn a list of images into html
+ *
+ * @param $post
+ * @param $field
+ *
+ * @return string
+ */
+function qw_theme_featured_image( $post, $field ) {
+	$style = $field['image_display_style'];
+	$output = '';
+
+	if ( has_post_thumbnail( $post->ID ) ) {
+		$image_id = get_post_thumbnail_id( $post->ID );
+
+		$output = wp_get_attachment_image( $image_id, $style );
+	}
+
+	return $output;
+}

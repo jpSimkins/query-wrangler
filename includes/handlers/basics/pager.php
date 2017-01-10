@@ -2,6 +2,9 @@
 
 add_filter( 'qw_basics', 'qw_basic_settings_pager' );
 
+add_filter( 'qw_generate_query_args', 'qw_generate_pager_query_args', 20, 2 );
+add_filter( 'qw_template_query_wrapper_args', 'qw_template_query_pager_wrapper_args', 10, 3 );
+
 /**
  * Pager types
  *
@@ -120,4 +123,102 @@ function qw_make_pager( $pager_type, &$qw_query, $display ) {
 	$pager_themed = call_user_func( $callback, $pager, $qw_query );
 
 	return $pager_themed;
+}
+
+/**
+ * @param $args
+ * @param $options
+ *
+ * @return mixed
+ */
+function qw_generate_pager_query_args( $args, $options ){
+	$paged = NULL;
+
+	// if pager_key is enabled, trick qw_get_page_number
+	if ( isset( $options['display']['page']['pager']['use_pager_key'] ) &&
+	     isset( $options['display']['page']['pager']['pager_key'] ) &&
+	     isset( $_GET[ $options['display']['page']['pager']['pager_key'] ] ) &&
+	     is_numeric( $_GET[ $options['display']['page']['pager']['pager_key'] ] )
+	) {
+		$paged = $_GET[ $options['display']['page']['pager']['pager_key'] ];
+	}
+
+	// standard arguments
+	$args['paged'] = ( $paged ) ? $paged : qw_get_page_number();
+
+	// having any offset will break pagination
+	if ( $args['paged'] > 1 ){
+		unset( $args['offset'] );
+	}
+
+	return $args;
+}
+
+/**
+ * Filter implements - qw_template_query_wrapper_args
+ *
+ * @param $wrapper_args
+ * @param $wp_query
+ * @param $options
+ *
+ * @return mixed
+ */
+function qw_template_query_pager_wrapper_args( $wrapper_args, $wp_query, $options )
+{
+	if ( count( $wp_query->posts ) > 0 &&
+	     !empty( $options['display']['page']['pager']['active'] ) &&
+	     !empty( $options['display']['page']['pager']['type'] ) )
+	{
+		$type = $options['display']['page']['pager']['type'];
+
+		$pager_classes = array(
+			'query-pager',
+			"pager-{$type}",
+		);
+
+		$wrapper_args['pager_classes'] = implode( " ", $pager_classes );
+		$wrapper_args['pager'] = qw_make_pager( $type, $wp_query, $options['display'] );
+	}
+
+	return $wrapper_args;
+}
+
+/**
+ * Helper function: Get the current page number
+ *
+ * @param object $wp_query - the query being displayed
+ *
+ * @return int - the currentpage number
+ */
+function qw_get_page_number( $wp_query = NULL )
+{
+	// help figure out the current page
+	$path_array = explode( '/page/', $_SERVER['REQUEST_URI'] );
+
+	// default value
+	$page = 1;
+
+	// look for paging in this query
+	if ( ! is_null( $wp_query ) && isset( $wp_query->query_vars['paged'] ) ) {
+		$page = $wp_query->query_vars['paged'];
+	}
+	// try global query
+	else if ( ! is_null( $wp_query ) && get_query_var( 'paged' ) ) {
+		$page = get_query_var( 'paged' );
+	}
+	// paging with slashes
+	else if ( isset( $path_array[1] ) ) {
+		$page = explode( '/', $path_array[1] );
+		$page = $page[0];
+	}
+	// paging with get variable
+	else if ( isset( $_GET['page'] ) ) {
+		$page = $_GET['page'];
+	}
+	// paging with a different get variable
+	else if ( isset( $_GET['paged'] ) ) {
+		$page = $_GET['paged'];
+	}
+
+	return $page;
 }

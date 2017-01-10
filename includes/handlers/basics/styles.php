@@ -2,6 +2,8 @@
 // hook into qw_basics
 add_filter( 'qw_basics', 'qw_basic_settings_style' );
 
+add_filter( 'qw_template_query_template_args', 'qw_template_query_style_template_args', 0, 3 );
+
 /**
  * Display Styles
  *
@@ -24,6 +26,7 @@ function qw_basic_settings_style( $basics )
 }
 
 /**
+ * Form for configuring display style
  *
  * @param $item
  * @param $display
@@ -60,4 +63,49 @@ function qw_basic_display_style_form( $item, $display )
 //		'items' => $styles,
 //		'display' => $display,
 //	) );
+}
+
+/**
+ * Get the settings values for each display style in this query
+ *
+ * @param $styles
+ * @param $display
+ *
+ * @return mixed
+ */
+function qw_styles_get_settings_values( $styles, $display )
+{
+	foreach( $styles as $hook_key => $style )
+	{
+		$styles[ $hook_key ]['settings'] = array();
+
+		if ( isset( $style['settings_key'], $display[ $style['settings_key'] ] ) ) {
+			$styles[ $hook_key ]['settings'] = $display[ $style['settings_key'] ];
+		}
+	}
+
+	return $styles;
+}
+
+/**
+ * Filter implements - qw_template_query_template_args
+ *
+ * @param $template_args
+ * @param $wp_query
+ * @param $options
+ *
+ * @return array
+ */
+function qw_template_query_style_template_args( $template_args, $wp_query, $options )
+{
+	$styles = qw_all_styles();
+	$styles = qw_styles_get_settings_values( $styles, $options['display'] );
+
+	$style = $styles[ $options['display']['style'] ];
+
+	$template_args['template'] = 'query-' . $style['hook_key'];
+	$template_args['style'] = $style['hook_key'];
+	$template_args['style_settings'] = $style['settings'];
+
+	return $template_args;
 }

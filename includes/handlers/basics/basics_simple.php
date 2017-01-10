@@ -37,48 +37,6 @@ function qw_simple_basic_settings( $basics ) {
 			)
 		)
 	);
-	$basics['header'] = array(
-		'title'         => __( 'Header' ),
-		'description'   => __( 'The content placed here will appear above the resulting query.' ),
-		'weight'        => 5,
-		'required'      => true,
-		'form_prefix'   => QW_FORM_PREFIX . '[display]',
-		'form_fields' => array(
-			array(
-				'type' => 'textarea',
-				'name' => 'header',
-				'class' => array( 'qw-field-textarea', 'qw-js-title' ),
-			)
-		)
-	);
-	$basics['footer'] = array(
-		'title'         => __( 'Footer' ),
-		'description'   => __( 'The content placed here will appear below the resulting query.' ),
-		'weight'        => 6,
-		'required'      => true,
-		'form_prefix'   => QW_FORM_PREFIX . '[display]',
-		'form_fields' => array(
-			'footer' => array(
-				'type' => 'textarea',
-				'name' => 'footer',
-				'class' => array( 'qw-field-textarea', 'qw-js-title' ),
-			)
-		),
-	);
-	$basics['empty'] = array(
-		'title'         => __( 'Empty Text' ),
-		'description'   => __( 'The content placed here will appear if the query has no results.' ),
-		'weight'        => 7,
-		'required'      => true,
-		'form_prefix'   => QW_FORM_PREFIX . '[display]',
-		'form_fields' => array(
-			'empty' => array(
-				'type' => 'textarea',
-				'name' => 'empty',
-				'class' => array( 'qw-field-textarea', 'qw-js-title' ),
-			)
-		),
-	);
 	$basics['page_path'] = array(
 		'title'               => __( 'Page path' ),
 		'description'         => __( 'The path or permalink you want this page to use. Avoid using spaces and capitalization for best results.' ),
@@ -121,3 +79,4 @@ function qw_simple_basic_settings( $basics ) {
 
 	return $basics;
 }
+

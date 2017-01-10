@@ -1,5 +1,8 @@
 <?php
 
+// template wrangler hook
+add_filter( 'tw_templates', 'qw_templates' );
+
 /**
  * Template Wrangler templates
  *
@@ -40,9 +43,6 @@ function qw_templates( $templates ) {
 
 	return $templates;
 }
-
-// tw hook
-add_filter( 'tw_templates', 'qw_templates' );
 
 /*
  * Preprocess query_display_rows to allow field styles to define their own default path
@@ -94,79 +94,37 @@ function theme_query_display_style_preprocess( $template ) {
  * @return string HTML for themed/templated query
  */
 function qw_template_query( &$wp_query, $options ) {
-	$results_count = count( $wp_query->posts );
-	$options['meta']['results_count'] = $results_count;
+	$options['meta']['results_count'] = count( $wp_query->posts );
 
-	// start building theme arguments
+	/*
+	 * Template arguments are delivered to the appropriate "style" template
+	 */
+	$template_args = array(
+		'slug'     => $options['meta']['slug'],
+		'options'  => $options,
+		'rows'     => array(),
+	);
+
+	// allow items to manage their own template arguments
+	$template_args = apply_filters( 'qw_template_query_template_args', $template_args, $wp_query, $options );
+
+	/*
+	 * Wrapper arguments are delivered to query-wrapper template
+	 */
 	$wrapper_args = array(
 		'slug'    => $options['meta']['slug'],
 		'options' => $options,
+		'content' => theme( 'query_display_rows', $template_args ),
+		'classes' => array(
+			'query',
+			"query-{$options['meta']['slug']}-wrapper",
+			$options['display']['wrapper-classes'],
+		),
 	);
 
-	// look for empty results
-	if ( $results_count > 0 ) {
-		$all_styles = qw_all_styles();
+	$wrapper_args = apply_filters( 'qw_template_query_wrapper_args', $wrapper_args, $wp_query, $options );
 
-		$style = $all_styles[ $options['display']['style'] ];
-		$style['settings'] = array();
-
-		if ( isset( $style['settings_key'], $options['display'][ $style['settings_key'] ] ) ) {
-			$style['settings'] = $options['display'][ $style['settings_key'] ];
-		}
-
-		// setup row template arguments
-		$template_args = array(
-			'template' => 'query-' . $style['hook_key'],
-			'slug'     => $options['meta']['slug'],
-			'style'    => $style['hook_key'],
-			'options'  => $options,
-			'style_settings' => $style['settings'],
-		);
-
-		$row_styles = qw_all_row_styles();
-		$row_style = $row_styles[ $options['display']['row_style'] ];
-
-		if ( is_callable( $row_style['make_rows_callback'] ) ) {
-			$template_args['rows'] = call_user_func( $row_style['make_rows_callback'], $wp_query, $options );
-		}
-
-		// template the query rows
-		$wrapper_args['content'] = theme( 'query_display_rows', $template_args );
-	}
-	// empty results
-	else {
-		// no pagination
-		$options['meta']['pagination'] = FALSE;
-		// show empty text
-		$wrapper_args['content'] = '<div class="query-empty">' . $options['meta']['empty'] . '</div>';
-	}
-
-	$wrapper_classes   = array();
-	$wrapper_classes[] = 'query';
-	$wrapper_classes[] = 'query-' . $options['meta']['slug'] . '-wrapper';
-	$wrapper_classes[] = $options['display']['wrapper-classes'];
-
-	$wrapper_args['wrapper_classes'] = implode( " ", $wrapper_classes );
-
-	// header
-	if ( $options['meta']['header'] != '' ) {
-		$wrapper_args['header'] = $options['meta']['header'];
-	}
-	// footer
-	if ( $options['meta']['footer'] != '' ) {
-		$wrapper_args['footer'] = $options['meta']['footer'];
-	}
-
-	// pagination
-	if ( $options['meta']['pagination'] && isset( $options['display']['page']['pager']['active'] ) ) {
-		$pager_classes   = array();
-		$pager_classes[] = 'query-pager';
-		$pager_classes[] = 'pager-' . $options['display']['page']['pager']['type'];
-
-		$wrapper_args['pager_classes'] = implode( " ", $pager_classes );
-		// pager
-		$wrapper_args['pager'] = qw_make_pager( $options['display']['page']['pager']['type'], $wp_query, $options['display'] );
-	}
+	$wrapper_args['wrapper_classes'] = implode( " ", $wrapper_args['classes'] );
 
 	// exposed filters
 	$exposed = qw_generate_exposed_handlers( $options );
@@ -174,7 +132,6 @@ function qw_template_query( &$wp_query, $options ) {
 		$wrapper_args['exposed'] = $exposed;
 	}
 
-	// template with wrapper
 	return theme( 'query_display_wrapper', $wrapper_args );
 }
 
@@ -217,8 +174,13 @@ function qw_make_groups_rows( $groups, $group_by_field_name = NULL ) {
 	return $rows;
 }
 
-/*
+/**
  * Make theme row classes
+ *
+ * @param $i
+ * @param $last_row
+ *
+ * @return string
  */
 function qw_row_classes( $i, $last_row ) {
 	$row_classes   = array( 'query-row' );
@@ -233,100 +195,4 @@ function qw_row_classes( $i, $last_row ) {
 	}
 
 	return implode( " ", $row_classes );
-}
-
-
-/*
- * Turn a list of images into html
- *
- * @param $post
- * @param $field
- */
-function qw_theme_featured_image( $post, $field ) {
-	$style = $field['image_display_style'];
-	if ( has_post_thumbnail( $post->ID ) ) {
-		$image_id = get_post_thumbnail_id( $post->ID );
-
-		return wp_get_attachment_image( $image_id, $style );
-	}
-}
-
-
-/**
- * Get and theme attached post files
- *
- * @param $post
- * @param $field
- * @return string
- */
-function qw_theme_file( $post, $field ) {
-	$style = ( $field['file_display_style'] ) ? $field['file_display_style'] : 'link';
-	$count = ( $field['file_display_count'] ) ? $field['file_display_count'] : 0;
-
-	$files = qw_get_post_files( $post->ID );
-	if ( is_array( $files ) ) {
-		$output = array();
-		$i      = 0;
-		foreach ( $files as $file ) {
-			if ( ( $count == 0 || ( $i < $count ) ) && substr( $file->post_mime_type,
-							0,
-							5 ) != "image"
-			) {
-				switch ( $style ) {
-					case 'url':
-						$output[] = wp_get_attachment_url( $file->ID );
-						break;
-
-					case 'link':
-						// complete file name
-						$file_name = explode( "/", $file->guid );
-						$file_name = $file_name[ count( $file_name ) - 1 ];
-						$output[] = '<a href="' . wp_get_attachment_url( $file->ID ) . '" class="query-file-link">' . $file_name . '</a>';
-						break;
-
-					case 'link_url':
-						$output[] = '<a href="' . wp_get_attachment_url( $file->ID ) . '" class="query-file-link">' . $file->guid . '</a>';
-						break;
-				}
-			}
-			$i ++;
-		}
-
-		return "<span class='qw-file-attachment'>".implode( "</span><span class='qw-file-attachment'>", $output ) ."</span>";
-	}
-}
-
-/**
- * Turn a list of images into html
- *
- * @param $post
- * @param $field
- *
- * @return null|string
- */
-function qw_theme_image( $post, $field ) {
-	$style             = $field['image_display_style'];
-	$count             = $field['image_display_count'];
-	$featured_image_id = isset( $field['featured_image'] ) ? get_post_thumbnail_id( $post->ID ) : NULL;
-	$images            = qw_get_post_images( $post->ID );
-
-	if ( is_array( $images ) ) {
-		$output = '';
-		$i      = 0;
-		foreach ( $images as $image ) {
-			if ( $featured_image_id ) {
-				if ( $image->ID == $featured_image_id ) {
-					$output .= wp_get_attachment_image( $image->ID, $style );
-				}
-
-			} else {
-				if ( $count == 0 || ( $i < $count ) ) {
-					$output .= wp_get_attachment_image( $image->ID, $style );
-				}
-			}
-			$i ++;
-		}
-
-		return $output;
-	}
 }

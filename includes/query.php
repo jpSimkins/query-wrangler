@@ -1,8 +1,6 @@
 <?php
 
 add_filter( 'qw_generate_query_args', 'qw_generate_filter_callback_args', 0, 2 );
-add_filter( 'qw_generate_query_args', 'qw_generate_pager_query_args', 20, 2 );
-add_filter( 'qw_generate_query_args', 'qw_generate_exposed_filter_callback_args', 30, 2 );
 
 /**
  * Primary function for building and displaying a query
@@ -132,35 +130,6 @@ function qw_default_query_data() {
 }
 
 /**
- * @param $args
- * @param $options
- *
- * @return mixed
- */
-function qw_generate_pager_query_args( $args, $options ){
-	$paged = NULL;
-
-	// if pager_key is enabled, trick qw_get_page_number
-	if ( isset( $options['display']['page']['pager']['use_pager_key'] ) &&
-	     isset( $options['display']['page']['pager']['pager_key'] ) &&
-	     isset( $_GET[ $options['display']['page']['pager']['pager_key'] ] ) &&
-	     is_numeric( $_GET[ $options['display']['page']['pager']['pager_key'] ] )
-	) {
-		$paged = $_GET[ $options['display']['page']['pager']['pager_key'] ];
-	}
-
-	// standard arguments
-	$args['paged'] = ( $paged ) ? $paged : qw_get_page_number();
-
-	// having any offset will break pagination
-	if ( $args['paged'] > 1 ){
-		unset( $args['offset'] );
-	}
-
-	return $args;
-}
-
-/**
  * Filters require a callback for setting their values in the $args array.
  * This processes those callbacks.
  *
@@ -186,165 +155,6 @@ function qw_generate_filter_callback_args( $args, $options ){
 	}
 
 	return $args;
-}
-
-/**
- * @param $args
- * @param $options
- *
- * @return mixed
- */
-function qw_generate_exposed_filter_callback_args( $args, $options ){
-
-	$handlers = qw_get_query_handlers( $options );
-	$submitted_data = qw_exposed_submitted_data();
-
-	foreach ( $handlers as $handler_type => $handler ) {
-		if ( is_array( $handler['items'] ) ) {
-			foreach ( $handler['items'] as $name => $item ) {
-
-				// Only work items that are exposed
-				if ( !empty( $item['values']['is_exposed'] ) ) {
-
-					if ( ! empty( $item['values']['exposed_key'] ) ) {
-						// override exposed key
-						$item['exposed_key'] = $item['values']['exposed_key'];
-					}
-					else {
-						// default exposed key
-						$item['exposed_key'] = 'exposed_' . $item['values']['name'];
-					}
-
-					// Process submitted exposed values
-					if ( isset( $submitted_data[ $item['exposed_key'] ] ) && is_callable( $item['exposed_process'] ) ) {
-						$value = $submitted_data[ $item['exposed_key'] ];
-						call_user_func( $item['exposed_process'], $args, $item, $value );
-					}
-				}
-			}
-		}
-	}
-
-	return $args;
-}
-
-/**
- * Helper function: Get the current page number
- *
- * @param object $qw_query - the query being displayed
- *
- * @return int - the currentpage number
- */
-function qw_get_page_number( $qw_query = NULL ) {
-	// help figure out the current page
-	$path_array = explode( '/page/', $_SERVER['REQUEST_URI'] );
-
-	// look for WP paging first
-	if ( ! is_null( $qw_query ) && isset( $qw_query->query_vars['paged'] ) ) {
-		$page = $qw_query->query_vars['paged'];
-	} // try wordpress method
-	else if ( ! is_null( $qw_query ) && get_query_var( 'paged' ) ) {
-		$page = get_query_var( 'paged' );
-	} // paging with slashes
-	else if ( isset( $path_array[1] ) ) {
-		$page = explode( '/', $path_array[1] );
-		$page = $page[0];
-	} // paging with get variable
-	else if ( isset( $_GET['page'] ) ) {
-		$page = $_GET['page'];
-	} // paging with a different get variable
-	else if ( isset( $_GET['paged'] ) ) {
-		$page = $_GET['paged'];
-	} else {
-		$page = 1;
-	}
-
-	return $page;
-}
-
-/**
- * Trim each item in an array w/ array_walk
- *   eg: array_walk($fruit, 'qw_trim');
- *
- * @param mixed
- */
-function qw_trim( &$value ) {
-	$value = trim( $value );
-}
-
-/**
- * Serialize wrapper functions for future changes.
- *
- * @param $array
- *
- * @return string
- */
-function qw_serialize( $array ) {
-	return serialize( $array );
-}
-
-/**
- * Custom: Fix unserialize problem with quotation marks
- *
- * @param $serial_str
- *
- * @return array
- */
-function qw_unserialize( $serial_str ) {
-	$data = maybe_unserialize( $serial_str );
-
-	// if the string failed to unserialize, we may have a quotation problem
-	if ( !is_array( $data ) ) {
-		$serial_str = @preg_replace( '!s:(\d+):"(.*?)";!se', "'s:'.strlen('$2').':\"$2\";'", $serial_str );
-		$data = maybe_unserialize( $serial_str );
-	}
-
-	if ( is_array( $data ) ) {
-		// stripslashes twice for science
-		$data = array_map( 'stripslashes_deep', $data );
-		$data = array_map( 'stripslashes_deep', $data );
-
-		return $data;
-	}
-
-	// if we're here the data wasn't unserialized properly.
-	// return a modified version of the default query to prevent major failures.
-	$default = qw_default_query_data();
-	$default['display']['title'] = 'error unserializing query data';
-	$default['args']['filters']['posts_per_page']['posts_per_page'] = 1;
-
-	return $default;
-}
-
-/**
- * Support function for legacy, pre hook_keys discovery
- *
- * @param $all
- * @param $single
- *
- * @return int|string
- */
-function qw_get_hook_key( $all, $single ) {
-	// default to new custom_field (meta_value_new)
-	$hook_key = '';
-
-	// see if hook key is set
-	if ( ! empty( $single['hook_key'] ) && isset( $all[ $single['hook_key'] ] ) ) {
-		$hook_key = $single['hook_key'];
-	} // look for type as key
-	else if ( ! empty( $single['type'] ) ) {
-		foreach ( $all as $key => $item ) {
-			if ( $single['type'] == $item['type'] ) {
-				$hook_key = $item['hook_key'];
-				break;
-			} else if ( $single['type'] == $key ) {
-				$hook_key = $key;
-				break;
-			}
-		}
-	}
-
-	return $hook_key;
 }
 
 /**
@@ -379,20 +189,4 @@ function qw_contextual_tokens_replace( $args ) {
 	}
 
 	return $args;
-}
-
-/**
- * usort callback - sort by 'weight' key in array
- *
- * @param $a
- * @param $b
- *
- * @return int
- */
-function qw_cmp( $a, $b ) {
-	if ( $a['weight'] == $b['weight'] ) {
-		return 0;
-	}
-
-	return ( $a['weight'] < $b['weight'] ) ? - 1 : 1;
 }
