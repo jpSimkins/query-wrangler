@@ -4,7 +4,6 @@ add_filter( 'qw_handlers','qw_handler_type_filter' );
 
 add_filter( 'qw_generate_query_args', 'qw_generate_filter_callback_args', 0, 2 );
 
-
 /**
  * Filters add arguments to the array of arguments passed into WP_Query()
  *
@@ -24,6 +23,33 @@ function qw_handler_type_filter( $handlers )
 	);
 
 	return $handlers;
+}
+
+/**
+ * Get all "Filter" handler item types
+ *
+ * @return array
+ */
+function qw_all_filters()
+{
+	$filters = apply_filters( 'qw_filters', array() );
+	$filters = qw_set_hook_keys( $filters );
+
+	foreach ( $filters as $type => $filter ) {
+		// set filter's type as a value if not provided by filter
+		if ( ! isset( $filter['type'] ) ) {
+			$filters[ $type ]['type'] = $type;
+		}
+	}
+
+	// sort them by title
+	$titles = array();
+	foreach ( $filters as $key => $filter ) {
+		$titles[ $key ] = $filter['title'];
+	}
+	array_multisort( $titles, SORT_ASC, $filters );
+
+	return $filters;
 }
 
 /**

@@ -32,29 +32,33 @@ function qw_post_properties_fields( $fields ) {
 		'title'       => __( 'Post ID' ),
 		'description' => __( 'The post ID.' ),
 	);
-	$fields['post_status'] = array(
-		'title'       => __( 'Post Status' ),
-		'description' => __( 'Status of a post.' ),
-	);
-	$fields['post_parent'] = array(
-		'title'       => __( 'Post Parent' ),
-		'description' => __( 'Parent page ID for a page.' ),
-	);
-	$fields['post_modified'] = array(
-		'title'       => __( 'Post Modified' ),
-		'description' => __( 'Last date a post was modified.' ),
+	$fields['comment_count'] = array(
+		'title'       => __( 'Comment Count' ),
+		'description' => __( 'Number of comments for a post.' ),
 	);
 	$fields['guid'] = array(
 		'title'       => __( 'GUID' ),
 		'description' => __( 'Global Unique ID for a post (url).' ),
 	);
+	$fields['post_mime_type'] = array(
+		'title'       => __( 'Post Mime Type' ),
+		'description' => __( 'Mime type of the post object.' ),
+	);
+	$fields['post_modified'] = array(
+		'title'       => __( 'Post Modified' ),
+		'description' => __( 'Last date a post was modified.' ),
+	);
+	$fields['post_parent'] = array(
+		'title'       => __( 'Post Parent' ),
+		'description' => __( 'Parent page ID for a page.' ),
+	);
+	$fields['post_status'] = array(
+		'title'       => __( 'Post Status' ),
+		'description' => __( 'Status of a post.' ),
+	);
 	$fields['post_type'] = array(
 		'title'       => __( 'Post Type' ),
 		'description' => __( 'The type of a post.' ),
-	);
-	$fields['comment_count'] = array(
-		'title'       => __( 'Comment Count' ),
-		'description' => __( 'Number of comments for a post.' ),
 	);
 
 	return $fields;

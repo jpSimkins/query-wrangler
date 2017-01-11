@@ -26,6 +26,19 @@ function qw_basic_settings_row_style( $basics )
 }
 
 /**
+ * Get all Row Style options for the Basic "Row Styles" handler item type
+ *
+ * @return array
+ */
+function qw_all_row_styles()
+{
+	$row_styles = apply_filters( 'qw_row_styles', array() );
+	$row_styles = qw_set_hook_keys( $row_styles );
+
+	return $row_styles;
+}
+
+/**
  * Get the current settings values saved to this query
  *
  * @param $row_styles

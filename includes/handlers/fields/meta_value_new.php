@@ -25,16 +25,29 @@ function qw_field_meta_value_new( $fields ) {
 }
 
 /**
+ * Meta value field display handlers
+ *
+ * @return array
+ */
+function qw_all_meta_value_display_handlers()
+{
+	$displays = apply_filters( 'qw_meta_value_display_handlers', array() );
+	$displays = qw_set_hook_keys( $displays );
+
+	return $displays;
+}
+
+/**
  * Post Meta form settings
  *
  * @param $field
  */
 function qw_meta_value_new_form_callback( $field ) {
-	$handlers = array();
-	$display_handlers = qw_get_meta_value_display_handlers();
+	$display_handlers_options = array();
+	$display_handlers = qw_all_meta_value_display_handlers();
 
 	foreach ($display_handlers as $handler => $details ){
-		$handlers[ $handler ] = $details['title'];
+		$display_handlers_options[ $handler ] = $details['title'];
 	}
 
 	$image_styles = get_intermediate_image_sizes();
@@ -79,7 +92,7 @@ function qw_meta_value_new_form_callback( $field ) {
 		'description' => __( 'Select the method fo displaying the meta value.
 			To display the raw value, choose -none-.' ),
 		'value' => isset( $field['values']['display_handler'] ) ? $field['values']['display_handler'] : '',
-		'options' => $handlers,
+		'options' => $display_handlers_options,
 		'class' => array( 'qw-js-title' ),
 	) );
 
@@ -128,13 +141,12 @@ function qw_meta_value_new_form_callback( $field ) {
 function qw_display_post_meta_value_new( $post, $field ) {
 	// pick up after the old meta_value field
 	// try to find the old meta_key
-	if ( empty( $field['meta_key'] ) && strpos( $field['type'],
-			'meta_' ) === 0
-	) {
+	if ( empty( $field['meta_key'] ) && strpos( $field['type'], 'meta_' ) === 0 )
+	{
 		$field['meta_key'] = substr( $field['type'], 5 );
 	}
 
-	$display_handlers    = qw_get_meta_value_display_handlers();
+	$display_handlers    = qw_all_meta_value_display_handlers();
 	$display_handler_key = isset( $field['display_handler'] ) ? $field['display_handler'] : 'none';
 	$handler             = isset( $display_handlers[ $display_handler_key ] ) ? $display_handlers[ $display_handler_key ] : $display_handlers['none'];
 
@@ -153,9 +165,11 @@ function qw_display_post_meta_value_new( $post, $field ) {
 	}
 
 	// handle count limit
-	if ( $count <= 0 || count( $meta_values ) <= $count ) {
+	if ( $count <= 0 || count( $meta_values ) <= $count )
+	{
 		$values = $meta_values;
-	} else {
+	}
+	else {
 		$i = 0;
 		foreach ( $meta_values as $k => $v ) {
 			if ( $i < $count ) {
@@ -166,12 +180,11 @@ function qw_display_post_meta_value_new( $post, $field ) {
 	}
 
 	// image ids
-	if ( isset( $field['are_image_ids'] ) ) {
+	if ( !empty( $field['are_image_ids'] ) ) {
 		$image_ids = $values;
 		$values    = array();
 		foreach ( $image_ids as $image_id ) {
-			$values[] = wp_get_attachment_image( $image_id,
-				$field['image_display_style'] );
+			$values[] = wp_get_attachment_image( $image_id, $field['image_display_style'] );
 		}
 	}
 

@@ -43,7 +43,7 @@
 							array(
 								'handler_type' => 'override',
 								'title' => __( 'Overrides' ),
-								'items' => $overrides,
+								'items' => $handlers['override']['items'],
 								'limit_per_type' => 1,
 								'add_rearrange' => true,
 								'query_type' => $query_type,
@@ -54,7 +54,7 @@
 						array(
 							'handler_type' => 'field',
 							'title' => __( 'Fields' ),
-							'items' => $fields,
+							'items' => $handlers['field']['items'],
 							'add_rearrange' => true,
 							'query_type' => $query_type,
 						));
@@ -68,7 +68,7 @@
 						array(
 							'handler_type' => 'sort',
 							'title' => __( 'Order By' ),
-							'items' => $sorts,
+							'items' => $handlers['sort']['items'],
 							'add_rearrange' => true,
 							'query_type' => $query_type,
 						));
@@ -77,7 +77,7 @@
 						array(
 							'handler_type' => 'filter',
 							'title' => __( 'Filters' ),
-							'items' => $filters,
+							'items' => $handlers['filter']['items'],
 							'add_rearrange' => true,
 							'query_type' => $query_type,
 						));
@@ -90,17 +90,9 @@
 				<?php
 				print qw_admin_template( 'form-editor-items-add-list',
 					array(
-						'handler_type' => 'sort',
-						'description' => __( 'Select options for sorting the query results.' ),
-						'all_item_types' => $all_sorts,
-						'query_type' => $query_type,
-					));
-
-				print qw_admin_template( 'form-editor-items-add-list',
-					array(
 						'handler_type' => 'field',
 						'description' => __( 'Select Fields to add to this query\'s output.' ),
-						'all_item_types' => $all_fields,
+						'all_item_types' => $handlers['field']['all_items'],
 						'query_type' => $query_type,
 					));
 
@@ -108,7 +100,7 @@
 					array(
 						'handler_type' => 'filter',
 						'description' => __( 'Select filters to affect the query\'s results.' ),
-						'all_item_types' => $all_filters,
+						'all_item_types' => $handlers['filter']['all_items'],
 						'query_type' => $query_type,
 					));
 
@@ -116,7 +108,15 @@
 					array(
 						'handler_type' => 'override',
 						'description' => __( 'Select overrides to add to this query. Limit 1 per type.' ),
-						'all_item_types' => $all_overrides,
+						'all_item_types' => $handlers['override']['all_items'],
+						'query_type' => $query_type,
+					));
+
+				print qw_admin_template( 'form-editor-items-add-list',
+					array(
+						'handler_type' => 'sort',
+						'description' => __( 'Select options for sorting the query results.' ),
+						'all_item_types' => $handlers['sort']['all_items'],
 						'query_type' => $query_type,
 					));
 				?>

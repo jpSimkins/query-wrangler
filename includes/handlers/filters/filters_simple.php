@@ -2,8 +2,19 @@
 
 add_filter( 'qw_filters', 'qw_simple_filters' );
 
-function qw_simple_filters( $filters ){
-
+/**
+ * Simple filters can function completely by using one of the following
+ * query_args_callbacks:
+ *
+ * - qw_simple_filter_args_callback()
+ * - qw_dynamic_filter_args_callback()
+ *
+ * @param $filters
+ *
+ * @return mixed
+ */
+function qw_simple_filters( $filters )
+{
 	/*
 	 * Ignore sticky posts
 	 */
@@ -128,26 +139,6 @@ function qw_simple_filters( $filters ){
 				'type' => 'number',
 				'name' => 'offset',
 				'default_value' => 0,
-				'class' => array( 'qw-js-title' ),
-			)
-		)
-	);
-
-	/*
-	 * Post status
-	 */
-	$filters['post_status'] = array(
-		'title'         => __( 'Posts Status' ),
-		'description'   => __( 'Select the post status of the items displayed.' ),
-		'query_args_callback' => 'qw_simple_filter_args_callback',
-		'query_display_types' => array( 'page', 'widget', 'override' ),
-		'required' => true,
-		'form_fields' => array(
-			'post_status' => array(
-				'type' => 'checkboxes',
-				'name' => 'post_status',
-				'default_value' => array(),
-				'options' => qw_all_post_statuses(),
 				'class' => array( 'qw-js-title' ),
 			)
 		)

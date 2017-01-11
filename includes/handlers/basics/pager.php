@@ -27,6 +27,25 @@ function qw_basic_settings_pager( $basics )
 }
 
 /**
+ * Get all Pager options for the Basic "Pager" handler item type
+ *
+ * @return array
+ */
+function qw_all_pager_types()
+{
+	$pagers = apply_filters( 'qw_pager_types', array() );
+	$pagers = qw_set_hook_keys( $pagers );
+
+	foreach( $pagers as $hook_key => $pager ){
+		if ( !empty( $pager['settings_key'] ) ){
+			$pagers[ $hook_key ]['form_prefix'] = QW_FORM_PREFIX . "[display][pager][{$pager['settings_key']}]";
+		}
+	}
+
+	return $pagers;
+}
+
+/**
  * Pager form
  * Additional settings provided by individual pager types
  *

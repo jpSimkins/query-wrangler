@@ -26,6 +26,23 @@ function qw_basic_settings_style( $basics )
 }
 
 /**
+ * Get all Template Style options for the Basic "Style" handler item type
+ *
+ * return array
+ */
+function qw_all_styles()
+{
+	$styles = apply_filters( 'qw_styles', array() );
+	$styles = qw_set_hook_keys( $styles );
+
+//	foreach ( $styles as $hook_key => $style ) {
+//		$styles[ $hook_key ]['form_prefix'] = QW_FORM_PREFIX . "[display][style_settings][{$style['settings_key']}]";
+//	}
+
+	return $styles;
+}
+
+/**
  * Form for configuring display style
  *
  * @param $item

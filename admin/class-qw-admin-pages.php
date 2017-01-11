@@ -505,24 +505,10 @@ class QW_Admin_Pages {
 			'args'                => $options['args'],
 			'display'             => $display,
 			'basics'              => $basics,
-			'filters'             => $handlers['filter']['items'],
-			'fields'              => $handlers['field']['items'],
-			'sorts'               => $handlers['sort']['items'],
-			'overrides'           => $handlers['override']['items'],
-
-			'post_statuses'       => qw_all_post_statuses(),
-			'styles'              => qw_all_styles(),
-			'row_styles'          => qw_all_row_styles(),
-			'page_templates'      => get_page_templates(),
-			'post_types'          => qw_all_post_types(),
-			'pager_types'         => qw_all_pager_types(),
-			'all_overrides'       => qw_all_overrides(),
-			'all_filters'         => qw_all_filters(),
-			'all_fields'          => qw_all_fields(),
-			'all_sorts'           => qw_all_sort_options(),
-			'image_sizes'         => get_intermediate_image_sizes(),
-			'file_styles'         => qw_all_file_styles(),
+			'handlers'            => $handlers,
 		);
+
+		$editor_args = apply_filters( 'qw_edit_page_args', $editor_args );
 
 		return $editor_args;
 	}

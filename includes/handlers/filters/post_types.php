@@ -3,7 +3,8 @@
 // add default filters to the filter
 add_filter( 'qw_filters', 'qw_filter_post_types' );
 
-function qw_filter_post_types( $filters ) {
+function qw_filter_post_types( $filters )
+{
 	$filters['post_types'] = array(
 		'title'                 => __( 'Post Types' ),
 		'description'           => __( 'Select which post types should be shown.' ),
@@ -25,6 +26,33 @@ function qw_filter_post_types( $filters ) {
 	);
 
 	return $filters;
+}
+
+/**
+ * List of all public Post Types registered in WordPress
+ *
+ * @return array
+ */
+function qw_all_post_types()
+{
+	// Get all verified post types
+	$post_types = get_post_types( array(
+		'public'   => TRUE,
+		'_builtin' => FALSE
+	),
+		'names',
+		'and' );
+
+	// Add standard types
+	$post_types['post'] = 'post';
+	$post_types['page'] = 'page';
+
+	$post_types = apply_filters( 'qw_post_types', $post_types );
+
+	// sort types
+	ksort( $post_types );
+
+	return $post_types;
 }
 
 /*

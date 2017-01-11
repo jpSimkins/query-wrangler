@@ -14,6 +14,35 @@ function qw_get_query_handlers( $options ){
 }
 
 /**
+ * All Handlers
+ *
+ * Handlers are groups of items that can be added and removed from a query
+ * eg: filters, sorts, fields
+ *
+ * @return array
+ */
+function qw_all_handlers()
+{
+	$handlers = apply_filters( 'qw_handlers', array() );
+	$handlers = qw_set_hook_keys( $handlers );
+
+	foreach ( $handlers as $hook_key => $handler ) {
+		$handlers[ $hook_key ]['all_items'] = call_user_func( $handler['all_callback'] );
+	}
+
+	return $handlers;
+}
+
+/**
+ * Return Default Template File
+ *
+ * @return string
+ */
+function qw_default_template_file() {
+	return apply_filters( 'qw_default_template_file', 'index.php' );
+}
+
+/**
  * Trim each item in an array w/ array_walk
  *   eg: array_walk($fruit, 'qw_trim');
  *

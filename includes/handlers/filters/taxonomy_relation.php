@@ -1,5 +1,5 @@
 <?php
-// hook into qw_all_filters()
+
 add_filter( 'qw_filters', 'qw_filter_taxonomy_relation' );
 
 /*

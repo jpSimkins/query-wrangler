@@ -43,15 +43,13 @@ class QW_Override {
 			if ( isset( $override['get_query_callback'] ) && is_callable( $override['get_query_callback'] ) ) {
 
 				// override get_query_callbacks should return a QW_Query object
-				$qw_query = call_user_func( $override['get_query_callback'],
-					$wp_query );
+				$qw_query = call_user_func( $override['get_query_callback'], $wp_query );
 
 				if ( $qw_query && is_a( $qw_query, 'QW_Query' ) ) {
 					$this->override_query = $qw_query;
 
 					// go ahead and correct pagination
-					$wp_query->set( 'posts_per_page',
-						$qw_query->data['args']['posts_per_page'] );
+					$wp_query->set( 'posts_per_page', $qw_query->data['args']['posts_per_page'] );
 
 					// !first one wins
 					break;

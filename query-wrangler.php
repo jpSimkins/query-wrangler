@@ -52,22 +52,12 @@ class Query_Wrangler {
 		}
 		include_once QW_PLUGIN_DIR . '/includes/php-polyfill.php';
 		include_once QW_PLUGIN_DIR . '/includes/functions.php';
-		include_once QW_PLUGIN_DIR . '/includes/hooks.php';
-		include_once QW_PLUGIN_DIR . '/includes/pages.php';
+		//include_once QW_PLUGIN_DIR . '/includes/pages.php';
 		include_once QW_PLUGIN_DIR . '/includes/query.php';
-		include_once QW_PLUGIN_DIR . '/includes/query-db.php';
 		include_once QW_PLUGIN_DIR . '/includes/template.php';
 		include_once QW_PLUGIN_DIR . '/includes/exposed.php';
 
 		spl_autoload_register( array( $this, 'autoload' ) );
-
-		$last_db_version = get_option( 'qw_db_version', '2000' );
-
-		$update = new QW_Update( $last_db_version, QW_DB_VERSION );
-
-		if ( $update->needed() ){
-			$update->perform_updates();
-		}
 	}
 
 	/**
@@ -91,10 +81,26 @@ class Query_Wrangler {
 	 * Initialize
 	 */
 	function init(){
+		$this->check_updates();
+
 		$this->load_common();
 
 		if ( is_admin() ){
 			$this->load_admin();
+		}
+	}
+
+	/**
+	 * Perform database updates if needed
+	 */
+	function check_updates(){
+		$last_db_version = get_option( 'qw_db_version', '2000' );
+
+		$needed = version_compare( QW_DB_VERSION, $last_db_version, '>' );
+
+		if ( $needed ){
+			$update = new QW_Update( $last_db_version, QW_DB_VERSION );
+			$update->perform_updates();
 		}
 	}
 
@@ -104,6 +110,7 @@ class Query_Wrangler {
 	function load_common(){
 		$includes = array(
 			'includes/handlers' => array(
+				'basic',
 				'field',
 				'filter',
 				'override',
@@ -119,29 +126,31 @@ class Query_Wrangler {
 				'styles',
 			),
 			'includes/handlers/fields' => array(
-				'template_tags',
-				'post_properties',
+				'callback_field',
+				'file_attachment',
+				'featured_image',
+				'image_attachment',
+				'meta_value_new',
 				'post_author',
 				'post_author_avatar',
-				'file_attachment',
-				'image_attachment',
-				'featured_image',
-				'callback_field',
+				'post_properties',
 				'taxonomy_terms',
+				'template_tags',
 			),
 			'includes/handlers/filters' => array(
-				'filters_simple',
 				'author',
 				'callback',
-				'post_types',
-				'post_id',
-				'meta_query',
-				'tags',
 				'categories',
+				'filters_simple',
+				'meta_query',
+				'post_id',
 				'post_parent',
+				'post_status',
+				'post_types',
+				'search',
+				'tags',
 				'taxonomies',
 				'taxonomy_relation',
-				'search',
 			),
 			'includes/handlers/sorts' => array(
 				'default_sorts'
@@ -175,23 +184,13 @@ class Query_Wrangler {
 			),
 		);
 
-		/*
-		 * Meta value field changes depending on a setting
-		 */
-		$this->settings = QW_Settings::get_instance();
-
-		if ( $this->settings->get( 'meta_value_field_handler', 0 ) ) {
-			$includes['/includes/handlers/fields'][] = 'meta_value_new';
-		}
-		else {
-			$includes['/includes/handlers/fields'][] = 'meta_value';
-		}
-
 		foreach( $includes as $folder => $files ){
 			foreach( $files as $file ){
 				include_once QW_PLUGIN_DIR . "/{$folder}/{$file}.php";
 			}
 		}
+
+		$this->settings = QW_Settings::get_instance();
 
 		QW_Override::register();
 		QW_Shortcodes::register( $this->settings );

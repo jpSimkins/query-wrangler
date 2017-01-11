@@ -196,15 +196,16 @@ class Query_Wrangler_List_Table extends WP_List_Table {
 		}
 
 		if ( $item['type'] == 'override' ) {
-			$details = _( 'Overriding' );
+			$details = __( 'Overriding' );
 
 			$row = qw_get_query_by_id( $item['ID'] );
 			if ( isset( $row->data['override'] ) ) {
-				$all_overrides = qw_all_overrides();
+				$handlers = qw_all_handlers();
+
 				foreach ( $row->data['override'] as $type => $values ) {
 
-					if ( isset( $all_overrides[ $type ] ) ) {
-						$override = $all_overrides[ $type ];
+					if ( isset( $handlers['override']['all_items'][ $type ] ) ) {
+						$override = $handlers['override']['all_items'][ $type ];
 
 						$details .= '<br>'.$override['title'] . ': ';
 

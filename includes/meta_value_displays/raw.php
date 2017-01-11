@@ -12,7 +12,7 @@ add_filter( 'qw_meta_value_display_handlers', 'qw_meta_value_display_handlers_de
 function qw_meta_value_display_handlers_default( $displays )
 {
 	$displays['none'] = array(
-		'title'    => '-none-',
+		'title'    => __('Raw'),
 		'callback' => 'qw_get_post_meta',
 	);
 

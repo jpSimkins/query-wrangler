@@ -25,6 +25,32 @@ function qw_handler_type_field( $handlers )
 }
 
 /**
+ * Get all "Field" handler item types
+ *
+ * @return array
+ */
+function qw_all_fields()
+{
+	$fields = apply_filters( 'qw_fields', array() );
+	$fields = qw_set_hook_keys( $fields );
+
+	foreach ( $fields as $type => $field ) {
+		if ( ! isset( $field['type'] ) ) {
+			$fields[ $type ]['type'] = $type;
+		}
+	}
+
+	// sort them by title
+	$titles = array();
+	foreach ( $fields as $key => $field ) {
+		$titles[ $key ] = $field['title'];
+	}
+	array_multisort( $titles, SORT_ASC, $fields );
+
+	return $fields;
+}
+
+/**
  * Retrieve existing Field data from an array of query options
  *
  * @param $options

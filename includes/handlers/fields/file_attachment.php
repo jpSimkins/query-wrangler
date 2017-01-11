@@ -43,6 +43,30 @@ function qw_field_file_attachment( $fields ) {
 }
 
 /**
+ * Simple list of all File Styles used by certain "Field" handler item types
+ *
+ * @return array
+ */
+function qw_all_file_styles()
+{
+	$default = array(
+		'link' => array(
+			'title' => __( 'Filename Link to File' ),
+		),
+		'link_url' => array(
+			'title' => __( 'URL Link to File' ),
+		),
+		'url' => array(
+			'title' => __( 'URL of File' ),
+		),
+	);
+
+	$styles = apply_filters( 'qw_file_styles', $default );
+
+	return $styles;
+}
+
+/**
  * Get and theme attached post files
  *
  * @param $post
