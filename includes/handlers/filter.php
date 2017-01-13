@@ -34,20 +34,7 @@ function qw_all_filters()
 {
 	$filters = apply_filters( 'qw_filters', array() );
 	$filters = qw_set_hook_keys( $filters );
-
-	foreach ( $filters as $type => $filter ) {
-		// set filter's type as a value if not provided by filter
-		if ( ! isset( $filter['type'] ) ) {
-			$filters[ $type ]['type'] = $type;
-		}
-	}
-
-	// sort them by title
-	$titles = array();
-	foreach ( $filters as $key => $filter ) {
-		$titles[ $key ] = $filter['title'];
-	}
-	array_multisort( $titles, SORT_ASC, $filters );
+	$filters = qw_set_hook_types( $filters );
 
 	return $filters;
 }

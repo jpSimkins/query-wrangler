@@ -13,13 +13,12 @@ add_filter( 'qw_template_query_template_args', 'qw_template_query_row_style_temp
  */
 function qw_basic_settings_row_style( $basics )
 {
-	$basics['display_row_style'] = array(
+	$basics['row_style'] = array(
 		'title'         => __( 'Show' ),
 		'description'   => __( 'How should each row in this query be presented?' ),
 		'form_callback' => 'qw_basic_display_row_style_form',
 		'weight'        => 3,
 		'required'      => true,
-		'form_prefix'   => QW_FORM_PREFIX . '[display]',
 	);
 
 	return $basics;
@@ -65,12 +64,12 @@ function qw_row_styles_get_settings_values( $row_styles, $display )
  * Callback to display row_styles selection form
  *
  * @param $item
- * @param $display
+ * @param $options
  */
-function qw_basic_display_row_style_form( $item, $display )
+function qw_basic_display_row_style_form( $item, $options )
 {
 	$row_styles = qw_all_row_styles();
-	$row_styles = qw_row_styles_get_settings_values( $row_styles, $display );
+	$row_styles = qw_row_styles_get_settings_values( $row_styles, $options['display'] );
 
 	$form = new QW_Form_Fields( array(
 		'form_field_prefix' => $item['form_prefix'],
@@ -86,14 +85,14 @@ function qw_basic_display_row_style_form( $item, $display )
 		'type' => 'select',
 		'name' => 'row_style',
 		'description' => $item['description'],
-		'value' => isset( $display['row_style'] ) ? $display['row_style'] : '',
+		'value' => isset( $item['values']['row_style'] ) ? $item['values']['row_style'] : '',
 		'options' => $row_style_options,
 		'class' => array( 'qw-js-title', 'qw-select-group-toggle' ),
 	) );
 
 	print qw_admin_template( 'select-settings-group', array(
 		'items' => $row_styles,
-		'display' => $display,
+		'display' => $options['display'],
 	) );
 }
 

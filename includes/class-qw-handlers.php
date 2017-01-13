@@ -62,7 +62,7 @@ class QW_Handlers {
 
 			// preprocess existing handler items
 			if ( !empty( $items ) ) {
-				$items = $this->preprocess_handler_items( $handler_type, $items );
+				$items = $this->preprocess_handler_items( $handler_type, $items, $options );
 			}
 
 			// sort according to weight
@@ -84,16 +84,21 @@ class QW_Handlers {
 	 *
 	 * @return mixed
 	 */
-	function preprocess_handler_items( $handler_type, $existing_items ){
+	function preprocess_handler_items( $handler_type, $existing_items, $options ){
 		$handler = $this->all_handlers[ $handler_type ];
 
 		// loop through all existing items and prepare them for output
-		foreach ( $existing_items as $name => $values ) {
-			// load sort type data
+		foreach ( $existing_items as $name => $values )
+		{
 			$hook_key = qw_get_hook_key( $handler['all_items'], $values );
 
 			if ( empty( $hook_key ) ) {
 				$hook_key = ! empty( $values['hook_key'] ) ? $values['hook_key'] : $name;
+			}
+
+			// handler item type definition can enforce weight on the instance
+			if ( isset( $handler['all_items'][ $hook_key ]['weight'] ) ){
+				$values['weight'] = $handler['all_items'][ $hook_key ]['weight'];
 			}
 
 			// this_item is a combination of the default item and the saved item
@@ -112,7 +117,7 @@ class QW_Handlers {
 			// this handler's form
 			if ( isset( $this_item['form_callback'] ) && is_callable( $this_item['form_callback'] ) ) {
 				ob_start();
-				call_user_func( $this_item['form_callback'], $this_item );
+				call_user_func( $this_item['form_callback'], $this_item, $options );
 				$this_item['form'] = ob_get_clean();
 			}
 			// automatic form fields
@@ -127,7 +132,7 @@ class QW_Handlers {
 	}
 
 	/**
-	 * Ensure that required item typess of a handler type exist
+	 * Ensure that required item types of a handler type exist
 	 *
 	 * @param $handler_type
 	 * @param array $items
@@ -137,13 +142,20 @@ class QW_Handlers {
 	function enforce_required_items( $handler_type, $items = array() ){
 		$required = $this->get_required_item_types( $handler_type );
 
-		foreach( $required as $required_key => $required_item ){
-			if ( empty( $items[ $required_key ] ) ){
+		foreach( $required as $required_key => $required_item )
+		{
+			if ( empty( $items[ $required_key ] ) )
+			{
 				$items[ $required_key ] = array(
-					'name' => $required_item['type'],
-					'type' => $required_item['type'],
 					'hook_key' => $required_item['hook_key'],
 				);
+
+				// not all handler types require recording of "type" and "name"
+				if ( !empty( $required_item['type'] ) )
+				{
+					$items[ $required_key ]['name'] = $required_item['type'];
+					$items[ $required_key ]['type'] = $required_item['type'];
+				}
 			}
 		}
 

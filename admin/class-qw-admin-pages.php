@@ -488,9 +488,9 @@ class QW_Admin_Pages {
 		// preprocess existing handlers
 		$handlers = qw_get_query_handlers( $options );
 		$handlers = $this->make_handler_wrapper_forms( $handlers );
-
-		$basics = qw_all_basic_settings();
-		$basics = $this->make_basics_wrapper_forms( $basics, $options );
+d($handlers);
+//		$basics = qw_all_basic_settings();
+//		$basics = $this->make_basics_wrapper_forms( $basics, $options );
 
 		// start building edit page data
 		$editor_args = array(
@@ -504,7 +504,7 @@ class QW_Admin_Pages {
 			'options'             => $options,
 			'args'                => $options['args'],
 			'display'             => $display,
-			'basics'              => $basics,
+			//'basics'              => $basics,
 			'handlers'            => $handlers,
 		);
 
@@ -553,23 +553,24 @@ class QW_Admin_Pages {
 		$tokens = array();
 
 		foreach( $handlers as $handler_type => $handler ){
-			if ( !empty( $handler['items'] ) ) {
-				foreach( $handler['items'] as $k => $item ){
-					$args = array(
-						$handler_type => $item,
+			if ( empty( $handler['items'] ) ) {
+				continue;
+			}
+
+			foreach( $handler['items'] as $k => $item ){
+				$args = array(
+					$handler_type => $item,
+				);
+
+				// fields need token
+				if ( $handler_type == 'field' ){
+					$tokens[ $item['name'] ] = '{{' . $item['name'] . '}}';
+					$args += array(
+						'tokens' => $tokens,
 					);
-
-					// fields need token
-					if ( $handler_type == 'field' ){
-						$tokens[ $item['name'] ] = '{{' . $item['name'] . '}}';
-						$args += array(
-							'tokens' => $tokens,
-						);
-					}
-
-					$handlers[ $handler_type ]['items'][ $k ]['wrapper_form'] =
-							qw_admin_template( 'handler-'.$handler_type, $args );
 				}
+
+				$handlers[ $handler_type ]['items'][ $k ]['wrapper_form'] = qw_admin_template( 'handler-'.$handler_type, $args );
 			}
 		}
 

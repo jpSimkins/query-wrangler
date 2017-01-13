@@ -112,6 +112,18 @@ function qw_cmp( $a, $b ) {
 	return ( $a['weight'] < $b['weight'] ) ? - 1 : 1;
 }
 
+function qw_array_by_key( $items, $key )
+{
+
+	// sort them by title
+	$titles = array();
+	foreach ( $items as $i => $item ) {
+		$titles[ $i ] = $item['title'];
+	}
+
+	array_multisort( $titles, SORT_ASC, $items );
+}
+
 /**
  * Replace contextual tokens within a string
  *
@@ -163,6 +175,22 @@ function qw_set_hook_keys( $items )
 }
 
 /**
+ * @param $items
+ *
+ * @return mixed
+ */
+function qw_set_hook_types( $items )
+{
+	foreach( $items as $hook_key => $item )
+	{
+		if ( ! isset( $item['type'] ) ) {
+			$items[ $hook_key ]['type'] = $hook_key;
+		}
+	}
+	return $items;
+}
+
+/**
  * Support function for legacy, pre hook_keys discovery
  *
  * @param $all
@@ -170,20 +198,23 @@ function qw_set_hook_keys( $items )
  *
  * @return int|string
  */
-function qw_get_hook_key( $all, $single ) {
-	// default to new custom_field (meta_value_new)
+function qw_get_hook_key( $all, $single )
+{
 	$hook_key = '';
 
 	// see if hook key is set
 	if ( ! empty( $single['hook_key'] ) && isset( $all[ $single['hook_key'] ] ) ) {
 		$hook_key = $single['hook_key'];
 	} // look for type as key
-	else if ( ! empty( $single['type'] ) ) {
-		foreach ( $all as $key => $item ) {
+	else if ( ! empty( $single['type'] ) )
+	{
+		foreach ( $all as $key => $item )
+		{
 			if ( $single['type'] == $item['type'] ) {
 				$hook_key = $item['hook_key'];
 				break;
-			} else if ( $single['type'] == $key ) {
+			}
+			else if ( $single['type'] == $key ) {
 				$hook_key = $key;
 				break;
 			}

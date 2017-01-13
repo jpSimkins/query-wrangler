@@ -19,7 +19,6 @@ function qw_basic_settings_style( $basics )
 		'form_callback' => 'qw_basic_display_style_form',
 		'weight'        => 2,
 		'required'      => true,
-		'form_prefix'   => QW_FORM_PREFIX . '[display]',
 	);
 
 	return $basics;

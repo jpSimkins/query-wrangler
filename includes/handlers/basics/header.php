@@ -18,7 +18,6 @@ function qw_basic_header_settings( $basics )
 		'description'   => __( 'The content placed here will appear above the resulting query.' ),
 		'weight'        => 5,
 		'required'      => true,
-		'form_prefix'   => QW_FORM_PREFIX . '[display]',
 		'form_fields' => array(
 			array(
 				'type' => 'textarea',
@@ -42,8 +41,8 @@ function qw_basic_header_settings( $basics )
  */
 function qw_template_query_header_wrapper_args( $args, $wp_query, $options )
 {
-	if ( !empty( $options['display']['header'] ) ) {
-		$args['header'] = $options['display']['header'];
+	if ( !empty( $options['display']['basic']['header']['header'] ) ) {
+		$args['header'] = $options['display']['basic']['header']['header'];
 	}
 
 	return $args;

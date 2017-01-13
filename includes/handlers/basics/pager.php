@@ -19,7 +19,7 @@ function qw_basic_settings_pager( $basics )
 		'description'   => __( 'Select which type of pager to use.' ),
 		'weight'        => 12,
 		'required'      => true,
-		'form_prefix'   => QW_FORM_PREFIX . '[display][pager]',
+		//'form_prefix'   => QW_FORM_PREFIX . '[display][pager]',
 		'form_callback' => 'qw_basic_pager_form',
 	);
 
@@ -50,12 +50,12 @@ function qw_all_pager_types()
  * Additional settings provided by individual pager types
  *
  * @param $pager
- * @param $display
+ * @param $options
  */
-function qw_basic_pager_form( $pager, $display )
+function qw_basic_pager_form( $pager, $options )
 {
 	$pager_types = qw_all_pager_types();
-	$pager_types = qw_pager_types_get_settings( $pager_types, $display );
+	$pager_types = qw_pager_types_get_settings( $pager_types, $options['display'] );
 
 	$form = new QW_Form_Fields( array(
 		'form_field_prefix' => $pager['form_prefix'],
@@ -64,7 +64,7 @@ function qw_basic_pager_form( $pager, $display )
 	print $form->render_field( array(
 		'type' => 'checkbox',
 		'name' => 'active',
-		'value' => !empty( $display['pager']['active'] ),
+		'value' => !empty( $options['display']['pager']['active'] ),
 		'title' => __( 'Use Pagination' ),
 		'class' => array( 'qw-js-title' ),
 	) );
@@ -81,7 +81,7 @@ function qw_basic_pager_form( $pager, $display )
 	print $form->render_field( array(
 		'type' => 'select',
 		'name' => 'type',
-		'value' => !empty( $display['pager']['type'] ) ? $display['pager']['type'] : '',
+		'value' => !empty( $options['display']['pager']['type'] ) ? $options['display']['pager']['type'] : '',
 		'title' => __( 'Pager Type' ),
 		'description' => __( 'Select the type of pager to use.' ),
 		'options' => $pager_types_options,
@@ -90,7 +90,7 @@ function qw_basic_pager_form( $pager, $display )
 
 	print qw_admin_template( 'select-settings-group', array(
 		'items' => $pager_types,
-		'display' => $display,
+		'display' => $options['display'],
 	) );
 }
 

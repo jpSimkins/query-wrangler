@@ -33,19 +33,7 @@ function qw_all_fields()
 {
 	$fields = apply_filters( 'qw_fields', array() );
 	$fields = qw_set_hook_keys( $fields );
-
-	foreach ( $fields as $type => $field ) {
-		if ( ! isset( $field['type'] ) ) {
-			$fields[ $type ]['type'] = $type;
-		}
-	}
-
-	// sort them by title
-	$titles = array();
-	foreach ( $fields as $key => $field ) {
-		$titles[ $key ] = $field['title'];
-	}
-	array_multisort( $titles, SORT_ASC, $fields );
+	$fields = qw_set_hook_types( $fields );
 
 	return $fields;
 }

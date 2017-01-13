@@ -29,7 +29,7 @@
 						array(
 							'handler_type' => 'basic',
 							'title' => __( 'Basic Settings' ),
-							'items' => $basics,
+							'items' => $handlers['basic']['items'],
 							'query_type' => $query_type,
 						));
 					?>

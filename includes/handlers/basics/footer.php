@@ -18,7 +18,6 @@ function qw_basic_footer_settings( $basics )
 		'description'   => __( 'The content placed here will appear below the resulting query.' ),
 		'weight'        => 6,
 		'required'      => true,
-		'form_prefix'   => QW_FORM_PREFIX . '[display]',
 		'form_fields' => array(
 			'footer' => array(
 				'type' => 'textarea',
@@ -42,8 +41,8 @@ function qw_basic_footer_settings( $basics )
  */
 function qw_template_query_footer_wrapper_args( $args, $wp_query, $options )
 {
-	if ( !empty( $options['display']['footer'] ) ) {
-		$args['footer'] = $options['display']['footer'];
+	if ( !empty( $options['display']['basic']['footer']['footer'] ) ) {
+		$args['footer'] = $options['display']['basic']['footer']['footer'];
 	}
 
 	return $args;
