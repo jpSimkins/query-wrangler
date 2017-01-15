@@ -195,7 +195,7 @@ class Query_Wrangler {
 		QW_Override::register();
 		QW_Shortcodes::register( $this->settings );
 
-		$this->handlers = QW_Handlers::get_instance();
+		$this->handlers = QW_Handler_Manager::get_instance();
 	}
 
 	/**

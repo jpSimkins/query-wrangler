@@ -63,16 +63,16 @@ function qw_row_styles_get_settings_values( $row_styles, $display )
 /**
  * Callback to display row_styles selection form
  *
- * @param $item
+ * @param $handler_item_type
  * @param $options
  */
-function qw_basic_display_row_style_form( $item, $options )
+function qw_basic_display_row_style_form( $handler_item_type, $options )
 {
 	$row_styles = qw_all_row_styles();
-	$row_styles = qw_row_styles_get_settings_values( $row_styles, $options['display'] );
+	$row_styles = qw_row_styles_get_settings_values( $row_styles, $options );
 
 	$form = new QW_Form_Fields( array(
-		'form_field_prefix' => $item['form_prefix'],
+		'form_field_prefix' => $handler_item_type['form_prefix'],
 	) );
 
 	$row_style_options = array();
@@ -84,15 +84,16 @@ function qw_basic_display_row_style_form( $item, $options )
 	print $form->render_field( array(
 		'type' => 'select',
 		'name' => 'row_style',
-		'description' => $item['description'],
-		'value' => isset( $item['values']['row_style'] ) ? $item['values']['row_style'] : '',
+		'description' => $handler_item_type['description'],
+		'value' => isset( $handler_item_type['values']['row_style'] ) ? $handler_item_type['values']['row_style'] : '',
 		'options' => $row_style_options,
 		'class' => array( 'qw-js-title', 'qw-select-group-toggle' ),
 	) );
 
 	print qw_admin_template( 'select-settings-group', array(
-		'items' => $row_styles,
-		'display' => $options['display'],
+		'handler_item_type' => $handler_item_type,
+		'settings_group_options' => $row_styles,
+		'query_data' => $options,
 	) );
 }
 
@@ -109,7 +110,7 @@ function qw_basic_display_row_style_form( $item, $options )
 function qw_template_query_row_style_template_args( $template_args, $wp_query, $options )
 {
 	$row_styles = qw_all_row_styles();
-	$row_style = $row_styles[ $options['display']['row_style'] ];
+	$row_style = $row_styles[ $options['basic']['row_style']['row_style'] ];
 
 	if ( is_callable( $row_style['make_rows_callback'] ) ) {
 		$template_args['rows'] = call_user_func( $row_style['make_rows_callback'], $wp_query, $options );

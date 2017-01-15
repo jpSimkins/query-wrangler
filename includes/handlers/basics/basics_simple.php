@@ -30,7 +30,7 @@ function qw_simple_basic_settings( $basics ) {
 		'form_fields' => array(
 			'wrapper_classes' => array(
 				'type' => 'text',
-				'name' => 'wrapper-classes',
+				'name' => 'wrapper_classes',
 				'class' => array( 'qw-text-long', 'qw-js-title' ),
 			)
 		)

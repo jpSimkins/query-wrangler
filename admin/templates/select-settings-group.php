@@ -14,25 +14,25 @@
 ?>
 <div id="row-style-settings">
 	<?php
-	foreach ( $items as $item )
+	foreach ( $settings_group_options as $option_settings )
 	{
-		if ( isset( $item['settings_callback'] ) && is_callable( $item['settings_callback'] ) )
+		if ( isset( $option_settings['settings_callback'] ) && is_callable( $option_settings['settings_callback'] ) )
 		{
 			// get the current values saved to this query
-			$item['values'] = array();
+			$option_settings['values'] = array();
 
-			if ( isset( $item['settings_key'] ) &&
-			     isset( $display[ $item['settings_key'] ] ) )
+			if ( isset( $option_settings['settings_key'] ) &&
+			     isset( $display[ $option_settings['settings_key'] ] ) )
 			{
-				$item['values'] =  $display[ $item['settings_key'] ];
+				$option_settings['values'] =  $display[ $option_settings['settings_key'] ];
 			}
 			?>
-			<div id="tab-row-style-settings-<?php print $item['hook_key']; ?>"
-			     class="qw-query-content qw-select-group-item qw-select-group-value-<?php print $item['hook_key']; ?>">
-				<h3><?php print $item['title']; ?> <?php _e( 'Settings' ); ?></h3>
+			<div id="tab-row-style-settings-<?php print $option_settings['hook_key']; ?>"
+			     class="qw-query-content qw-select-group-item qw-select-group-value-<?php print $option_settings['hook_key']; ?>">
+				<h3><?php print $option_settings['title']; ?> <?php _e( 'Settings' ); ?></h3>
 
 				<div class="qw-setting-group-inner">
-					<?php print call_user_func( $item['settings_callback'], $item, $display ); ?>
+					<?php print call_user_func( $option_settings['settings_callback'], $option_settings, $query_data, $handler_item_type ); ?>
 				</div>
 			</div>
 			<?php

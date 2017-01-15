@@ -15,10 +15,7 @@ function qw_handler_type_field( $handlers )
 	$handlers['field']    = array(
 		'title'            => __( 'Field' ),
 		'description'      => __( 'Select Fields to add to this query output.' ),
-		'all_callback'     => 'qw_all_fields',
-		'data_callback'    => 'qw_handler_type_field_get_data',
-		'set_data_callback'=> 'qw_handler_type_field_set_data',
-		'form_prefix'      => '[display][field_settings][fields]',
+		'all_callback'     => 'qw_all_field_handler_item_types',
 	);
 
 	return $handlers;
@@ -27,45 +24,18 @@ function qw_handler_type_field( $handlers )
 /**
  * Get all "Field" handler item types
  *
- * @return array
- */
-function qw_all_fields()
-{
-	$fields = apply_filters( 'qw_fields', array() );
-	$fields = qw_set_hook_keys( $fields );
-	$fields = qw_set_hook_types( $fields );
-
-	return $fields;
-}
-
-/**
- * Retrieve existing Field data from an array of query options
- *
- * @param $options
+ * @param $handler
  *
  * @return array
  */
-function qw_handler_type_field_get_data( $options )
+function qw_all_field_handler_item_types( $handler = NULL )
 {
-	$data = array();
+	$handler_item_types = apply_filters( 'qw_fields', array() );
+	$handler_item_types = qw_set_hook_types( $handler_item_types );
 
-	if ( !empty( $options['display']['field_settings']['fields'] ) ) {
-		$data = $options['display']['field_settings']['fields'];
+	if ( $handler ){
+		$handler_item_types = qw_pre_process_handler_item_types( $handler_item_types, $handler );
 	}
 
-	return $data;
-}
-
-/**
- * @param $data
- * @param $key
- * @param $value
- *
- * @return array
- */
-function qw_handler_type_field_set_data( $data, $key, $value )
-{
-	$data['display']['field_settings']['fields'][ $key ] = $value;
-
-	return $data;
+	return $handler_item_types;
 }

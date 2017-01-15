@@ -8,7 +8,7 @@
  * @return mixed|void
  */
 function qw_get_query_handlers( $options ){
-	$handlers = QW_Handlers::get_instance();
+	$handlers = QW_Handler_Manager::get_instance();
 
 	return $handlers->get_query_handlers( $options );
 }
@@ -24,13 +24,92 @@ function qw_get_query_handlers( $options ){
 function qw_all_handlers()
 {
 	$handlers = apply_filters( 'qw_handlers', array() );
-	$handlers = qw_set_hook_keys( $handlers );
+	$handlers = qw_pre_process_handler_types( $handlers );
 
+	return $handlers;
+}
+
+function qw_pre_process_handler_types( $handlers )
+{
 	foreach ( $handlers as $hook_key => $handler ) {
-		$handlers[ $hook_key ]['all_items'] = call_user_func( $handler['all_callback'] );
+		$handler['hook_key'] = $hook_key;
+		$handler['form_prefix'] = QW_FORM_PREFIX . "[{$hook_key}]" ;
+		$handler['all_items'] = call_user_func( $handler['all_callback'], $handler );
+
+		$handlers[ $hook_key ] = $handler;
 	}
 
 	return $handlers;
+}
+
+/**
+ * Simple helper functions for very common task of recording an item's original
+ * unique index.
+ *
+ * @param $item_types
+ * @param $handler
+ *
+ * @return mixed
+ */
+function qw_pre_process_handler_item_types( $item_types, $handler )
+{
+	foreach( $item_types as $hook_key => $item ){
+		$item['hook_key'] = $hook_key;
+		$item['form_prefix'] = "{$handler['form_prefix']}[{$hook_key}]";
+
+		$item_types[ $hook_key ] = $item;
+	}
+	return $item_types;
+}
+
+/**
+ * Simple helper functions for very common task of recording an item's original
+ * unique index.
+ *
+ * @param $settings
+ * @param $handler_item_type
+ *
+ * @return mixed
+ */
+function qw_pre_process_handler_item_type_settings( $settings, $handler_item_type )
+{
+	foreach( $settings as $hook_key => $item ){
+		$item['hook_key'] = $hook_key;
+		$item['form_prefix'] = "{$handler_item_type['form_prefix']}[{$hook_key}]";
+
+		$settings[ $hook_key ] = $item;
+	}
+
+	return $settings;
+}
+
+/**
+ * @param $items
+ *
+ * @return mixed
+ */
+function qw_set_hook_keys( $items ){
+	foreach ($items as $hook_key => $item ){
+		$items[ $hook_key ]['hook_key'] = $hook_key;
+	}
+
+	return $items;
+}
+
+/**
+ * @param $items
+ *
+ * @return mixed
+ */
+function qw_set_hook_types( $items )
+{
+	foreach( $items as $hook_key => $item )
+	{
+		if ( ! isset( $item['type'] ) ) {
+			$items[ $hook_key ]['type'] = $hook_key;
+		}
+	}
+	return $items;
 }
 
 /**
@@ -156,38 +235,6 @@ function qw_contextual_tokens_replace( $args ) {
 	}
 
 	return $args;
-}
-
-/**
- * Simple helper functions for very common task of recording an item's original
- * unique index.
- *
- * @param $items
- *
- * @return mixed
- */
-function qw_set_hook_keys( $items )
-{
-	foreach( $items as $hook_key => $item ){
-		$items[ $hook_key ]['hook_key'] = $hook_key;
-	}
-	return $items;
-}
-
-/**
- * @param $items
- *
- * @return mixed
- */
-function qw_set_hook_types( $items )
-{
-	foreach( $items as $hook_key => $item )
-	{
-		if ( ! isset( $item['type'] ) ) {
-			$items[ $hook_key ]['type'] = $hook_key;
-		}
-	}
-	return $items;
 }
 
 /**

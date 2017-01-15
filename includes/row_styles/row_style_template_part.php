@@ -26,12 +26,14 @@ function qw_row_style_template_part( $row_styles )
  * Additional settings for this row_style
  *
  * @param $row_style
- * @param $display
+ * @param $options
+ * @param $handler_item_type
+ *
  */
-function qw_row_style_template_part_settings( $row_style, $display )
+function qw_row_style_template_part_settings( $row_style, $options, $handler_item_type )
 {
 	$form = new QW_Form_Fields( array(
-		'form_field_prefix' => QW_FORM_PREFIX . "[display][{$row_style['settings_key']}]",
+		'form_field_prefix' => "{$handler_item_type['form_prefix']}[{$row_style['settings_key']}]",
 	) );
 
 	print $form->render_field( array(

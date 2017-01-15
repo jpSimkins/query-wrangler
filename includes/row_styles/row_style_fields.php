@@ -25,12 +25,13 @@ function qw_row_style_fields( $row_styles )
  * Additional settings for form this row_style
  *
  * @param $row_style
- * @param $display
+ * @param $options
+ * @param $handler_item_type
  */
-function qw_row_style_fields_settings( $row_style, $display )
+function qw_row_style_fields_settings( $row_style, $options, $handler_item_type )
 {
-	$query_fields = !empty( $display['field_settings']['fields'] ) ? $display['field_settings']['fields'] : array();
-	$all_fields   = qw_all_fields();
+	$query_fields = !empty( $options['field'] ) ? $options['field'] : array();
+	$all_fields   = qw_all_field_handler_item_types();
 
 	$group_by_options = array(
 		'__none__' => __( '- None -' ),
@@ -40,7 +41,7 @@ function qw_row_style_fields_settings( $row_style, $display )
 	}
 
 	$form = new QW_Form_Fields( array(
-		'form_field_prefix' => QW_FORM_PREFIX . "[display][{$row_style['settings_key']}]",
+		'form_field_prefix' => "{$handler_item_type['form_prefix']}[{$row_style['settings_key']}]",
 	) );
 
 	print $form->render_field( array(
@@ -73,24 +74,23 @@ function qw_row_style_fields_settings( $row_style, $display )
  */
 function qw_row_style_fields_make_rows( $wp_query, $options )
 {
-	$display         = $options['display'];
-	$all_fields      = qw_all_fields();
+	$all_fields      = qw_all_field_handler_item_types();
 	$groups          = array();
 	$tokens          = array();
 	$current_post_id = get_the_ID();
 
 	// the query needs fields
-	if ( empty( $display['field_settings']['fields'] ) || ! is_array( $display['field_settings']['fields'] ) ) {
+	if ( empty( $options['field'] ) || ! is_array( $options['field'] ) ) {
 		return array();
 	}
 
 	// sort according to weights
-	uasort( $display['field_settings']['fields'], 'qw_cmp' );
+	uasort( $options['field'], 'qw_cmp' );
 
 	// look for selected group by field
 	$group_by_field_name = NULL;
-	if ( isset( $display['field_settings']['group_by_field'] ) ) {
-		$group_by_field_name = $display['field_settings']['group_by_field'];
+	if ( isset( $options['basic']['row_style']['field_settings']['group_by_field'] ) ) {
+		$group_by_field_name = $options['basic']['row_style']['field_settings']['group_by_field'];
 	}
 
 	// loop through each post
@@ -105,7 +105,7 @@ function qw_row_style_fields_make_rows( $wp_query, $options )
 		);
 
 		// loop through each field
-		foreach ( $display['field_settings']['fields'] as $field_name => $field_settings ) {
+		foreach ( $options['field'] as $field_name => $field_settings ) {
 			if ( ! isset( $field_settings['empty_field_content_enabled'] ) ) {
 				$field_settings['empty_field_content_enabled'] = FALSE;
 				$field_settings['empty_field_content']         = '';
@@ -184,9 +184,8 @@ function qw_row_style_fields_make_rows( $wp_query, $options )
 
 			// apply labels to full style fields
 			if ( !empty( $field_settings['has_label'] ) &&
-			     //$display['type'] != 'full' &&
-			     $display['style'] != 'table'
-			) {
+			     $options['style'] != 'table' )
+			{
 				$row['fields'][ $field_name ]['output'] = '<label class="query-label">' . $field_settings['label'] . '</label> ' . $row['fields'][ $field_name ]['output'];
 			}
 
@@ -221,7 +220,7 @@ function qw_row_style_fields_make_rows( $wp_query, $options )
 		if ( $group_by_field_name && isset( $row['fields'][ $group_by_field_name ] ) )
 		{
 			// strip tags from group by field
-			if ( !empty( $display['field_settings']['strip_group_by_field'] ) ) {
+			if ( !empty( $options['field_settings']['strip_group_by_field'] ) ) {
 				$row['fields'][ $group_by_field_name ]['content'] = strip_tags( $row['fields'][ $group_by_field_name ]['content'] );
 			}
 			$group_by_field_content = $row['fields'][ $group_by_field_name ]['content'];

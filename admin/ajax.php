@@ -16,7 +16,7 @@ function qw_form_ajax() {
 	if ( isset( $_POST['hook_key'], $_POST['handler'], $_POST['name'] ) ){
 		// buffer the whole process in case of php warnings/notices
 		ob_start();
-		$qw_handlers = QW_Handlers::get_instance();
+		$qw_handlers = QW_Handler_Manager::get_instance();
 
 		$handler_type = $_POST['handler'];
 		$name         = $_POST['name'];
@@ -138,22 +138,21 @@ function qw_get_edit_preview_data(){
 		              To override a query's template, copy the corresponding template from the <span style='font-family: monospace;'>query-wrangler/templates</span> folder to your theme folder (or THEME/templates) and rename it.
 		              <pre>" . print_r( qw_template_scan( $qw_query->options ), 1 ) . "</pre>";
 
-		// php wp_query
 		$php_wpquery = '<pre>$query = new WP_Query(' . var_export( $qw_query->args, 1 ) . ');</pre>';
 
 		$new_query = "<pre>" . htmlentities( print_r( $qw_query->wp_query, TRUE ) ) . "</pre>";
 
+		$qw_query_debug = "<pre>".  htmlentities( print_r( $qw_query, 1 ) )."</pre>";
 		$all_options = "<pre>" . htmlentities( print_r( $qw_query->options, TRUE ) ) . "</pre>";
 
 		// return
 		$data = array(
-				'preview'     => $preview,
-				'php_wpquery' => $php_wpquery,
-				//'args'        => $args,
-				//'display'     => $display,
-				'options'     => $all_options,
-				'wpquery'     => $new_query,
-				'templates'   => $templates,
+			'preview'     => $preview,
+			'php_wpquery' => $php_wpquery,
+			'options'     => $all_options,
+			'wpquery'     => $new_query,
+			'qw_query_debug' => $qw_query_debug,
+			'templates'   => $templates,
 		);
 
 		$data = apply_filters( 'qw_post_preview', $data );

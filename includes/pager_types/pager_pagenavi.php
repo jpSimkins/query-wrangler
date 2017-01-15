@@ -58,7 +58,7 @@ function qw_pager_type_pagenavi_settings_callback( $pager, $display )
 	}
 
 	$form = new QW_Form_Fields( array(
-		'form_field_prefix' => QW_FORM_PREFIX . '[display][pager][pagenavi_settings]',
+		'form_field_prefix' => $pager['form_prefix'],
 	) );
 
 	print $form->render_field( array(

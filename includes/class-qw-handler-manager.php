@@ -10,7 +10,7 @@
  *
  * This class manages all of the above
  */
-class QW_Handlers {
+class QW_Handler_Manager {
 
 	/**
 	 * Internal cache of all registered handler types
@@ -29,7 +29,7 @@ class QW_Handlers {
 	/**
 	 * Singleton
 	 *
-	 * @return QW_Handlers
+	 * @return QW_Handler_Manager
 	 */
 	static public function get_instance(){
 		static $instance = null;
@@ -53,9 +53,13 @@ class QW_Handlers {
 			$items = array();
 
 			// retrieve the handler items from the query array
-			if ( is_callable( $handler['data_callback'] ) ) {
-				$items = call_user_func( $handler['data_callback'], $options );
+			if ( !empty( $options[ $handler_type ] ) ){
+				$items = $options[ $handler_type ];
 			}
+			// @todo deprecated callback
+//			else if ( is_callable( $handler['data_callback'] ) ) {
+//				$items = call_user_func( $handler['data_callback'], $options );
+//			}
 
 			// handle missing required item types
 			$items = $this->enforce_required_items( $handler_type, $items );
@@ -109,7 +113,7 @@ class QW_Handlers {
 					'type' => !empty( $values['type'] ) ? $values['type'] : $name,
 					'weight' => !empty( $values['weight'] ) ? $values['weight'] : 0,
 					'hook_key' => $hook_key,
-					'form_prefix' => QW_FORM_PREFIX . $handler['form_prefix'] . '[' . $name . ']',
+					'form_prefix' => "{$handler['form_prefix']}[{$name}]",
 					'values' => $values,
 				)
 			);

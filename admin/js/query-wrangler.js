@@ -519,7 +519,7 @@ var QueryWrangler = {};
      */
     refresh: function() {
       // show fields, hide message
-      if ( $('#edit--qw-query-optionsdisplayrow_style').val() == 'fields' ) {
+      if ( $('#edit--qw-query-optionsbasicrow_stylerow_style').val() == 'fields' ) {
         $('#query-field').find('.qw-handler-item').show();
         $('.fields-not-used-message').hide();
       }

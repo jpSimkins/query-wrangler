@@ -32,7 +32,7 @@ function qw_field_meta_value_new( $fields ) {
 function qw_all_meta_value_display_handlers()
 {
 	$displays = apply_filters( 'qw_meta_value_display_handlers', array() );
-	$displays = qw_set_hook_keys( $displays );
+	$displays = qw_pre_process_handler_item_types( $displays );
 
 	return $displays;
 }

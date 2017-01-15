@@ -41,8 +41,8 @@ function qw_basic_footer_settings( $basics )
  */
 function qw_template_query_footer_wrapper_args( $args, $wp_query, $options )
 {
-	if ( !empty( $options['display']['basic']['footer']['footer'] ) ) {
-		$args['footer'] = $options['display']['basic']['footer']['footer'];
+	if ( !empty( $options['basic']['footer']['footer'] ) ) {
+		$args['footer'] = $options['basic']['footer']['footer'];
 	}
 
 	return $args;

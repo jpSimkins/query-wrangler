@@ -6,7 +6,7 @@ $form = new QW_Form_Fields( array(
 
 ?>
 <!-- <?php echo $basic['name']; ?> -->
-<div id="qw-field-<?php print $basic['name']; ?>" class="qw-field qw-sortable-item qw-item-form">
+<div id="qw-field-<?php print $basic['name']; ?>" class="qw-field qw-item-form">
 	<p class="description"><?php print $basic['description']; ?></p>
 
 	<?php

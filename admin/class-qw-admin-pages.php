@@ -483,12 +483,13 @@ class QW_Admin_Pages {
 	 */
 	function edit_page_args( $qw_query ) {
 		$options = $qw_query->row->data;
-		$display = isset( $options['display'] ) ? array_map( 'stripslashes_deep', $options['display'] ) : array();
+		//$display = isset( $options['display'] ) ? array_map( 'stripslashes_deep', $options['display'] ) : array();
 
 		// preprocess existing handlers
 		$handlers = qw_get_query_handlers( $options );
 		$handlers = $this->make_handler_wrapper_forms( $handlers );
 d($handlers);
+d($options);
 //		$basics = qw_all_basic_settings();
 //		$basics = $this->make_basics_wrapper_forms( $basics, $options );
 
@@ -502,8 +503,8 @@ d($handlers);
 			'query_type'          => $qw_query->type,
 			'shortcode'           => $this->settings->get('shortcode_compat') ? 'qw_query' : 'query',
 			'options'             => $options,
-			'args'                => $options['args'],
-			'display'             => $display,
+			//'args'                => $options['args'],
+			//'display'             => $display,
 			//'basics'              => $basics,
 			'handlers'            => $handlers,
 		);

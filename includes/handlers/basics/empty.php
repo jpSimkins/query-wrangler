@@ -42,9 +42,9 @@ function qw_basic_empty_settings( $basics )
 function qw_template_query_empty_wrapper_args( $args, $wp_query, $options )
 {
 	if ( count( $wp_query->posts ) <= 0 &&
-	     !empty( $options['display']['basic']['empty']['empty'] ) )
+	     !empty( $options['basic']['empty']['empty'] ) )
 	{
-		$args['content'] = '<div class="query-empty">' . $options['display']['basic']['empty']['empty'] . '</div>';
+		$args['content'] = '<div class="query-empty">' . $options['basic']['empty']['empty'] . '</div>';
 	}
 
 	return $args;

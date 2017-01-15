@@ -41,8 +41,8 @@ function qw_basic_header_settings( $basics )
  */
 function qw_template_query_header_wrapper_args( $args, $wp_query, $options )
 {
-	if ( !empty( $options['display']['basic']['header']['header'] ) ) {
-		$args['header'] = $options['display']['basic']['header']['header'];
+	if ( !empty( $options['basic']['header']['header'] ) ) {
+		$args['header'] = $options['basic']['header']['header'];
 	}
 
 	return $args;

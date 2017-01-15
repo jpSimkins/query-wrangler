@@ -25,6 +25,13 @@ $data = qw_get_edit_preview_data();
 		</div>
 	</div>
 	<div class="group">
+		<div class="qw-setting-header"><?php _e( 'Resulting QW_Query Object' ); ?></div>
+		<div id="qw-show-wpquery-target">
+			<!-- WP_Query -->
+			<?php echo $data['qw_query_debug']; ?>
+		</div>
+	</div>
+	<div class="group">
 		<div class="qw-setting-header"><?php _e( 'Template Suggestions' ); ?></div>
 		<div id="qw-show-templates-target">
 			<!-- templates -->

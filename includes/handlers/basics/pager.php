@@ -19,7 +19,6 @@ function qw_basic_settings_pager( $basics )
 		'description'   => __( 'Select which type of pager to use.' ),
 		'weight'        => 12,
 		'required'      => true,
-		//'form_prefix'   => QW_FORM_PREFIX . '[display][pager]',
 		'form_callback' => 'qw_basic_pager_form',
 	);
 
@@ -29,16 +28,18 @@ function qw_basic_settings_pager( $basics )
 /**
  * Get all Pager options for the Basic "Pager" handler item type
  *
+ * @param $handler_item_type
+ *
  * @return array
  */
-function qw_all_pager_types()
+function qw_all_pager_types( $handler_item_type )
 {
 	$pagers = apply_filters( 'qw_pager_types', array() );
 	$pagers = qw_set_hook_keys( $pagers );
 
 	foreach( $pagers as $hook_key => $pager ){
 		if ( !empty( $pager['settings_key'] ) ){
-			$pagers[ $hook_key ]['form_prefix'] = QW_FORM_PREFIX . "[display][pager][{$pager['settings_key']}]";
+			$pagers[ $hook_key ]['form_prefix'] = "{$handler_item_type['form_prefix']}[{$pager['settings_key']}]";
 		}
 	}
 
@@ -49,22 +50,22 @@ function qw_all_pager_types()
  * Pager form
  * Additional settings provided by individual pager types
  *
- * @param $pager
+ * @param $handler_item_type
  * @param $options
  */
-function qw_basic_pager_form( $pager, $options )
+function qw_basic_pager_form( $handler_item_type, $options )
 {
-	$pager_types = qw_all_pager_types();
-	$pager_types = qw_pager_types_get_settings( $pager_types, $options['display'] );
+	$pager_types = qw_all_pager_types( $handler_item_type );
+	$pager_types = qw_pager_types_get_settings( $pager_types, $options );
 
 	$form = new QW_Form_Fields( array(
-		'form_field_prefix' => $pager['form_prefix'],
+		'form_field_prefix' => $handler_item_type['form_prefix'],
 	) );
 
 	print $form->render_field( array(
 		'type' => 'checkbox',
 		'name' => 'active',
-		'value' => !empty( $options['display']['pager']['active'] ),
+		'value' => !empty( $handler_item_type['values']['active'] ),
 		'title' => __( 'Use Pagination' ),
 		'class' => array( 'qw-js-title' ),
 	) );
@@ -81,7 +82,7 @@ function qw_basic_pager_form( $pager, $options )
 	print $form->render_field( array(
 		'type' => 'select',
 		'name' => 'type',
-		'value' => !empty( $options['display']['pager']['type'] ) ? $options['display']['pager']['type'] : '',
+		'value' => !empty( $handler_item_type['values']['type'] ) ? $handler_item_type['values']['type'] : '',
 		'title' => __( 'Pager Type' ),
 		'description' => __( 'Select the type of pager to use.' ),
 		'options' => $pager_types_options,
@@ -89,8 +90,9 @@ function qw_basic_pager_form( $pager, $options )
 	) );
 
 	print qw_admin_template( 'select-settings-group', array(
-		'items' => $pager_types,
-		'display' => $options['display'],
+		'handler_item_type' => $handler_item_type,
+		'settings_group_options' => $pager_types,
+		'query_data' => $options,
 	) );
 }
 
@@ -98,18 +100,18 @@ function qw_basic_pager_form( $pager, $options )
  * Gather all the settings values for all pager types
  *
  * @param $pager_types
- * @param $display
+ * @param $options
  *
  * @return mixed
  */
-function qw_pager_types_get_settings( $pager_types, $display ){
+function qw_pager_types_get_settings( $pager_types, $options ){
 	// Get the current settings values saved to this query
 	foreach( $pager_types as $hook_key => $item ){
 		if ( !empty( $item['settings_key'] ) ) {
 			$pager_types[ $hook_key ]['values'] = array();
 
-			if ( !empty( $display['pager'][ $item['settings_key'] ] ) ) {
-				$pager_types[ $hook_key ]['values'] = $display['pager'][ $item['settings_key'] ];
+			if ( !empty( $options['pager'][ $item['settings_key'] ] ) ) {
+				$pager_types[ $hook_key ]['values'] = $options['pager'][ $item['settings_key'] ];
 			}
 		}
 	}

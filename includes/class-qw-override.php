@@ -36,7 +36,7 @@ class QW_Override {
 			return;
 		}
 
-		$overrides = qw_all_overrides();
+		$overrides = qw_all_override_handler_item_types();
 
 		// Loop through all override types and let them look for their own active overrides
 		foreach ( $overrides as $override ) {

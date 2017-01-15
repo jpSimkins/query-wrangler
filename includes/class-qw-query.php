@@ -187,7 +187,11 @@ class QW_Query {
 
 			// get existing items on the query
 			$existing_items = array();
-			if ( is_callable( $handler['data_callback'] ) ) {
+			if ( !empty( $options[ $handler_type ] ) ){
+				$existing_items = $options[ $handler_type ];
+			}
+			// @todo deprecated callback
+			else if ( is_callable( $handler['data_callback'] ) ) {
 				$existing_items = call_user_func( $handler['data_callback'], $this->data );
 			}
 
@@ -215,9 +219,7 @@ class QW_Query {
 			$new_item = array_replace_recursive( $new_item, $values );
 
 			// set new item in the query args
-			if ( is_callable( $handler['set_data_callback'] ) ){
-				$this->data = call_user_func( $handler['set_data_callback'], $this->data, $new_item['name'], $new_item );
-			}
+			$this->data[ $handler['hook_key'] ][ $new_item['name'] ] = $new_item;
 		}
 
 		return $this;

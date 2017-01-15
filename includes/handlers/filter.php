@@ -16,10 +16,9 @@ function qw_handler_type_filter( $handlers )
 	$handlers['filter']   = array(
 		'title'            => __( 'Filter' ),
 		'description'      => __( 'Select filters to affect the query results.' ),
-		'all_callback'     => 'qw_all_filters',
-		'data_callback'    => 'qw_handler_type_filter_get_data',
-		'set_data_callback'=> 'qw_handler_type_filter_set_data',
-		'form_prefix'      => '[args][filters]',
+		'all_callback'     => 'qw_all_filter_handler_item_types',
+//		'data_callback'    => 'qw_handler_type_filter_get_data',
+//		'set_data_callback'=> 'qw_handler_type_filter_set_data',
 	);
 
 	return $handlers;
@@ -28,48 +27,50 @@ function qw_handler_type_filter( $handlers )
 /**
  * Get all "Filter" handler item types
  *
- * @return array
- */
-function qw_all_filters()
-{
-	$filters = apply_filters( 'qw_filters', array() );
-	$filters = qw_set_hook_keys( $filters );
-	$filters = qw_set_hook_types( $filters );
-
-	return $filters;
-}
-
-/**
- * Retrieve existing filter data from an array of query options
- *
- * @param $options
+ * @param $handler
  *
  * @return array
  */
-function qw_handler_type_filter_get_data( $options )
+function qw_all_filter_handler_item_types( $handler )
 {
-	$data = array();
+	$handler_item_types = apply_filters( 'qw_filters', array() );
+	$handler_item_types = qw_pre_process_handler_item_types( $handler_item_types, $handler );
+	$handler_item_types = qw_set_hook_types( $handler_item_types );
 
-	if ( !empty( $options['args']['filters'] ) ) {
-		$data = $options['args']['filters'];
-	}
-
-	return $data;
+	return $handler_item_types;
 }
 
-/**
- * @param $data
- * @param $key
- * @param $value
- *
- * @return array
- */
-function qw_handler_type_filter_set_data( $data, $key, $value )
-{
-	$data['args']['filters'][ $key ] = $value;
-
-	return $data;
-}
+///**
+// * Retrieve existing filter data from an array of query options
+// *
+// * @param $options
+// *
+// * @return array
+// */
+//function qw_handler_type_filter_get_data( $options )
+//{
+//	$data = array();
+//
+//	if ( !empty( $options['args']['filters'] ) ) {
+//		$data = $options['args']['filters'];
+//	}
+//
+//	return $data;
+//}
+//
+///**
+// * @param $data
+// * @param $key
+// * @param $value
+// *
+// * @return array
+// */
+//function qw_handler_type_filter_set_data( $data, $key, $value )
+//{
+//	$data['args']['filters'][ $key ] = $value;
+//
+//	return $data;
+//}
 
 /**
  * Filters require a callback for setting their values in the $args array.

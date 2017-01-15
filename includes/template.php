@@ -107,7 +107,7 @@ function qw_template_query( &$wp_query, $options ) {
 		'classes' => array(
 			'query',
 			"query-{$options['meta']['slug']}-wrapper",
-			$options['display']['wrapper-classes'],
+			$options['basic']['wrapper_classes']['wrapper_classes'],
 		),
 	);
 
