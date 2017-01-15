@@ -27,13 +27,6 @@ $form = new QW_Form_Fields( array(
 
 	print $form->render_field( array(
 			'type'  => 'hidden',
-			'name'  => 'type',
-			'value' => $filter['type'],
-			'class' => array( 'qw-field-type' ),
-	) );
-
-	print $form->render_field( array(
-			'type'  => 'hidden',
 			'name'  => 'hook_key',
 			'value' => $filter['hook_key'],
 			'class' => array( 'qw-field-hook_key' ),

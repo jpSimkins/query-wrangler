@@ -39,7 +39,6 @@ define( 'QW_FORM_PREFIX', 'qw-query-options' );
 
 class Query_Wrangler {
 
-	private $handlers;
 	private $settings;
 
 	/**
@@ -194,8 +193,6 @@ class Query_Wrangler {
 
 		QW_Override::register();
 		QW_Shortcodes::register( $this->settings );
-
-		$this->handlers = QW_Handler_Manager::get_instance();
 	}
 
 	/**
@@ -206,11 +203,13 @@ class Query_Wrangler {
 		include_once QW_PLUGIN_DIR . '/admin/ajax.php';
 
 		QW_Admin_Pages::register( $this->settings, $wpdb );
-
 	}
 
-	// QW_Admin_Pages
-	// class-qw-admin-pages.php
+	/**
+	 * Autoload internal classes
+	 *
+	 * @param $class
+	 */
 	function autoload($class) {
 		$dirs = array(
 			QW_PLUGIN_DIR . '/includes/',

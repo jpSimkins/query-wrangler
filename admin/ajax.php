@@ -16,25 +16,25 @@ function qw_form_ajax() {
 	if ( isset( $_POST['hook_key'], $_POST['handler'], $_POST['name'] ) ){
 		// buffer the whole process in case of php warnings/notices
 		ob_start();
-		$qw_handlers = QW_Handler_Manager::get_instance();
+		$manager = new QW_Handler_Manager();
 
 		$handler_type = $_POST['handler'];
 		$name         = $_POST['name'];
 		$hook_key     = $_POST['hook_key'];
 		$weight       = !empty( $_POST['next_weight'] ) ? $_POST['next_weight'] : 0;
 
-		$handler = $qw_handlers->all_handlers[ $handler_type ];
-		$template = 'handler-' . $handler_type;
+		$handler = $manager->get_handler( $handler_type );
 
 		// prepare and item and preprocess it
 		$item = $handler['all_items'][ $hook_key ];
 		$item['name']   = $name;
 		$item['weight'] = $weight;
 
-		$items = $qw_handlers->preprocess_handler_items( $handler_type, array( $name => $item ) );
+		$existing_items = array( $name => $item );
+		$items = $handler->process_handler_item_instance_forms( $existing_items, array() );
 		$item  = $items[ $name ];
 
-		print qw_admin_template( $template,  array( $handler_type => $item ) );
+		print qw_admin_template( 'handler-' . $handler_type,  array( $handler_type => $item ) );
 
 		wp_send_json( array(
 			'template' => ob_get_clean(),
@@ -74,14 +74,14 @@ function qw_edit_query_json( $query_id = NULL )
 		return json_encode( array() );
 	}
 
-	$handlers = qw_all_handlers();
+	$manager = new QW_Handler_Manager();
 
 	$data = array(
 		'query'          => $qw_query->row,
-		'allFields'      => $handlers['field']['all_items'],
-		'allFilters'     => $handlers['filter']['all_items'],
-		'allOverrides'   => $handlers['override']['all_items'],
-		'allSortOptions' => $handlers['sort']['all_items'],
+		'allFields'      => $manager->get_handler('field')->handler_item_types(),
+		'allFilters'     => $manager->get_handler('filter')->handler_item_types(),
+		'allOverrides'   => $manager->get_handler('override')->handler_item_types(),
+		'allSortOptions' => $manager->get_handler('sort')->handler_item_types(),
 	);
 
 	return json_encode( $data );

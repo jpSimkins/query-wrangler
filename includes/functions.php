@@ -7,59 +7,11 @@
  *
  * @return mixed|void
  */
-function qw_get_query_handlers( $options ){
-	$handlers = QW_Handler_Manager::get_instance();
-
-	return $handlers->get_query_handlers( $options );
-}
-
-/**
- * All Handlers
- *
- * Handlers are groups of items that can be added and removed from a query
- * eg: filters, sorts, fields
- *
- * @return array
- */
-function qw_all_handlers()
+function qw_get_query_handlers( $options )
 {
-	$handlers = apply_filters( 'qw_handlers', array() );
-	$handlers = qw_pre_process_handler_types( $handlers );
+	$manager = new QW_Handler_Manager();
 
-	return $handlers;
-}
-
-function qw_pre_process_handler_types( $handlers )
-{
-	foreach ( $handlers as $hook_key => $handler ) {
-		$handler['hook_key'] = $hook_key;
-		$handler['form_prefix'] = QW_FORM_PREFIX . "[{$hook_key}]" ;
-		$handler['all_items'] = call_user_func( $handler['all_callback'], $handler );
-
-		$handlers[ $hook_key ] = $handler;
-	}
-
-	return $handlers;
-}
-
-/**
- * Simple helper functions for very common task of recording an item's original
- * unique index.
- *
- * @param $item_types
- * @param $handler
- *
- * @return mixed
- */
-function qw_pre_process_handler_item_types( $item_types, $handler )
-{
-	foreach( $item_types as $hook_key => $item ){
-		$item['hook_key'] = $hook_key;
-		$item['form_prefix'] = "{$handler['form_prefix']}[{$hook_key}]";
-
-		$item_types[ $hook_key ] = $item;
-	}
-	return $item_types;
+	return $manager->get_handler_item_instances( $options );
 }
 
 /**
@@ -184,7 +136,9 @@ function qw_unserialize( $serial_str ) {
  * @return int
  */
 function qw_cmp( $a, $b ) {
-	if ( $a['weight'] == $b['weight'] ) {
+	if ( empty( $a['weight'] ) || empty( $b['weight'] ) ||
+	     $a['weight'] == $b['weight'] )
+	{
 		return 0;
 	}
 

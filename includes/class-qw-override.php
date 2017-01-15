@@ -36,11 +36,14 @@ class QW_Override {
 			return;
 		}
 
-		$overrides = qw_all_override_handler_item_types();
+		$manager = new QW_Handler_Manager();
 
 		// Loop through all override types and let them look for their own active overrides
-		foreach ( $overrides as $override ) {
-			if ( isset( $override['get_query_callback'] ) && is_callable( $override['get_query_callback'] ) ) {
+		foreach ( $manager->get_handler('override')->handler_item_types() as $override )
+		{
+			if ( isset( $override['get_query_callback'] ) &&
+			     is_callable( $override['get_query_callback'] ) )
+			{
 
 				// override get_query_callbacks should return a QW_Query object
 				$qw_query = call_user_func( $override['get_query_callback'], $wp_query );

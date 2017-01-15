@@ -30,8 +30,10 @@ function qw_row_style_fields( $row_styles )
  */
 function qw_row_style_fields_settings( $row_style, $options, $handler_item_type )
 {
+	$manager = new QW_Handler_Manager();
+	$all_fields = $manager->get_handler('field')->handler_item_types();
+
 	$query_fields = !empty( $options['field'] ) ? $options['field'] : array();
-	$all_fields   = qw_all_field_handler_item_types();
 
 	$group_by_options = array(
 		'__none__' => __( '- None -' ),
@@ -74,7 +76,8 @@ function qw_row_style_fields_settings( $row_style, $options, $handler_item_type 
  */
 function qw_row_style_fields_make_rows( $wp_query, $options )
 {
-	$all_fields      = qw_all_field_handler_item_types();
+	$manager = new QW_Handler_Manager();
+	$all_fields = $manager->get_handler('field')->handler_item_types();
 	$groups          = array();
 	$tokens          = array();
 	$current_post_id = get_the_ID();

@@ -11,27 +11,14 @@ add_filter( 'qw_handlers','qw_handler_type_sort' );
  */
 function qw_handler_type_sort( $handlers )
 {
-	$handlers['sort']     = array(
-		'title'            => __( 'Sort Option' ),
-		'description'      => __( 'Select options for sorting the query results.' ),
-		'all_callback'     => 'qw_all_sort_handler_item_types',
+	$handler = new QW_Handler_Type(
+		'sort',
+		__( 'Sort' ),
+		__( 'Select options for sorting the query results.' ),
+		'qw_sort_options'
 	);
 
+	$handlers[ $handler->hook_key ] = $handler;
+
 	return $handlers;
-}
-
-/**
- * Get all "Sort" (Order) handler item types
- *
- * @param $handler
- *
- * @return array
- */
-function qw_all_sort_handler_item_types( $handler )
-{
-	$handler_item_types = apply_filters( 'qw_sort_options', array() );
-	$handler_item_types = qw_pre_process_handler_item_types( $handler_item_types, $handler );
-	$handler_item_types = qw_set_hook_types( $handler_item_types );
-
-	return $handler_item_types;
 }

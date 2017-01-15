@@ -88,6 +88,7 @@ class QW_Query {
 	 * -- Should be executed before process_options()
 	 *
 	 * @param $options_override
+	 * @param bool $full_override
 	 *
 	 * @return $this
 	 */
@@ -202,7 +203,7 @@ class QW_Query {
 			foreach ( $existing_items as $name => $existing_item ) {
 				$weight += 1;
 
-				if ( $existing_item['type'] == $handler_item['type'] ) {
+				if ( $existing_item['hook_key'] == $handler_item['hook_key'] ) {
 					$instances += 1;
 				}
 			}
@@ -210,9 +211,8 @@ class QW_Query {
 			// create our new item
 			$new_item = array(
 				'hook_key' => $handler_item['hook_key'],
-				'type'     => $handler_item['type'],
-				'name'     => ( $instances > 0 ) ? $handler_item['type'] . '_' . $instances : $handler_item['type'],
 				'weight'   => $weight,
+				'name'     => ( $instances > 0 ) ? $handler_item['hook_key'] . '_' . $instances : $handler_item['hook_key'],
 			);
 
 			// merge in values

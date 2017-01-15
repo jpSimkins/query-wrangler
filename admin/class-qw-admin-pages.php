@@ -202,7 +202,7 @@ class QW_Admin_Pages {
 			switch ( $action ) {
 				case 'update':
 					if ( $query_id && !empty( $_POST[ QW_FORM_PREFIX ] ) ){
-						$this->update_query( $query_id, $_POST[ QW_FORM_PREFIX ] );
+						$this->edit_page_save( $query_id, $_POST[ QW_FORM_PREFIX ] );
 						$this->redirect( 'query-wrangler.edit', $query_id );
 					}
 					break;
@@ -260,14 +260,10 @@ class QW_Admin_Pages {
 
 		$this->wpdb->delete( $this->db_table, array( 'id' => absint( $query_id ) ) );
 
-		/**
+		/*
 		 * Hook `qw_delete_query` allows for additional operations on delete
 		 */
 		do_action( 'qw_delete_query', $query_id );
-
-		// @todo - move this somewhere that subscribes to the action
-		$table = $this->wpdb->prefix . "query_override_terms";
-		$this->wpdb->delete( $table, array( 'query_id' => $query_id ) );
 	}
 
 	/**
@@ -369,7 +365,7 @@ class QW_Admin_Pages {
 
 		// unserialize the stored data
 		$row['data'] = qw_unserialize( $row['data'] );
-		$row['data'] = $this->escape_export( $row['data'] );
+		$row['data'] = $this->export_escape_data( $row['data'] );
 		$export = wp_json_encode( $row, JSON_PRETTY_PRINT );
 
 		return $export;
@@ -382,7 +378,7 @@ class QW_Admin_Pages {
 	 *
 	 * @return mixed
 	 */
-	function escape_export( $data ){
+	function export_escape_data( $data ){
 		if ( isset( $data['display']['field_settings']['fields'] ) ) {
 			$fields = &$data['display']['field_settings']['fields'];
 
@@ -423,7 +419,7 @@ class QW_Admin_Pages {
 		if ( !empty( $import['query'] ) ){
 			$import['query'] = stripslashes( $import['query'] );
 			$query = json_decode( $import['query'], TRUE );
-			$query['data'] = $this->decode_import( $query['data'] );
+			$query['data'] = $this->import_decode( $query['data'] );
 
 		}
 
@@ -445,7 +441,7 @@ class QW_Admin_Pages {
 	 *
 	 * @return mixed
 	 */
-	function decode_import( $data ){
+	function import_decode( $data ){
 		if ( isset( $data['display']['field_settings']['fields'] ) ) {
 			$fields = &$data['display']['field_settings']['fields'];
 
@@ -468,50 +464,23 @@ class QW_Admin_Pages {
 		$qw_query = qw_get_query( $query_id );
 		if ( !$qw_query ) return;
 
-		$args = $this->edit_page_args( $qw_query );
-		$args['live_preview'] = $this->settings->get('live_preview');
-
-		print qw_admin_template( 'page-query-edit', $args );
-	}
-
-	/**
-	 * Edit - Arguments
-	 *
-	 * @param $qw_query
-	 *
-	 * @return array
-	 */
-	function edit_page_args( $qw_query ) {
-		$options = $qw_query->row->data;
-		//$display = isset( $options['display'] ) ? array_map( 'stripslashes_deep', $options['display'] ) : array();
-
-		// preprocess existing handlers
-		$handlers = qw_get_query_handlers( $options );
-		$handlers = $this->make_handler_wrapper_forms( $handlers );
-d($handlers);
-d($options);
-//		$basics = qw_all_basic_settings();
-//		$basics = $this->make_basics_wrapper_forms( $basics, $options );
+		$manager = new QW_Handler_Manager();
+		$handler_item_instances = $manager->get_handler_item_instances( $qw_query->row->data );
+		$handler_item_instances = $this->make_handler_item_instance_wrapper_forms( $handler_item_instances );
 
 		// start building edit page data
-		$editor_args = array(
-			'form_action'         => admin_url( "admin.php?page=query-wrangler.actions&action=update&query_id={$qw_query->id}&noheader=true" ),
-
-			'query_id'            => $qw_query->id,
-			'query_slug'          => $qw_query->slug,
-			'query_name'          => $qw_query->name,
-			'query_type'          => $qw_query->type,
-			'shortcode'           => $this->settings->get('shortcode_compat') ? 'qw_query' : 'query',
-			'options'             => $options,
-			//'args'                => $options['args'],
-			//'display'             => $display,
-			//'basics'              => $basics,
-			'handlers'            => $handlers,
+		$args = array(
+			'form_action' => admin_url( "admin.php?page=query-wrangler.actions&action=update&query_id={$qw_query->id}&noheader=true" ),
+			'qw_query' => $qw_query,
+			'shortcode' => $this->settings->get('shortcode_compat') ? 'qw_query' : 'query',
+			'live_preview' => $this->settings->get('live_preview'),
+			'handler_manager' => $manager,
+			'handler_item_instances' => $handler_item_instances,
 		);
 
-		$editor_args = apply_filters( 'qw_edit_page_args', $editor_args );
+		$args = apply_filters( 'qw_edit_page_args', $args );
 
-		return $editor_args;
+		print qw_admin_template( 'page-query-edit', $args );
 	}
 
 	/**
@@ -520,7 +489,7 @@ d($options);
 	 * @param $query_id
 	 * @param $options
 	 */
-	function update_query( $query_id, $options ) {
+	function edit_page_save( $query_id, $options ) {
 		$qw_query = qw_get_query( $query_id );
 		if ( ! $qw_query ){
 			return;
@@ -536,98 +505,7 @@ d($options);
 			'data' => qw_serialize( $options )
 		);
 
-		// update for pages
-		if ( $qw_query->type == 'page' ) {
-			$data['path'] = !empty( $options['display']['page']['path'] ) ? ltrim( $options['display']['page']['path'], '/' ) : '';
-		}
-
 		$this->wpdb->update( $this->db_table, $data, array( 'id' => $query_id ) );
-	}
-
-	/**
-	 *
-	 *
-	 * @param $handlers
-	 * @return mixed
-	 */
-	function make_handler_wrapper_forms( $handlers ){
-		$tokens = array();
-
-		foreach( $handlers as $handler_type => $handler ){
-			if ( empty( $handler['items'] ) ) {
-				continue;
-			}
-
-			foreach( $handler['items'] as $k => $item ){
-				$args = array(
-					$handler_type => $item,
-				);
-
-				// fields need token
-				if ( $handler_type == 'field' ){
-					$tokens[ $item['name'] ] = '{{' . $item['name'] . '}}';
-					$args += array(
-						'tokens' => $tokens,
-					);
-				}
-
-				$handlers[ $handler_type ]['items'][ $k ]['wrapper_form'] = qw_admin_template( 'handler-'.$handler_type, $args );
-			}
-		}
-
-		return $handlers;
-	}
-
-	/**
-	 * Prepare all the 'basic' forms
-	 *
-	 * @param $basics
-	 * @param $options
-	 * @return mixed
-	 */
-	function make_basics_wrapper_forms( $basics, $options ){
-		foreach( $basics as $basic_key => $basic ) {
-			ob_start();
-			if ( !empty( $basic['form_fields'] ) ) {
-
-				$form = new QW_Form_Fields( array(
-					'form_field_prefix' => $basic['form_prefix'],
-				) );
-
-				foreach( $basic['form_fields'] as $field_key => $field ){
-					$default_value = !empty( $field['default_value'] ) ? $field['default_value'] : '';
-
-					// build the field name for our array_query
-					$field_name = 'display';
-					if ( !empty( $field['name_prefix'] ) ){
-						$field_name.= $field['name_prefix'];
-					}
-					$field_name.= '['.$field['name'].']';
-
-					// look for existing values
-					$field['value'] = $form->get_field_value_from_data( $field_name, $options );
-					if ( is_null( $field['value'] ) ){
-						$field['value'] = $default_value;
-					}
-
-					// for single field basics, the field should inherit the
-					// item's description
-					if ( count( $basic['form_fields'] ) === 1){
-						$field['description'] = $basic['description'];
-					}
-
-					// render the field
-					print $form->render_field( $field );
-				}
-
-			}
-			else if ( isset( $basic['form_callback'] ) && is_callable( $basic['form_callback'] ) ) {
-				call_user_func( $basic['form_callback'], $basic, $options['display'] );
-			}
-			$basics[ $basic_key ]['wrapper_form'] = ob_get_clean();
-		}
-
-		return $basics;
 	}
 
 	/**
@@ -662,5 +540,42 @@ d($options);
 
 		wp_redirect( $url );
 		exit();
+	}
+
+	/**
+	 * Render the forms for a query's handler item instances
+	 *
+	 * @todo - room for improvement
+	 *
+	 * @param $handler_item_instances
+	 *
+	 * @return mixed
+	 */
+	function make_handler_item_instance_wrapper_forms( $handler_item_instances ){
+		$tokens = array();
+
+		foreach( $handler_item_instances as $handler_type => $handler ){
+			if ( empty( $handler['items'] ) ) {
+				continue;
+			}
+
+			foreach( $handler['items'] as $k => $item )
+			{
+				// @todo - not all handler types need or can use tokens.
+				// maybe find a good way to limit by the ones that need it
+				$tokens[ $item['name'] ] = '{{' . $item['name'] . '}}';
+
+				$args = array(
+					$handler_type => $item,
+					'tokens' => $tokens,
+				);
+
+				$item['wrapper_form'] = qw_admin_template( 'handler-'.$handler_type, $args );
+
+				$handler_item_instances[ $handler_type ]['items'][ $k ] = $item;
+			}
+		}
+
+		return $handler_item_instances;
 	}
 }
