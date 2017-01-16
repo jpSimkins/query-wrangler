@@ -23,7 +23,7 @@ function qw_form_ajax() {
 		$hook_key     = $_POST['hook_key'];
 		$weight       = !empty( $_POST['next_weight'] ) ? $_POST['next_weight'] : 0;
 
-		$handler = $manager->get_handler( $handler_type );
+		$handler = $manager->get( $handler_type );
 
 		// prepare and item and preprocess it
 		$item = $handler['all_items'][ $hook_key ];
@@ -78,10 +78,10 @@ function qw_edit_query_json( $query_id = NULL )
 
 	$data = array(
 		'query'          => $qw_query->row,
-		'allFields'      => $manager->get_handler('field')->handler_item_types(),
-		'allFilters'     => $manager->get_handler('filter')->handler_item_types(),
-		'allOverrides'   => $manager->get_handler('override')->handler_item_types(),
-		'allSortOptions' => $manager->get_handler('sort')->handler_item_types(),
+		'allFields'      => $manager->get('field')->handler_item_types(),
+		'allFilters'     => $manager->get('filter')->handler_item_types(),
+		'allOverrides'   => $manager->get('override')->handler_item_types(),
+		'allSortOptions' => $manager->get('sort')->handler_item_types(),
 	);
 
 	return json_encode( $data );

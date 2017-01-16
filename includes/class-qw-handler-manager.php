@@ -37,11 +37,13 @@ class QW_Handler_Manager {
 	 *
 	 * @return QW_Handler_Type
 	 */
-	function get_handler( $handler_type_hook_key )
+	function get( $handler_type_hook_key )
 	{
 		if ( !empty( $this->handlers[ $handler_type_hook_key ] ) ) {
 			return $this->handlers[ $handler_type_hook_key ];
 		}
+
+		return NULL;
 	}
 
 	/**

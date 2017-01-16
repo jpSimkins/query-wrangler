@@ -39,7 +39,7 @@ class QW_Override {
 		$manager = new QW_Handler_Manager();
 
 		// Loop through all override types and let them look for their own active overrides
-		foreach ( $manager->get_handler('override')->handler_item_types() as $override )
+		foreach ( $manager->get('override')->handler_item_types() as $override )
 		{
 			if ( isset( $override['get_query_callback'] ) &&
 			     is_callable( $override['get_query_callback'] ) )
